@@ -15,8 +15,7 @@ export const store = configureStore({
     userSlice: userSlice,
     order: orderReducer,
     commission: commissionReducer,
-    language: languageReducer,
-    notifications: notificationReducer, // ✅ YENİ
+    language: languageReducer, // ✅ YENİ
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat([productApi.middleware, authApi.middleware]),
