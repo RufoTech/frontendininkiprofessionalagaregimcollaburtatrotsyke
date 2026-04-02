@@ -3,14 +3,19 @@ import { setIsAuthenticated, setUser, logout } from "../features/userSlice.js";
 
 export const authApi = createApi({
     reducerPath: "authApi",
-    baseQuery: fetchBaseQuery({ baseUrl: "https://agminciqqaraminciq-production.up.railway.app/commerce/mehsullar", credentials: "include" }),
+    baseQuery: fetchBaseQuery({ baseUrl: "/commerce/mehsullar", credentials: "include" }),
     endpoints: (builder) => ({
 
         // ── Qeydiyyat ──
+        // Register sonrası da login kimi işləyir:
+        //   sendToken cookie yazır + sellerInfo cavabda olur
+        //   onQueryStarted dispatch(setUser({ user: data.user })) edir
+        //   data.user = { id, name, email, role, sellerStatus, sellerInfo }
+        //   { user: data.user } wrapping — Navbar user?.user?.role oxuyur
         register: builder.mutation({
             query(body) {
                 return {
-                    url: "register",
+                    url: "/register",
                     method: "POST",
                     body,
                 };
@@ -18,19 +23,27 @@ export const authApi = createApi({
             async onQueryStarted(args, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled;
-                    // data = { success, token, user: { name, email, role, sellerInfo... } }
-                    // Navbar user?.user?.role oxuyur — ona görə { user: data.user } formatı
-                    dispatch(setUser({ user: data.user }));
-                    dispatch(setIsAuthenticated(true));
-                } catch (err) {}
+                    // data.user mövcuddursa dispatch et
+                    // data.user yoxdursa (xəta cavabı) dispatch etmə
+                    if (data?.user) {
+                        // { user: data.user } — Redux-da user.user.role formatı üçün
+                        dispatch(setUser({ user: data.user }));
+                        dispatch(setIsAuthenticated(true));
+                    }
+                } catch (err) {
+                    // Xəta baş verdisə heç nə etmə — Register.jsx toast göstərir
+                }
             },
         }),
 
         // ── Giriş ──
+        // Login cavabı: { success, token, user: { id, name, email, role, sellerStatus, sellerInfo } }
+        // sendToken-da sellerInfo əlavə edildiyindən admin login-də
+        // AdminProducts, AddProduct düzgün işləyir
         login: builder.mutation({
             query(body) {
                 return {
-                    url: "login",
+                    url: "/login",
                     method: "POST",
                     body,
                 };
@@ -38,23 +51,27 @@ export const authApi = createApi({
             async onQueryStarted(args, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled;
-                    // data = { success, token, user: { name, email, role, sellerInfo... } }
-                    // Navbar user?.user?.role oxuyur — ona görə { user: data.user } formatı
-                    dispatch(setUser({ user: data.user }));
-                    dispatch(setIsAuthenticated(true));
-                } catch (err) {}
+                    // data.user mövcuddursa dispatch et
+                    if (data?.user) {
+                        // { user: data.user } — Redux-da user.user.role formatı üçün
+                        dispatch(setUser({ user: data.user }));
+                        dispatch(setIsAuthenticated(true));
+                    }
+                } catch (err) {
+                    // Xəta baş verdisə heç nə etmə — Login.jsx toast göstərir
+                }
             },
         }),
 
         // ── Çıxış ──
         logout: builder.query({
-            query: () => "logout",
+            query: () => "/logout",
         }),
 
         // ── Şifrəni sıfırla ──
         resetPassword: builder.mutation({
             query: ({ token, password, confirmPassword }) => ({
-                url: `password/reset/${token}`,
+                url: `/password/reset/${token}`,
                 method: "PUT",
                 body: { password, confirmPassword },
             }),
@@ -65,7 +82,7 @@ export const authApi = createApi({
             query: (body) => {
                 console.log("Sending forgot password request", body);
                 return {
-                    url: "password/forgot",
+                    url: "/password/forgot",
                     method: "POST",
                     body,
                 };
@@ -84,7 +101,7 @@ export const authApi = createApi({
         // ── MAĞAZA PROFİLİ — slug ilə ──
         // ════════════════════════════════════════════════════
         getStoreBySlug: builder.query({
-            query: (slug) => `store/${slug}`,
+            query: (slug) => `/store/${slug}`,
         }),
 
     }),

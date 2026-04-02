@@ -2,8 +2,11 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const productApi = createApi({
   reducerPath: "productApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "https://agminciqqaraminciq-production.up.railway.app/commerce/mehsullar", credentials: "include" }),
-  tagTypes: ['Cart', 'Favorites', 'Products', 'Reviews'],
+  baseQuery: fetchBaseQuery({
+    baseUrl: "/commerce/mehsullar",
+    credentials: "include", // ✅ düzgün yer - fetchBaseQuery içində
+  }),
+  tagTypes: ["Cart", "Favorites", "Products", "Reviews"],
   endpoints: (builder) => ({
 
     getProducts: builder.query({
@@ -19,7 +22,7 @@ export const productApi = createApi({
         url: "/admin/products",
         method: "POST",
         body: productData,
-            credentials: 'include',  // ✅ bunu əlavə et
+        // ❌ credentials buradan silindi - artıq baseQuery-dən gəlir
       }),
     }),
 
@@ -40,36 +43,36 @@ export const productApi = createApi({
 
     getCart: builder.query({
       query: () => "/products/cart",
-      providesTags: ['Cart'],
+      providesTags: ["Cart"],
     }),
 
     addToCart: builder.mutation({
       query: ({ productId, quantity }) => ({
-        url: '/products/cart',
-        method: 'POST',
+        url: "/products/cart",
+        method: "POST",
         body: { productId, quantity },
-        credentials: 'include',
+        // ❌ credentials buradan silindi
       }),
-      invalidatesTags: ['Cart'],
+      invalidatesTags: ["Cart"],
     }),
 
     updateCartQuantity: builder.mutation({
       query: ({ productId, quantity }) => ({
         url: `/products/cart/update/${productId}`,
-        method: 'PUT',
+        method: "PUT",
         body: { quantity },
-        credentials: 'include',
+        // ❌ credentials buradan silindi
       }),
-      invalidatesTags: ['Cart'],
+      invalidatesTags: ["Cart"],
     }),
 
     removeFromCart: builder.mutation({
       query: (productId) => ({
         url: `/products/cart/${productId}`,
-        method: 'DELETE',
-        credentials: 'include',
+        method: "DELETE",
+        // ❌ credentials buradan silindi
       }),
-      invalidatesTags: ['Cart'],
+      invalidatesTags: ["Cart"],
     }),
 
     getFavorites: builder.query({
@@ -85,7 +88,7 @@ export const productApi = createApi({
         url: "/products/favorites",
         method: "POST",
         body: { productId },
-        credentials: "include",
+        // ❌ credentials buradan silindi
       }),
       invalidatesTags: ["Favorites"],
     }),
@@ -94,19 +97,21 @@ export const productApi = createApi({
       query: (productId) => ({
         url: `/products/favorites/${productId}`,
         method: "DELETE",
-        credentials: "include",
+        // ❌ credentials buradan silindi
       }),
       invalidatesTags: ["Favorites"],
       async onQueryStarted(productId, { dispatch, queryFulfilled }) {
         try {
-          await queryFulfilled
+          await queryFulfilled;
           dispatch(
             productApi.util.updateQueryData("getFavorites", undefined, (draft) => {
-              draft.favorites = draft.favorites.filter((favorite) => favorite._id !== productId)
-            }),
-          )
+              draft.favorites = draft.favorites.filter(
+                (favorite) => favorite._id !== productId
+              );
+            })
+          );
         } catch {
-          // If the mutation fails, we don't need to do anything
+          // Mutation uğursuz olarsa heç nə etməyə ehtiyac yoxdur
         }
       },
     }),
@@ -124,6 +129,7 @@ export const productApi = createApi({
         params: { query, page, limit },
       }),
     }),
+
     createOrUpdateReview: builder.mutation({
       query: (reviewData) => ({
         url: "/products/review",
@@ -132,15 +138,29 @@ export const productApi = createApi({
       }),
       invalidatesTags: ["Products"],
     }),
-        getProductReviews: builder.query({
-          query: (id) => `/products/${id}/reviews`,
-          providesTags: ["Reviews"],
-        }),
+
+    getProductReviews: builder.query({
+      query: (id) => `/products/${id}/reviews`,
+      providesTags: ["Reviews"],
+    }),
   }),
 });
 
-
-
-
-
-export const { useGetProductDetailsQuery, useGetProductsQuery, useAddProductMutation, useDeleteProductMutation, useEditProductMutation, useGetCartQuery, useAddToCartMutation, useRemoveFromCartMutation, useUpdateCartQuantityMutation, useGetFavoritesQuery, useAddToFavoritesMutation, useRemoveFromFavoritesMutation , useSearchProductsQuery, useGetFilteredProductsQuery, useCreateOrUpdateReviewMutation, useGetProductReviewsQuery } = productApi;
+export const {
+  useGetProductDetailsQuery,
+  useGetProductsQuery,
+  useAddProductMutation,
+  useDeleteProductMutation,
+  useEditProductMutation,
+  useGetCartQuery,
+  useAddToCartMutation,
+  useRemoveFromCartMutation,
+  useUpdateCartQuantityMutation,
+  useGetFavoritesQuery,
+  useAddToFavoritesMutation,
+  useRemoveFromFavoritesMutation,
+  useSearchProductsQuery,
+  useGetFilteredProductsQuery,
+  useCreateOrUpdateReviewMutation,
+  useGetProductReviewsQuery,
+} = productApi;

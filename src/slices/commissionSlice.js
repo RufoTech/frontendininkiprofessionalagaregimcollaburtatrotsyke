@@ -1,6 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as api from "./commissionApi";
 
+// ════════════════════════════════════════════════════════════════════════════
+//  ASYNC THUNK-LAR
+// ════════════════════════════════════════════════════════════════════════════
+
+// ── SATICI BALANSI ─────────────────────────────────────────────────────────
 export const getSellerBalance = createAsyncThunk(
   "commission/getBalance",
   async (sellerId, { rejectWithValue }) => {
@@ -13,6 +18,7 @@ export const getSellerBalance = createAsyncThunk(
   }
 );
 
+// ── AYLIK HESABAT ──────────────────────────────────────────────────────────
 export const getMonthlyCommission = createAsyncThunk(
   "commission/getMonthly",
   async ({ sellerId, month, year }, { rejectWithValue }) => {
@@ -25,18 +31,7 @@ export const getMonthlyCommission = createAsyncThunk(
   }
 );
 
-export const doTransferCommission = createAsyncThunk(
-  "commission/transfer",
-  async (payload, { rejectWithValue }) => {
-    try {
-      const { data } = await api.transferCommission(payload);
-      return data;
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Xəta baş verdi");
-    }
-  }
-);
-
+// ── BALANSİ ÇƏK ───────────────────────────────────────────────────────────
 export const doWithdrawBalance = createAsyncThunk(
   "commission/withdraw",
   async (payload, { rejectWithValue }) => {
@@ -49,67 +44,72 @@ export const doWithdrawBalance = createAsyncThunk(
   }
 );
 
+// ── QEYD: doTransferCommission ÇIXARILDI ──────────────────────────────────
+// PashaPay pulu sifariş anında özü bölür (87/10/3).
+// Frontend-dən heç bir "köçürmə" əməliyyatı başlatmaq lazım deyil.
+// Backend PashaPay webhook-larını alıb Redux store-un bilmədiyi
+// şəkildə avtomatik işləyir — satıcı balansı səhifəni yeniləyəndə
+// (və ya polling ilə) yenilənmiş halda görünür.
+
+
+// ════════════════════════════════════════════════════════════════════════════
+//  SLICE
+// ════════════════════════════════════════════════════════════════════════════
 const commissionSlice = createSlice({
   name: "commission",
   initialState: {
-    balance: null,
-    monthly: null,
-    transferResult: null,
+    balance:        null,   // { availableBalance, pendingEarning, totalEarned,
+                            //   totalWithdrawn, totalOrderAmount }
+    monthly:        null,   // { totalOrderAmount, totalSellerEarning,
+                            //   settledSellerEarning, pendingSellerEarning, ... }
     withdrawResult: null,
-    loading: false,
-    error: null,
+    loading:        false,
+    error:          null,
   },
   reducers: {
     clearCommissionState: (state) => {
-      state.error = null;
-      state.transferResult = null;
+      state.error          = null;
       state.withdrawResult = null;
     },
   },
   extraReducers: (builder) => {
-    const pending  = (state) => { state.loading = true; state.error = null; };
-    const rejected = (state, action) => { state.loading = false; state.error = action.payload; };
+    const setPending  = (state)         => { state.loading = true;  state.error = null; };
+    const setRejected = (state, action) => { state.loading = false; state.error = action.payload; };
 
     builder
-      .addCase(getSellerBalance.pending, pending)
+      // ── getSellerBalance ────────────────────────────────────────────
+      .addCase(getSellerBalance.pending,   setPending)
       .addCase(getSellerBalance.fulfilled, (state, action) => {
         state.loading = false;
         state.balance = action.payload;
       })
-      .addCase(getSellerBalance.rejected, rejected)
+      .addCase(getSellerBalance.rejected,  setRejected)
 
-      .addCase(getMonthlyCommission.pending, pending)
+      // ── getMonthlyCommission ────────────────────────────────────────
+      .addCase(getMonthlyCommission.pending,   setPending)
       .addCase(getMonthlyCommission.fulfilled, (state, action) => {
         state.loading = false;
         state.monthly = action.payload;
       })
-      .addCase(getMonthlyCommission.rejected, rejected)
+      .addCase(getMonthlyCommission.rejected,  setRejected)
 
-      .addCase(doTransferCommission.pending, pending)
-      .addCase(doTransferCommission.fulfilled, (state, action) => {
-        state.loading = false;
-        state.transferResult = action.payload;
-        if (action.payload?.success && state.balance) {
-          state.balance.pendingCommission = Math.max(
-            0,
-            (state.balance.pendingCommission || 0) - (action.payload.totalCommission || 0)
-          );
-          state.balance.totalCommissionPaid =
-            (state.balance.totalCommissionPaid || 0) + (action.payload.totalCommission || 0);
-        }
-      })
-      .addCase(doTransferCommission.rejected, rejected)
-
-      .addCase(doWithdrawBalance.pending, pending)
+      // ── doWithdrawBalance ───────────────────────────────────────────
+      // Uğurlu çəkiş sonra Redux store-dakı balansı dərhal yeniləyirik.
+      // API-yə yenidən sorğu göndərmədən UI-ı aktual saxlamaq üçün.
+      .addCase(doWithdrawBalance.pending,   setPending)
       .addCase(doWithdrawBalance.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loading        = false;
         state.withdrawResult = action.payload;
+
         if (action.payload?.success && state.balance) {
+          // Serverden gelen remainingBalance-i götür — daha etibarlı
           state.balance.availableBalance =
             action.payload.remainingBalance ?? state.balance.availableBalance;
+          // totalWithdrawn-ı optimistik yenilə
+          // (dəqiq dəyər üçün getSellerBalance yenidən çağırıla bilər)
         }
       })
-      .addCase(doWithdrawBalance.rejected, rejected);
+      .addCase(doWithdrawBalance.rejected,  setRejected);
   },
 });
 

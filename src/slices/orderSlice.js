@@ -3,7 +3,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const BASE_URL = "https://agminciqqaraminciq-production.up.railway.app/commerce/mehsullar";
+const BASE_URL = "http://localhost:3010/commerce/mehsullar";
 
 
 // ===================== SİFARİŞ YARAT =====================
@@ -74,7 +74,6 @@ export const updateOrderStatus = createAsyncThunk(
                 { status },
                 { withCredentials: true }
             );
-            // orderId-ni də qaytarırıq ki, slice-da tapaq
             return { ...response.data, orderId };
         } catch (error) {
             return thunkAPI.rejectWithValue(
@@ -89,11 +88,11 @@ export const updateOrderStatus = createAsyncThunk(
 const orderSlice = createSlice({
     name: "order",
     initialState: {
-        loading:        false,
-        myOrders:       [],   // İstifadəçinin öz sifarişləri
-        adminOrders:    [],   // Admin mağazasının sifarişləri
-        currentOrder:   null,
-        error:          null,
+        loading:      false,
+        myOrders:     [],
+        adminOrders:  [],
+        currentOrder: null,
+        error:        null,
     },
     reducers: {
         clearOrderError: (state) => {
@@ -114,7 +113,6 @@ const orderSlice = createSlice({
             .addCase(createOrder.fulfilled, (state, action) => {
                 state.loading      = false;
                 state.currentOrder = action.payload.order;
-                // Yeni sifarişi myOrders-ə əlavə et (API yenidən çağırmadan görünsün)
                 if (action.payload.order) {
                     state.myOrders = [action.payload.order, ...state.myOrders];
                 }
@@ -131,8 +129,8 @@ const orderSlice = createSlice({
                 state.error   = null;
             })
             .addCase(getMyOrders.fulfilled, (state, action) => {
-                state.loading   = false;
-                state.myOrders  = action.payload.orders;
+                state.loading  = false;
+                state.myOrders = action.payload.orders;
             })
             .addCase(getMyOrders.rejected, (state, action) => {
                 state.loading = false;
@@ -146,8 +144,8 @@ const orderSlice = createSlice({
                 state.error   = null;
             })
             .addCase(getAdminOrders.fulfilled, (state, action) => {
-                state.loading      = false;
-                state.adminOrders  = action.payload.orders;
+                state.loading     = false;
+                state.adminOrders = action.payload.orders;
             })
             .addCase(getAdminOrders.rejected, (state, action) => {
                 state.loading = false;
@@ -155,16 +153,25 @@ const orderSlice = createSlice({
             });
 
         // ── updateOrderStatus ────────────────────────────────────
+        // Backend cavabı: { success, message, orderStatus, isCompleted }
+        // + biz orderId əlavə edirik (yuxarıda return { ...response.data, orderId })
         builder
             .addCase(updateOrderStatus.pending, (state) => {
                 state.error = null;
             })
             .addCase(updateOrderStatus.fulfilled, (state, action) => {
-                const { orderId, orderStatus } = action.payload;
-                // adminOrders siyahısında statusu yenilə
+                const { orderId, orderStatus, isCompleted } = action.payload;
+
+                // adminOrders-da həm orderStatus, həm isCompleted eyni anda yenilənir.
+                // "delivered" seçildikdə isCompleted: true gəlir —
+                // getAdminOrders yenidən çağırmadan banner və badge dərhal görünür.
                 state.adminOrders = state.adminOrders.map((order) =>
                     (order.id || order._id)?.toString() === orderId?.toString()
-                        ? { ...order, orderStatus }
+                        ? {
+                            ...order,
+                            orderStatus,
+                            isCompleted: isCompleted ?? order.isCompleted,
+                          }
                         : order
                 );
             })

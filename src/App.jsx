@@ -1,11 +1,10 @@
 import { useState } from 'react'
 import './App.css'
-import './i18n/index.js'   // ✅ DİL PAKETİ
+import './i18n/index.js'
 import "flowbite"
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
-
-import SplashScreen from './components/Splashscreen'  // ✅ YENİ
+import SplashScreen from './components/Splashscreen'
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import Login from './components/Login'
@@ -44,8 +43,7 @@ import Welcome from './components/Welcome'
 import Store from './components/Store'
 import MyOrders from './pages/MyOrders'
 import AdminOrders from './pages/AdminOrders'
-import CommissionPage from './pages/seller/CommissionPage' // ✅ YENİ
-
+import CommissionPage from './pages/seller/CommissionPage'
 
 function AppContent() {
   const location = useLocation();
@@ -75,13 +73,17 @@ function AppContent() {
         <Route path="/my-orders" element={<UserRoute><MyOrders /></UserRoute>} />
 
         {/* Satıcı — yalnız seller */}
-        <Route path="/seller/commission" element={<UserRoute><CommissionPage /></UserRoute>} /> {/* ✅ YENİ */}
+        <Route path="/seller/commission" element={<UserRoute><CommissionPage /></UserRoute>} />
 
         {/* Admin — yalnız admin */}
         <Route path="/admin/orders" element={<PrivateRoute><AdminOrders /></PrivateRoute>} />
-        <Route path="/admin/products" element={<PrivateRoute><AddProducts /></PrivateRoute>} />
-        <Route path="/admin/product" element={<PrivateRoute><AdminProducts /></PrivateRoute>} />
-        <Route path='/admin/edit-product/:id' element={<PrivateRoute><EditProduct /></PrivateRoute>} />
+        <Route path="/admin/products" element={<PrivateRoute><AdminProducts /></PrivateRoute>} />
+
+        {/* ✅ HƏR İKİ ROUTE — /admin/product VƏ /admin/create-product eyni komponenti açır */}
+        <Route path="/admin/product" element={<PrivateRoute><AddProducts /></PrivateRoute>} />
+        <Route path="/admin/create-product" element={<PrivateRoute><AddProducts /></PrivateRoute>} />
+
+        <Route path="/admin/edit-product/:id" element={<PrivateRoute><EditProduct /></PrivateRoute>} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -97,10 +99,10 @@ function App() {
   return (
     <BrowserRouter>
       <Toaster position='top-center' />
-      <AppContent />
-      {!splashDone && (
-        <SplashScreen onFinish={() => setSplashDone(true)} />
-      )}
+      {!splashDone
+        ? <SplashScreen onFinish={() => setSplashDone(true)} />
+        : <AppContent />
+      }
     </BrowserRouter>
   );
 }

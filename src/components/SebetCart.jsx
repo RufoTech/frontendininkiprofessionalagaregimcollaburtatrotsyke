@@ -8,7 +8,6 @@ import {
   useAddToCartMutation,
 } from "../redux/api/productsApi"
 import { Link, useNavigate } from "react-router-dom"
-import { useSelector } from "react-redux"
 import { toast } from "react-toastify"
 import {
   ShoppingBag, Trash2, Plus, Minus, ArrowRight,
@@ -17,8 +16,7 @@ import {
 
 const SebetCart = () => {
   const navigate = useNavigate()
-  const { isAuthenticated } = useSelector((state) => state.userSlice)
-  const { data: cartData, isLoading, error } = useGetCartQuery(undefined, { skip: !isAuthenticated })
+  const { data: cartData, isLoading, error } = useGetCartQuery()
   const [removeFromCart] = useRemoveFromCartMutation()
   const [updateQuantity] = useUpdateCartQuantityMutation()
   const [addToCart] = useAddToCartMutation()

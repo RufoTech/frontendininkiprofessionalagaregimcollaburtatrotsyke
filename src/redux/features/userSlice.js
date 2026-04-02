@@ -1,32 +1,38 @@
-import {createSlice} from "@reduxjs/toolkit"
-
+import { createSlice } from "@reduxjs/toolkit"
 
 const initialState = {
-    user:null, // {}
-    isAuthenticated:false
+    user: null,
+    isAuthenticated: false
 }
 
+// localStorage-dan təhlükəsiz oxuma
+try {
+    const storedAuthStatus = localStorage.getItem("isAuthenticated")
+    const storedUser = localStorage.getItem("user")
 
-const storedAuthStatus = localStorage.getItem("isAuthenticated") //true false
-const storedUser = localStorage.getItem("user")
+    if (storedAuthStatus) {
+        initialState.isAuthenticated = JSON.parse(storedAuthStatus)
+    }
 
-
-//header payload signuture jwt tokenin 
-//true
-if(storedAuthStatus) {
-    // true
-    initialState.isAuthenticated = JSON.parse(storedAuthStatus)
+    if (storedUser) {
+        const parsedUser = JSON.parse(storedUser)
+        // Pozulmuş data yoxlaması — role mütləq olmalıdır
+        if (parsedUser && parsedUser.user && parsedUser.user.role) {
+            initialState.user = parsedUser
+        } else {
+            // Pozulmuş datanı təmizlə
+            localStorage.removeItem("user")
+            localStorage.removeItem("isAuthenticated")
+        }
+    }
+} catch (e) {
+    // JSON.parse xətası — localStorage-ı təmizlə
+    localStorage.removeItem("user")
+    localStorage.removeItem("isAuthenticated")
 }
-
-//name, token, email
-
-if(storedUser) {
-    initialState.user = JSON.parse(storedUser)
-}
-
 
 export const userSlice = createSlice({
-    name:"userSlice",
+    name: "userSlice",
     initialState,
     reducers: {
         setUser(state, action) {
@@ -37,8 +43,6 @@ export const userSlice = createSlice({
             state.isAuthenticated = action.payload
             localStorage.setItem("isAuthenticated", JSON.stringify(action.payload))
         },
-
-        //cache rtk cache ustunlukleri
         logout(state) {
             state.user = null
             state.isAuthenticated = false
@@ -49,4 +53,4 @@ export const userSlice = createSlice({
 })
 
 export default userSlice.reducer
-export const {setUser, setIsAuthenticated, logout} = userSlice.actions
+export const { setUser, setIsAuthenticated, logout } = userSlice.actions

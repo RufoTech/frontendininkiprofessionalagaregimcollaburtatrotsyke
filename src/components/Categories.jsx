@@ -7,7 +7,6 @@ import {
   useGetFavoritesQuery,
 } from "../redux/api/productsApi";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { Plus, Heart, ShoppingBag, Loader2, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 
@@ -317,7 +316,6 @@ function ProductRow({ title, items, viewAll, isLoading, onAddToCart, favoriteIds
 // EcommerceHome
 // ─────────────────────────────────────────
 export default function EcommerceHome() {
-  const { isAuthenticated } = useSelector((state) => state.userSlice);
   const [slide,     setSlide]     = useState(0);
   const [animating, setAnimating] = useState(false);
 
@@ -329,7 +327,7 @@ export default function EcommerceHome() {
   const { data: newArrivalsData, isLoading: loadingNew } =
     useGetProductsQuery({ sort: "createdAt", limit: 12 });
 
-  const { data: favData } = useGetFavoritesQuery(undefined, { skip: !isAuthenticated });
+  const { data: favData } = useGetFavoritesQuery();
   const favoriteIds = (favData?.favorites || []).map(f => f._id);
 
   const recommendedProducts =
