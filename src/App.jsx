@@ -44,6 +44,8 @@ import Store from './components/Store'
 import MyOrders from './pages/MyOrders'
 import AdminOrders from './pages/AdminOrders'
 import CommissionPage from './pages/seller/CommissionPage'
+import NotificationsPage from './components/Notificationbell'
+import Profile from './pages/Profile'
 
 function AppContent() {
   const location = useLocation();
@@ -67,7 +69,10 @@ function AppContent() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/favori" element={<FavoriteButton />} />
         <Route path="/password/reset/:token" element={<ResetPassword />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/payment" element={<PaymentComponent />} />
+        <Route path="/notifications" element={<UserRoute><NotificationsPage /></UserRoute>} />
+        <Route path="/profile" element={<UserRoute><Profile /></UserRoute>} />
 
         {/* Müştəri — giriş etmiş hər kəs */}
         <Route path="/my-orders" element={<UserRoute><MyOrders /></UserRoute>} />

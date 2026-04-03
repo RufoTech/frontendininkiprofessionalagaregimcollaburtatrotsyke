@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import {
   useGetProductDetailsQuery,
   useAddToCartMutation,
@@ -129,6 +129,7 @@ const RatingBar = ({ value, count, total }) => {
 ═══════════════════════════════════════════════════════════════ */
 const ProductDetail = () => {
   const params = useParams()
+  const navigate = useNavigate()
 
   const { data, isLoading, error } = useGetProductDetailsQuery(params?.id, {
     refetchOnMountOrArgChange: true,
@@ -615,6 +616,7 @@ const ProductDetail = () => {
                 marginBottom:16,
                 transition:"all 0.18s",
               }}
+                onClick={() => navigate("/payment")}
                 onMouseEnter={e=>{e.currentTarget.style.background=t.red; e.currentTarget.style.color="#fff"}}
                 onMouseLeave={e=>{e.currentTarget.style.background=t.white; e.currentTarget.style.color=t.red}}
               >

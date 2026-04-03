@@ -6,7 +6,7 @@ import {
   useRemoveFromFavoritesMutation,
   useGetFavoritesQuery,
 } from "../redux/api/productsApi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Plus, Heart, ShoppingBag, Loader2, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 
@@ -43,6 +43,7 @@ function ProductCard({ product, onAddToCart, favoriteIds }) {
   const [added,   setAdded]   = useState(false);
   const [hovered, setHovered] = useState(false);
   const [favHover, setFavHover] = useState(false);
+  const navigate = useNavigate();
 
   const [addToFavorites]      = useAddToFavoritesMutation();
   const [removeFromFavorites] = useRemoveFromFavoritesMutation();
@@ -79,6 +80,7 @@ function ProductCard({ product, onAddToCart, favoriteIds }) {
 
   return (
     <div
+      onClick={() => navigate(`/product/${product._id}`)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
@@ -318,6 +320,7 @@ function ProductRow({ title, items, viewAll, isLoading, onAddToCart, favoriteIds
 export default function EcommerceHome() {
   const [slide,     setSlide]     = useState(0);
   const [animating, setAnimating] = useState(false);
+  const navigate = useNavigate();
 
   const [addToCart] = useAddToCartMutation();
 
@@ -487,6 +490,7 @@ export default function EcommerceHome() {
               alignItems: "center",
               gap: 6,
             }}
+            onClick={() => navigate("/shop")}
             onMouseEnter={e => e.currentTarget.style.transform = "scale(1.05)"}
             onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
           >

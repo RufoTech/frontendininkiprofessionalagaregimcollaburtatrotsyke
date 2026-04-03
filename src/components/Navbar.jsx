@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { Link, useNavigate, useLocation } from "react-router-dom"
 import { useSelector, useDispatch } from "react-redux"
 import { logout } from "../redux/features/userSlice"
@@ -23,7 +23,7 @@ import {
   Wrench, ShoppingBag,
 } from "lucide-react"
 
-import { fetchUnreadCount } from "../slices/notificationSlice"
+import { fetchUnreadCount } from "../slices/Notificationslice"
 
 /* ─────────────────────────────────────────────
    LOGO SVG
@@ -91,176 +91,178 @@ const SidebarLogo = () => (
 /* ─────────────────────────────────────────────
    15 ANA KATEQORİYA + TAM SUBKATEQORİYALAR
 ───────────────────────────────────────────── */
-const MAIN_CATEGORIES = [
+function getMainCategories(t) {
+  return [
   {
-    label: "Elektronika", sub: "TV, Audio, Smart Home, Gadgets",
+    label: t("navCategories.electronics_label"), sub: t("navCategories.electronics_sub"),
     icon: Tv, slug: "electronics", color: "#E8192C", bg: "#fff5f5",
     subcategories: [
-      { key: "Electronics_TV",       label: "TV və Audio sistemlər",  icon: Tv        },
-      { key: "Electronics_Photo",    label: "Foto və video texnika",  icon: Camera    },
-      { key: "Electronics_Console",  label: "Oyun konsolları",        icon: Gamepad2  },
-      { key: "Electronics_SmartHome",label: "Smart home cihazlar",    icon: Wifi      },
-      { key: "Electronics_Gadgets",  label: "Gadgetlər",              icon: Cpu       },
-      { key: "Electronics_Acc",      label: "Elektron aksesuarlar",   icon: Plug      },
+      { key: "Electronics_TV",       label: t("navCategories.electronics_tv"),        icon: Tv        },
+      { key: "Electronics_Photo",    label: t("navCategories.electronics_photo"),      icon: Camera    },
+      { key: "Electronics_Console",  label: t("navCategories.electronics_console"),    icon: Gamepad2  },
+      { key: "Electronics_SmartHome",label: t("navCategories.electronics_smarthome"),  icon: Wifi      },
+      { key: "Electronics_Gadgets",  label: t("navCategories.electronics_gadgets"),    icon: Cpu       },
+      { key: "Electronics_Acc",      label: t("navCategories.electronics_acc"),        icon: Plug      },
     ],
   },
   {
-    label: "Telefonlar", sub: "Smartfonlar, Qulaqlıqlar, Kabel",
+    label: t("navCategories.phones_label"), sub: t("navCategories.phones_sub"),
     icon: Smartphone, slug: "phones", color: "#c0112a", bg: "#fce4e4",
     subcategories: [
-      { key: "Phones_Smartphone",  label: "Smartfonlar",             icon: Smartphone },
-      { key: "Phones_Basic",       label: "Düyməli telefonlar",      icon: Smartphone },
-      { key: "Phones_Headphones",  label: "Qulaqlıqlar",             icon: Headphones },
-      { key: "Phones_Cables",      label: "Kabellər və adapterlər",  icon: Zap        },
-      { key: "Phones_Powerbank",   label: "Powerbank",               icon: Zap        },
-      { key: "Phones_Acc",         label: "Telefon aksesuarları",    icon: Package    },
+      { key: "Phones_Smartphone",  label: t("navCategories.phones_smartphone"),  icon: Smartphone },
+      { key: "Phones_Basic",       label: t("navCategories.phones_basic"),       icon: Smartphone },
+      { key: "Phones_Headphones",  label: t("navCategories.phones_headphones"),  icon: Headphones },
+      { key: "Phones_Cables",      label: t("navCategories.phones_cables"),      icon: Zap        },
+      { key: "Phones_Powerbank",   label: t("navCategories.phones_powerbank"),   icon: Zap        },
+      { key: "Phones_Acc",         label: t("navCategories.phones_acc"),         icon: Package    },
     ],
   },
   {
-    label: "Kompüter & Ofis", sub: "Noutbuk, Monitor, Printer, Komponent",
+    label: t("navCategories.computers_label"), sub: t("navCategories.computers_sub"),
     icon: Laptop, slug: "computers", color: "#0369a1", bg: "#e0f2fe",
     subcategories: [
-      { key: "Computers_Laptop",     label: "Noutbuklar",                    icon: Laptop   },
-      { key: "Computers_Desktop",    label: "Stolüstü kompüterlər",          icon: Monitor  },
-      { key: "Computers_Monitor",    label: "Monitorlar",                    icon: Monitor  },
-      { key: "Computers_Printer",    label: "Printer və skanerlər",          icon: Printer  },
-      { key: "Computers_OfficeAcc",  label: "Ofis aksesuarları",             icon: Package  },
-      { key: "Computers_Parts",      label: "Komponentlər (RAM, SSD və s.)", icon: Cpu      },
+      { key: "Computers_Laptop",     label: t("navCategories.computers_laptop"),     icon: Laptop   },
+      { key: "Computers_Desktop",    label: t("navCategories.computers_desktop"),    icon: Monitor  },
+      { key: "Computers_Monitor",    label: t("navCategories.computers_monitor"),    icon: Monitor  },
+      { key: "Computers_Printer",    label: t("navCategories.computers_printer"),    icon: Printer  },
+      { key: "Computers_OfficeAcc",  label: t("navCategories.computers_officeacc"), icon: Package  },
+      { key: "Computers_Parts",      label: t("navCategories.computers_parts"),      icon: Cpu      },
     ],
   },
   {
-    label: "Məişət texnikası", sub: "Soyuducu, Tozsoran, Mətbəx, Kondisioner",
+    label: t("navCategories.appliances_label"), sub: t("navCategories.appliances_sub"),
     icon: Refrigerator, slug: "appliances", color: "#2e7d32", bg: "#e8f5e9",
     subcategories: [
-      { key: "HomeAppliances_Large",   label: "Böyük məişət (soyuducu, paltaryuyan)", icon: Refrigerator },
-      { key: "HomeAppliances_Small",   label: "Kiçik məişət (tozsoran, blender)",     icon: Zap          },
-      { key: "HomeAppliances_Kitchen", label: "Mətbəx texnikası",                     icon: Microwave    },
-      { key: "HomeAppliances_Climate", label: "Kondisioner və isitmə",                icon: Wind         },
-      { key: "HomeAppliances_Water",   label: "Su qızdırıcıları",                     icon: Droplets     },
+      { key: "HomeAppliances_Large",   label: t("navCategories.appliances_large"),   icon: Refrigerator },
+      { key: "HomeAppliances_Small",   label: t("navCategories.appliances_small"),   icon: Zap          },
+      { key: "HomeAppliances_Kitchen", label: t("navCategories.appliances_kitchen"), icon: Microwave    },
+      { key: "HomeAppliances_Climate", label: t("navCategories.appliances_climate"), icon: Wind         },
+      { key: "HomeAppliances_Water",   label: t("navCategories.appliances_water"),   icon: Droplets     },
     ],
   },
   {
-    label: "Ev və Dekor", sub: "İşıqlandırma, Tekstil, Dekorasiya",
+    label: t("navCategories.home_label"), sub: t("navCategories.home_sub"),
     icon: Flower2, slug: "home", color: "#0f766e", bg: "#ccfbf1",
     subcategories: [
-      { key: "HomeDecor_Deco",    label: "Dekorasiya",          icon: Flower2         },
-      { key: "HomeDecor_Light",   label: "İşıqlandırma",        icon: Lamp            },
-      { key: "HomeDecor_Textile", label: "Ev tekstili",         icon: Shirt           },
-      { key: "HomeDecor_Kitchen", label: "Mətbəx qabları",      icon: UtensilsCrossed },
-      { key: "HomeDecor_Bath",    label: "Hamam aksesuarları",  icon: Bath            },
+      { key: "HomeDecor_Deco",    label: t("navCategories.home_deco"),    icon: Flower2         },
+      { key: "HomeDecor_Light",   label: t("navCategories.home_light"),   icon: Lamp            },
+      { key: "HomeDecor_Textile", label: t("navCategories.home_textile"), icon: Shirt           },
+      { key: "HomeDecor_Kitchen", label: t("navCategories.home_kitchen"), icon: UtensilsCrossed },
+      { key: "HomeDecor_Bath",    label: t("navCategories.home_bath"),    icon: Bath            },
     ],
   },
   {
-    label: "Mebel", sub: "Qonaq, Yataq, Mətbəx, Ofis, Bağ",
+    label: t("navCategories.furniture_label"), sub: t("navCategories.furniture_sub"),
     icon: Sofa, slug: "furniture", color: "#b45309", bg: "#fef3c7",
     subcategories: [
-      { key: "Furniture_Living",  label: "Qonaq otağı mebeli",  icon: Sofa            },
-      { key: "Furniture_Bedroom", label: "Yataq otağı",         icon: Bed             },
-      { key: "Furniture_Kitchen", label: "Mətbəx mebeli",       icon: UtensilsCrossed },
-      { key: "Furniture_Office",  label: "Ofis mebeli",         icon: Laptop          },
-      { key: "Furniture_Garden",  label: "Bağ mebeli",          icon: Flower2         },
+      { key: "Furniture_Living",  label: t("navCategories.furniture_living"),   icon: Sofa            },
+      { key: "Furniture_Bedroom", label: t("navCategories.furniture_bedroom"),  icon: Bed             },
+      { key: "Furniture_Kitchen", label: t("navCategories.furniture_kitchen"),  icon: UtensilsCrossed },
+      { key: "Furniture_Office",  label: t("navCategories.furniture_office"),   icon: Laptop          },
+      { key: "Furniture_Garden",  label: t("navCategories.furniture_garden"),   icon: Flower2         },
     ],
   },
   {
-    label: "Qadın Geyimi", sub: "Üst, Alt, Gündəlik, İdman, Rəsmi",
+    label: t("navCategories.womenclothing_label"), sub: t("navCategories.womenclothing_sub"),
     icon: Shirt, slug: "womenclothing", color: "#db2777", bg: "#fdf2f8",
     subcategories: [
-      { key: "WomenClothing_Outer",  label: "Üst geyim",        icon: Shirt   },
-      { key: "WomenClothing_Inner",  label: "Alt geyim",        icon: Shirt   },
-      { key: "WomenClothing_Casual", label: "Gündəlik geyim",   icon: Shirt   },
-      { key: "WomenClothing_Sport",  label: "İdman geyimi",     icon: Dumbbell},
-      { key: "WomenClothing_Formal", label: "Rəsmi geyim",      icon: Shirt   },
-      { key: "WomenClothing_Under",  label: "Alt paltarları",   icon: Shirt   },
+      { key: "WomenClothing_Outer",  label: t("navCategories.womenclothing_outer"),  icon: Shirt   },
+      { key: "WomenClothing_Inner",  label: t("navCategories.womenclothing_inner"),  icon: Shirt   },
+      { key: "WomenClothing_Casual", label: t("navCategories.womenclothing_casual"), icon: Shirt   },
+      { key: "WomenClothing_Sport",  label: t("navCategories.womenclothing_sport"),  icon: Dumbbell},
+      { key: "WomenClothing_Formal", label: t("navCategories.womenclothing_formal"), icon: Shirt   },
+      { key: "WomenClothing_Under",  label: t("navCategories.womenclothing_under"),  icon: Shirt   },
     ],
   },
   {
-    label: "Kişi Geyimi", sub: "Üst, Alt, Gündəlik, İdman, Rəsmi",
+    label: t("navCategories.menclothing_label"), sub: t("navCategories.menclothing_sub"),
     icon: Shirt, slug: "menclothing", color: "#1d4ed8", bg: "#eff6ff",
     subcategories: [
-      { key: "MenClothing_Outer",  label: "Üst geyim",       icon: Shirt    },
-      { key: "MenClothing_Inner",  label: "Alt geyim",       icon: Shirt    },
-      { key: "MenClothing_Casual", label: "Gündəlik geyim",  icon: Shirt    },
-      { key: "MenClothing_Sport",  label: "İdman geyimi",    icon: Dumbbell },
-      { key: "MenClothing_Formal", label: "Rəsmi geyim",     icon: Shirt    },
-      { key: "MenClothing_Under",  label: "Alt paltarları",  icon: Shirt    },
+      { key: "MenClothing_Outer",  label: t("navCategories.menclothing_outer"),  icon: Shirt    },
+      { key: "MenClothing_Inner",  label: t("navCategories.menclothing_inner"),  icon: Shirt    },
+      { key: "MenClothing_Casual", label: t("navCategories.menclothing_casual"), icon: Shirt    },
+      { key: "MenClothing_Sport",  label: t("navCategories.menclothing_sport"),  icon: Dumbbell },
+      { key: "MenClothing_Formal", label: t("navCategories.menclothing_formal"), icon: Shirt    },
+      { key: "MenClothing_Under",  label: t("navCategories.menclothing_under"),  icon: Shirt    },
     ],
   },
   {
-    label: "Ayaqqabı", sub: "İdman, Klassik, Gündəlik, Sandalet",
+    label: t("navCategories.shoes_label"), sub: t("navCategories.shoes_sub"),
     icon: Footprints, slug: "shoes", color: "#be185d", bg: "#fce7f3",
     subcategories: [
-      { key: "Shoes_Sport",   label: "İdman ayaqqabısı",          icon: Footprints },
-      { key: "Shoes_Classic", label: "Klassik ayaqqabı",          icon: Footprints },
-      { key: "Shoes_Casual",  label: "Gündəlik",                  icon: Footprints },
-      { key: "Shoes_Sandal",  label: "Sandalet və yay modelləri", icon: Footprints },
+      { key: "Shoes_Sport",   label: t("navCategories.shoes_sport"),   icon: Footprints },
+      { key: "Shoes_Classic", label: t("navCategories.shoes_classic"), icon: Footprints },
+      { key: "Shoes_Casual",  label: t("navCategories.shoes_casual"),  icon: Footprints },
+      { key: "Shoes_Sandal",  label: t("navCategories.shoes_sandals"), icon: Footprints },
     ],
   },
   {
-    label: "Aksesuarlar", sub: "Çanta, Saat, Eynək, Zərgərlik, Kəmər",
+    label: t("navCategories.accessories_label"), sub: t("navCategories.accessories_sub"),
     icon: Watch, slug: "accessories", color: "#7c3aed", bg: "#f5f3ff",
     subcategories: [
-      { key: "Accessories_Bag",        label: "Çantalar",       icon: ShoppingBag },
-      { key: "Accessories_Watch",      label: "Saatlar",        icon: Watch       },
-      { key: "Accessories_Sunglasses", label: "Gün eynəkləri", icon: Glasses     },
-      { key: "Accessories_Jewelry",    label: "Zərgərlik",      icon: Sparkles    },
-      { key: "Accessories_Belt",       label: "Kəmərlər",       icon: Package     },
+      { key: "Accessories_Bag",        label: t("navCategories.accessories_bags"),        icon: ShoppingBag },
+      { key: "Accessories_Watch",      label: t("navCategories.accessories_watches"),     icon: Watch       },
+      { key: "Accessories_Sunglasses", label: t("navCategories.accessories_sunglasses"),  icon: Glasses     },
+      { key: "Accessories_Jewelry",    label: t("navCategories.accessories_jewelry"),     icon: Sparkles    },
+      { key: "Accessories_Belt",       label: t("navCategories.accessories_belts"),       icon: Package     },
     ],
   },
   {
-    label: "Gözəllik & Kosmetika", sub: "Makiyaj, Dəri, Saç, Parfüm, Gigiyena",
+    label: t("navCategories.beauty_label"), sub: t("navCategories.beauty_sub"),
     icon: Sparkles, slug: "beauty", color: "#e11d48", bg: "#fff1f2",
     subcategories: [
-      { key: "Beauty_Makeup",  label: "Makiyaj",                icon: Sparkles },
-      { key: "Beauty_Skin",    label: "Dəriyə qulluq",          icon: Sparkles },
-      { key: "Beauty_Hair",    label: "Saça qulluq",            icon: Sparkles },
-      { key: "Beauty_Perfume", label: "Parfümeriya",            icon: Sparkles },
-      { key: "Beauty_Men",     label: "Kişi baxım məhsulları",  icon: User     },
-      { key: "Beauty_Hygiene", label: "Gigiyena",               icon: Sparkles },
+      { key: "Beauty_Makeup",  label: t("navCategories.beauty_makeup"),  icon: Sparkles },
+      { key: "Beauty_Skin",    label: t("navCategories.beauty_skin"),    icon: Sparkles },
+      { key: "Beauty_Hair",    label: t("navCategories.beauty_hair"),    icon: Sparkles },
+      { key: "Beauty_Perfume", label: t("navCategories.beauty_perfume"), icon: Sparkles },
+      { key: "Beauty_Men",     label: t("navCategories.beauty_men"),     icon: User     },
+      { key: "Beauty_Hygiene", label: t("navCategories.beauty_hygiene"), icon: Sparkles },
     ],
   },
   {
-    label: "Uşaq & Ana", sub: "Geyim, Oyuncaq, Arabalar, Qida, Məktəb",
+    label: t("navCategories.kids_label"), sub: t("navCategories.kids_sub"),
     icon: Baby, slug: "kids", color: "#f57c00", bg: "#fff3e0",
     subcategories: [
-      { key: "KidsAndMom_Clothing", label: "Uşaq geyimləri",        icon: Baby     },
-      { key: "KidsAndMom_Toys",     label: "Oyuncaqlar",            icon: Gamepad2 },
-      { key: "KidsAndMom_Stroller", label: "Uşaq arabaları",        icon: Baby     },
-      { key: "KidsAndMom_Food",     label: "Qidalanma məhsulları",  icon: Baby     },
-      { key: "KidsAndMom_School",   label: "Məktəb ləvazimatları",  icon: BookOpen },
+      { key: "KidsAndMom_Clothing", label: t("navCategories.kids_clothing"), icon: Baby     },
+      { key: "KidsAndMom_Toys",     label: t("navCategories.kids_toys"),     icon: Gamepad2 },
+      { key: "KidsAndMom_Stroller", label: t("navCategories.kids_strollers"),icon: Baby     },
+      { key: "KidsAndMom_Food",     label: t("navCategories.kids_food"),     icon: Baby     },
+      { key: "KidsAndMom_School",   label: t("navCategories.kids_school"),   icon: BookOpen },
     ],
   },
   {
-    label: "İdman & Outdoor", sub: "Fitness, Kampinq, Velosiped, Geyim",
+    label: t("navCategories.sports_label"), sub: t("navCategories.sports_sub"),
     icon: Dumbbell, slug: "sport", color: "#15803d", bg: "#dcfce7",
     subcategories: [
-      { key: "Sports_Fitness",  label: "Fitness avadanlıqları",  icon: Dumbbell },
-      { key: "Sports_Camping",  label: "Kampinq",                icon: Tent     },
-      { key: "Sports_Bicycle",  label: "Velosipedlər",           icon: Bike     },
-      { key: "Sports_Clothing", label: "İdman geyimi",           icon: Shirt    },
-      { key: "Sports_Acc",      label: "İdman aksesuarları",     icon: Package  },
+      { key: "Sports_Fitness",  label: t("navCategories.sports_fitness"),  icon: Dumbbell },
+      { key: "Sports_Camping",  label: t("navCategories.sports_camping"),  icon: Tent     },
+      { key: "Sports_Bicycle",  label: t("navCategories.sports_bicycles"), icon: Bike     },
+      { key: "Sports_Clothing", label: t("navCategories.sports_clothing"), icon: Shirt    },
+      { key: "Sports_Acc",      label: t("navCategories.sports_acc"),      icon: Package  },
     ],
   },
   {
-    label: "Avto məhsullar", sub: "Aksesuarlar, Elektronika, Ehtiyat, Yağlar",
+    label: t("navCategories.auto_label"), sub: t("navCategories.auto_sub"),
     icon: Car, slug: "automotive", color: "#374151", bg: "#f3f4f6",
     subcategories: [
-      { key: "Automotive_Acc",         label: "Avto aksesuarlar",              icon: Car      },
-      { key: "Automotive_Electronics", label: "Elektronika (dashcam və s.)",   icon: Monitor  },
-      { key: "Automotive_Parts",       label: "Ehtiyat hissələri",             icon: Wrench   },
-      { key: "Automotive_Oils",        label: "Yağlar və kimyəvi məhsullar",   icon: FlaskConical },
+      { key: "Automotive_Acc",         label: t("navCategories.auto_acc"),         icon: Car          },
+      { key: "Automotive_Electronics", label: t("navCategories.auto_electronics"), icon: Monitor      },
+      { key: "Automotive_Parts",       label: t("navCategories.auto_parts"),       icon: Wrench       },
+      { key: "Automotive_Oils",        label: t("navCategories.auto_oils"),        icon: FlaskConical },
     ],
   },
   {
-    label: "Hədiyyələr & Lifestyle", sub: "Hədiyyə, Trending, Suvenir, Kitablar",
+    label: t("navCategories.gifts_label"), sub: t("navCategories.gifts_sub"),
     icon: Gift, slug: "gifts", color: "#9333ea", bg: "#faf5ff",
     subcategories: [
-      { key: "Gifts_Sets",     label: "Hədiyyə setləri",               icon: Gift     },
-      { key: "Gifts_Souvenir", label: "Suvenirlər",                    icon: Sparkles },
-      { key: "Gifts_Trending", label: "Maraqlı məhsullar (trending)",  icon: TrendingUp },
-      { key: "Gifts_Books",    label: "Kitablar və hobbi",             icon: BookOpen },
+      { key: "Gifts_Sets",     label: t("navCategories.gifts_sets"),      icon: Gift       },
+      { key: "Gifts_Souvenir", label: t("navCategories.gifts_souvenirs"), icon: Sparkles   },
+      { key: "Gifts_Trending", label: t("navCategories.gifts_trending"),  icon: TrendingUp },
+      { key: "Gifts_Books",    label: t("navCategories.gifts_books"),     icon: BookOpen   },
     ],
   },
-]
+  ]
+}
 
 /* local test products slug→category map */
 const SLUG_TO_CATEGORIES = {
@@ -326,7 +328,7 @@ const LOCAL_PRODUCTS = [
 
 const languages = [
   { code:"az", label:"Azərbaycan", flag:"🇦🇿", short:"AZ"  },
-  { code:"en", label:"English",    flag:"🇬🇧", short:"ENG" },
+  { code:"en", label:"English",    flag:"🇬🇧", short:"EN"  },
   { code:"ru", label:"Русский",    flag:"🇷🇺", short:"RUS" },
   { code:"tr", label:"Türkçe",     flag:"🇹🇷", short:"TR"  },
 ]
@@ -417,18 +419,23 @@ function LanguageSwitcher() {
    BİLDİRİŞ ZƏNGI
 ───────────────────────────────────────────── */
 function NotificationBell({ isMobile = false }) {
-  const { t }           = useTranslation()
-  const dispatch        = useDispatch()
-  const navigate        = useNavigate()
-  const { unreadCount } = useSelector((s) => s.notifications)
-  const [shake, setShake] = useState(false)
-  const prevCount         = useRef(unreadCount)
+  const { t }                        = useTranslation()
+  const dispatch                     = useDispatch()
+  const navigate                     = useNavigate()
+  const { unreadCount }              = useSelector((s) => s.notifications)
+  const { isAuthenticated }          = useSelector((s) => s.userSlice)
+  const [shake, setShake]            = useState(false)
+  const prevCount                    = useRef(unreadCount)
 
-  useEffect(() => { dispatch(fetchUnreadCount()) }, [dispatch])
   useEffect(() => {
+    if (isAuthenticated) dispatch(fetchUnreadCount())
+  }, [dispatch, isAuthenticated])
+
+  useEffect(() => {
+    if (!isAuthenticated) return
     const id = setInterval(() => dispatch(fetchUnreadCount()), 30000)
     return () => clearInterval(id)
-  }, [dispatch])
+  }, [dispatch, isAuthenticated])
   useEffect(() => {
     if (unreadCount > prevCount.current) { setShake(true); setTimeout(() => setShake(false), 600) }
     prevCount.current = unreadCount
@@ -682,7 +689,9 @@ function CategoryProductPanel({ cat, onClose, onCategoryNavigate }) {
    Hover → subkateqoriyalar sağda göstərilir
 ───────────────────────────────────────────── */
 function CategoryDropdown({ onCategorySelect }) {
-  const [hoveredCat, setHoveredCat] = useState(MAIN_CATEGORIES[0])
+  const { t } = useTranslation()
+  const MAIN_CATEGORIES = useMemo(() => getMainCategories(t), [t])
+  const [hoveredCat, setHoveredCat] = useState(() => getMainCategories(t)[0])
 
   return (
     <div style={{
@@ -774,6 +783,7 @@ function CategoryDropdown({ onCategorySelect }) {
 ───────────────────────────────────────────── */
 const Navbar = () => {
   const { t } = useTranslation()
+  const MAIN_CATEGORIES = useMemo(() => getMainCategories(t), [t])
   const { isAuthenticated, user } = useSelector(s => s.userSlice)
   const dispatch = useDispatch()
   const navigate = useNavigate()
