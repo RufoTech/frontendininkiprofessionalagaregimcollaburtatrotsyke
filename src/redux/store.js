@@ -6,6 +6,7 @@ import userSlice from "./features/userSlice";
 import orderReducer from '../slices/orderSlice';
 import commissionReducer from '../slices/commissionSlice';
 import languageReducer from '../slices/languageSlice';
+import notificationReducer from '../slices/notificationSlice';
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     order: orderReducer,
     commission: commissionReducer,
     language: languageReducer, // ✅ YENİ
+    notifications: notificationReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat([productApi.middleware, authApi.middleware]),
