@@ -24,7 +24,7 @@ import {
   Wrench, ShoppingBag,
 } from "lucide-react"
 
-import { fetchUnreadCount } from "../slices/Notificationslice"
+import { fetchUnreadCount } from "../slices/notificationSlice"
 
 /* ─────────────────────────────────────────────
    LOGO SVG
