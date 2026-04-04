@@ -3,10 +3,15 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 const BASE = "/commerce/mehsullar/notifications";
 
+// apiFetch — status kodu da qaytarır ki, 401 ayrıca işlənə bilsin
 const apiFetch = (url, options = {}) =>
     fetch(url, { credentials: "include", ...options }).then(async (r) => {
         const data = await r.json();
-        if (!r.ok) throw new Error(data.message || "Xəta baş verdi");
+        if (!r.ok) {
+            const err = new Error(data.message || "Xəta baş verdi");
+            err.status = r.status;
+            throw err;
+        }
         return data;
     });
 
@@ -15,7 +20,11 @@ export const fetchNotifications = createAsyncThunk(
     "notifications/fetchAll",
     async ({ page = 1, unreadOnly = false } = {}, { rejectWithValue }) => {
         try { return await apiFetch(`${BASE}?page=${page}&unreadOnly=${unreadOnly}`); }
-        catch (e) { return rejectWithValue(e.message); }
+        catch (e) {
+            // 401 — istifadəçi giriş etməyib, xəta göstərmə, sadəcə boş qaytar
+            if (e.status === 401) return { notifications: [], unreadCount: 0, total: 0, totalPages: 1, currentPage: 1 };
+            return rejectWithValue(e.message);
+        }
     }
 );
 
@@ -23,7 +32,10 @@ export const fetchUnreadCount = createAsyncThunk(
     "notifications/fetchUnreadCount",
     async (_, { rejectWithValue }) => {
         try { return await apiFetch(`${BASE}/unread-count`); }
-        catch (e) { return rejectWithValue(e.message); }
+        catch (e) {
+            if (e.status === 401) return { unreadCount: 0 };
+            return rejectWithValue(e.message);
+        }
     }
 );
 
@@ -69,7 +81,7 @@ const notificationSlice = createSlice({
         totalPages:  1,
         currentPage: 1,
         loading:     false,
-        error:       null,
+        error:       null,   // null = xəta yoxdur, string = real server xəta mesajı
     },
     reducers: {
         clearError: (s) => { s.error = null; },
@@ -80,16 +92,22 @@ const notificationSlice = createSlice({
             .addCase(fetchNotifications.pending,   (s) => { s.loading = true; s.error = null; })
             .addCase(fetchNotifications.fulfilled, (s, { payload: p }) => {
                 s.loading     = false;
-                s.items       = p.notifications;
-                s.unreadCount = p.unreadCount;
-                s.total       = p.total;
-                s.totalPages  = p.totalPages;
-                s.currentPage = p.currentPage;
+                s.items       = p.notifications  ?? [];
+                s.unreadCount = p.unreadCount    ?? 0;
+                s.total       = p.total          ?? 0;
+                s.totalPages  = p.totalPages     ?? 1;
+                s.currentPage = p.currentPage    ?? 1;
             })
-            .addCase(fetchNotifications.rejected,  (s, { payload }) => { s.loading = false; s.error = payload; })
+            // rejected — 401-dən FƏRQLI real xəta (şəbəkə, 500 vs.)
+            .addCase(fetchNotifications.rejected, (s, { payload }) => {
+                s.loading = false;
+                s.error   = payload || "Bildirişlər yüklənmədi";
+            })
 
             // fetchUnreadCount
-            .addCase(fetchUnreadCount.fulfilled, (s, { payload: p }) => { s.unreadCount = p.unreadCount; })
+            .addCase(fetchUnreadCount.fulfilled, (s, { payload: p }) => {
+                s.unreadCount = p?.unreadCount ?? 0;
+            })
 
             // markNotificationRead
             .addCase(markNotificationRead.fulfilled, (s, { payload: p }) => {

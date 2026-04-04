@@ -62,4 +62,4 @@ const paymentSlice = createSlice({
 });
 
 export const { resetPaymentState } = paymentSlice.actions;
-export default paymentSlice.reducer; 
+export default paymentSlice.reducer;

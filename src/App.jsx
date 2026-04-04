@@ -46,10 +46,26 @@ import AdminOrders from './pages/AdminOrders'
 import CommissionPage from './pages/seller/CommissionPage'
 import NotificationsPage from './components/Notificationbell'
 import Profile from './pages/Profile'
+import BloggerManagement from './pages/superadmin/BloggerManagement'
+import BloggerDashboard from './pages/blogger/BloggerDashboard'
+import BloggerRegister from './pages/blogger/BloggerRegister'
+import Terms from './pages/Terms'
+import SuperAdminLogin from './pages/superadmin/SuperAdminLogin'
+import SuperAdminDashboard from './pages/superadmin/SuperAdminDashboard'
+import SuperAdminRegister from './pages/superadmin/SuperAdminRegister'
+import SuperAdminRoute from './components/SuperAdminRoute'
+import GuestRoute from './components/GuestRoute'
+import BloggerLogin from './pages/blogger/BloggerLogin'
+import MyBonus from './pages/MyBonus'
 
 function AppContent() {
   const location = useLocation();
-  const isAuthPage = location.pathname === "/";
+  const authPaths = ["/", "/login", "/register", "/forgot-password"]
+  const isAuthPage = authPaths.includes(location.pathname) ||
+    location.pathname.startsWith("/password/reset/") ||
+    location.pathname.startsWith("/superadmin/") ||
+    location.pathname.startsWith("/blogger/login") ||
+    location.pathname.startsWith("/blogger/register");
 
   return (
     <>
@@ -57,11 +73,11 @@ function AppContent() {
 
       <Routes>
         <Route path="/" element={<Welcome />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
         <Route path="/home" element={<Home />} />
         <Route path="/store/:slug" element={<Store />} />
         <Route path="/search-results" element={<SearchResults />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/cart" element={<SebetCart />} />
         <Route path="/shop" element={<EcommerceApp />} />
@@ -69,16 +85,28 @@ function AppContent() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/favori" element={<FavoriteButton />} />
         <Route path="/password/reset/:token" element={<ResetPassword />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/forgot-password" element={<GuestRoute><ForgotPassword /></GuestRoute>} />
         <Route path="/payment" element={<PaymentComponent />} />
         <Route path="/notifications" element={<UserRoute><NotificationsPage /></UserRoute>} />
         <Route path="/profile" element={<UserRoute><Profile /></UserRoute>} />
 
         {/* Müştəri — giriş etmiş hər kəs */}
         <Route path="/my-orders" element={<UserRoute><MyOrders /></UserRoute>} />
+        <Route path="/my-bonus"  element={<UserRoute><MyBonus /></UserRoute>} />
 
         {/* Satıcı — yalnız seller */}
         <Route path="/seller/commission" element={<UserRoute><CommissionPage /></UserRoute>} />
+
+        {/* Blogger — qeydiyyat, giriş və panel */}
+        <Route path="/blogger/register" element={<GuestRoute><BloggerRegister /></GuestRoute>} />
+        <Route path="/blogger/login"    element={<GuestRoute><BloggerLogin /></GuestRoute>} />
+        <Route path="/blogger/dashboard" element={<BloggerDashboard />} />
+
+        {/* SuperAdmin — qeydiyyat, giriş və panel */}
+        <Route path="/superadmin/login"     element={<GuestRoute><SuperAdminLogin /></GuestRoute>} />
+        <Route path="/superadmin/register"  element={<GuestRoute><SuperAdminRegister /></GuestRoute>} />
+        <Route path="/superadmin/dashboard" element={<SuperAdminRoute><SuperAdminDashboard /></SuperAdminRoute>} />
+        <Route path="/superadmin/bloggers"  element={<PrivateRoute><BloggerManagement /></PrivateRoute>} />
 
         {/* Admin — yalnız admin */}
         <Route path="/admin/orders" element={<PrivateRoute><AdminOrders /></PrivateRoute>} />
@@ -90,6 +118,7 @@ function AppContent() {
 
         <Route path="/admin/edit-product/:id" element={<PrivateRoute><EditProduct /></PrivateRoute>} />
 
+        <Route path="/terms" element={<Terms />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
 

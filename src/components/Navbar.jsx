@@ -429,15 +429,6 @@ function NotificationBell({ isMobile = false }) {
   const prevCount                    = useRef(unreadCount)
 
   useEffect(() => {
-    if (isAuthenticated) dispatch(fetchUnreadCount())
-  }, [dispatch, isAuthenticated])
-
-  useEffect(() => {
-    if (!isAuthenticated) return
-    const id = setInterval(() => dispatch(fetchUnreadCount()), 30000)
-    return () => clearInterval(id)
-  }, [dispatch, isAuthenticated])
-  useEffect(() => {
     if (unreadCount > prevCount.current) { setShake(true); setTimeout(() => setShake(false), 600) }
     prevCount.current = unreadCount
   }, [unreadCount])
@@ -523,7 +514,9 @@ function CategoryProductPanel({ cat, onClose, onCategoryNavigate }) {
     ? LOCAL_PRODUCTS.filter(p => slugCats.includes(p.category))
     : LOCAL_PRODUCTS
   const baseProd    = activeSub ? allProducts.filter(p => p.category === activeSub) : allProducts
-  const maxPrice    = baseProd.length > 0 ? Math.ceil(Math.max(...baseProd.map(p => p.price ?? 0)) / 50) * 50 : 1000
+  const maxPrice    = baseProd.length > 0 
+    ? Math.ceil(Math.max(...baseProd.map(p => Number(p.price) || 0)) / 50) * 50 
+    : 1000
 
   useEffect(() => { setPriceRange(maxPrice) }, [maxPrice, activeSub])
 
@@ -812,6 +805,25 @@ const Navbar = () => {
     window.addEventListener("scroll", fn)
     return () => window.removeEventListener("scroll", fn)
   }, [])
+
+  // 🔔 BİLDİRİŞ POLLING (Yalnız Navbar-da 1 dəfə işləyir)
+  // Bildiriş sayını çəkən effekt - hər 60 saniyədən bir yenilənir (limitli)
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    // İlk yüklənmədə dərhal çək (əgər loading deyilsə)
+    dispatch(fetchUnreadCount());
+
+    // İntervalı 60 saniyəyə qaldırırıq (daha optimal performans üçün)
+    const intervalId = setInterval(() => {
+      // Səhifə aktiv deyilsə sorğu göndərməyək (isteğe bağlı, amma faydalıdır)
+      if (document.visibilityState === 'visible') {
+        dispatch(fetchUnreadCount());
+      }
+    }, 60000); 
+
+    return () => clearInterval(intervalId);
+  }, [dispatch, isAuthenticated]);
 
   useEffect(() => {
     const fn = e => {
