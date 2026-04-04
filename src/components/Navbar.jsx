@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { Link, useNavigate, useLocation } from "react-router-dom"
 import { useSelector, useDispatch } from "react-redux"
 import { logout } from "../redux/features/userSlice"
+import { bloggerLogout } from "../slices/bloggerSlice"
 import { useGetCartQuery, useGetFavoritesQuery } from "../redux/api/productsApi"
 import { setLanguage } from "../slices/languageSlice"
 import { useTranslation } from "react-i18next"
@@ -23,7 +24,7 @@ import {
   Wrench, ShoppingBag,
 } from "lucide-react"
 
-import { fetchUnreadCount } from "../slices/notificationSlice"
+import { fetchUnreadCount } from "../slices/Notificationslice"
 
 /* ─────────────────────────────────────────────
    LOGO SVG
@@ -784,7 +785,8 @@ function CategoryDropdown({ onCategorySelect }) {
 const Navbar = () => {
   const { t } = useTranslation()
   const MAIN_CATEGORIES = useMemo(() => getMainCategories(t), [t])
-  const { isAuthenticated, user } = useSelector(s => s.userSlice)
+  const { isAuthenticated, user }   = useSelector(s => s.userSlice)
+  const { profile: bloggerProfile } = useSelector(s => s.blogger)
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
@@ -802,7 +804,8 @@ const Navbar = () => {
   const catRef  = useRef(null)
   const userRef = useRef(null)
 
-  const isAdmin = user?.user?.role === "admin"
+  const isAdmin   = user?.user?.role === "admin"
+  const isBlogger = !!bloggerProfile?.blogger
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 10)
@@ -829,6 +832,7 @@ const Navbar = () => {
   const handleCatMouseLeave = useCallback(() => { hoverTimeout.current = setTimeout(() => setIsCategoryOpen(false), 200) }, [])
 
   const handleLogout           = () => { dispatch(logout()); navigate("/login") }
+  const handleBloggerLogout    = () => { dispatch(bloggerLogout()); navigate("/login") }
   const handleSearch           = e  => { e.preventDefault(); if (searchQuery.trim()) navigate(`/search-results?query=${encodeURIComponent(searchQuery)}`); setShowSearch(false); setSearchQuery("") }
   const handleCategorySelect   = cat => { setIsCategoryOpen(false); setIsMenuOpen(false); setActiveCatPanel(cat) }
   const handleCategoryNavigate = cat => { setActiveCatPanel(null); navigate(cat.slug ? `/shop?category=${cat.slug}` : "/shop") }
@@ -971,7 +975,13 @@ const Navbar = () => {
         <div style={{ display:"flex", alignItems:"center", gap:2 }}>
           <button className="bib" onClick={() => setShowSearch(true)} style={{ width:38, height:38, borderRadius:11 }}><Search size={17} /></button>
           <NotificationBell isMobile={true} />
-          {isAuthenticated ? (
+          {isBlogger ? (
+            <Link to="/blogger/dashboard" style={{ textDecoration:"none", display:"flex", alignItems:"center", justifyContent:"center", width:38, height:38 }}>
+              <div style={{ width:30, height:30, borderRadius:"50%", background:`linear-gradient(135deg,#E8192C,#7a0010)`, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:11, fontWeight:800 }}>
+                {bloggerProfile.blogger.firstName?.charAt(0).toUpperCase()}
+              </div>
+            </Link>
+          ) : isAuthenticated ? (
             <Link to="/profile" style={{ textDecoration:"none", display:"flex", alignItems:"center", justifyContent:"center", width:38, height:38 }}>
               {user?.user?.avatar?.url
                 ? <img src={user.user.avatar.url} alt="" style={{ width:30, height:30, borderRadius:"50%", objectFit:"cover", border:`2px solid ${C.rose200}` }} />
@@ -1027,7 +1037,28 @@ const Navbar = () => {
             <button className="bib" onClick={() => setShowSearch(true)} title={t("navbar.search")}><Search size={18} /></button>
             <NotificationBell />
             <div ref={userRef} style={{ position:"relative" }}>
-              {isAuthenticated ? (
+              {isBlogger ? (
+                <>
+                  <button className="bib" onClick={() => setIsUserMenuOpen(p => !p)}>
+                    <div style={{ width:30, height:30, borderRadius:"50%", background:`linear-gradient(135deg,#E8192C,#7a0010)`, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:11, fontWeight:800, boxShadow:`0 2px 8px rgba(232,25,44,0.28)` }}>
+                      {bloggerProfile.blogger.firstName?.charAt(0).toUpperCase()}
+                    </div>
+                  </button>
+                  {isUserMenuOpen && (
+                    <div style={{ position:"absolute", right:0, top:"calc(100% + 8px)", background:"#fff", borderRadius:18, boxShadow:"0 16px 52px rgba(0,0,0,0.11)", border:"1.5px solid #f3f4f6", minWidth:230, padding:"10px 7px", zIndex:100, animation:"nbUserDrop 0.18s ease" }}>
+                      <div style={{ padding:"8px 12px 11px" }}>
+                        <p style={{ fontSize:13, fontWeight:700, color:"#111", margin:0, fontFamily:"'Sora',sans-serif" }}>{bloggerProfile.blogger.firstName} {bloggerProfile.blogger.lastName}</p>
+                        <p style={{ fontSize:11, color:"#888", margin:"2px 0 0", fontFamily:"'Sora',sans-serif" }}>{bloggerProfile.blogger.email}</p>
+                        <p style={{ fontSize:10, color:"#E8192C", margin:"4px 0 0", fontFamily:"'Sora',sans-serif", fontWeight:700 }}>Blogger · {bloggerProfile.blogger.commissionRate}%</p>
+                      </div>
+                      <div style={{ borderTop:"1px solid #f3f4f6", paddingTop:5 }}>
+                        <Link to="/blogger/dashboard" onClick={() => setIsUserMenuOpen(false)} style={dropLink} onMouseEnter={e => e.currentTarget.style.background="#f9fafb"} onMouseLeave={e => e.currentTarget.style.background="transparent"}>📊 Blogger Paneli</Link>
+                        <button onClick={() => { handleBloggerLogout(); setIsUserMenuOpen(false) }} style={{ display:"block", width:"100%", textAlign:"left", padding:"8px 12px", borderRadius:10, fontSize:13, color:"#E8192C", background:"none", border:"none", cursor:"pointer", fontFamily:"'Sora',sans-serif", transition:"background .12s" }} onMouseEnter={e => e.currentTarget.style.background="#fff8f8"} onMouseLeave={e => e.currentTarget.style.background="transparent"}>Çıxış</button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : isAuthenticated ? (
                 <>
                   <button className="bib" onClick={() => setIsUserMenuOpen(p => !p)}>
                     {user?.user?.avatar?.url
@@ -1087,7 +1118,17 @@ const Navbar = () => {
 
         {/* İstifadəçi bloku */}
         <div style={{ padding:"14px 14px 12px", borderBottom:"1px solid #f3f4f6", flexShrink:0 }}>
-          {isAuthenticated && user ? (
+          {isBlogger ? (
+            <div style={{ display:"flex", alignItems:"center", gap:11 }}>
+              <div style={{ width:44, height:44, borderRadius:"50%", background:`linear-gradient(135deg,#E8192C,#7a0010)`, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:17, fontWeight:800, boxShadow:`0 4px 14px rgba(232,25,44,0.28)`, flexShrink:0 }}>
+                {bloggerProfile.blogger.firstName?.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <p style={{ margin:0, fontSize:14, fontWeight:700, color:C.dark, fontFamily:"'Sora',sans-serif" }}>{bloggerProfile.blogger.firstName} {bloggerProfile.blogger.lastName}</p>
+                <p style={{ margin:"2px 0 0", fontSize:11, color:"#E8192C", fontFamily:"'Sora',sans-serif", fontWeight:700 }}>Blogger · {bloggerProfile.blogger.commissionRate}%</p>
+              </div>
+            </div>
+          ) : isAuthenticated && user ? (
             <div style={{ display:"flex", alignItems:"center", gap:11 }}>
               {user?.user?.avatar?.url
                 ? <img src={user.user.avatar.url} alt="" style={{ width:44, height:44, borderRadius:"50%", objectFit:"cover", border:`2px solid ${C.rose200}` }} />
@@ -1195,18 +1236,27 @@ const Navbar = () => {
         </nav>
 
         {/* Admin & hesab linklər */}
-        {isAuthenticated && (
+        {(isAuthenticated || isBlogger) && (
           <div style={{ padding:"10px 6px 80px", borderTop:"1px solid #f3f4f6", flexShrink:0 }}>
-            {isAdmin && (
+            {isBlogger ? (
               <>
-                <Link to="/admin/products"    className="bsi" onClick={() => setIsMenuOpen(false)}>{t("navbar.adminProducts")}</Link>
-                <Link to="/admin/product"     className="bsi" onClick={() => setIsMenuOpen(false)}>{t("navbar.addProduct")}</Link>
-                <Link to="/admin/orders"      className="bsi" onClick={() => setIsMenuOpen(false)}>🏪 {t("navbar.storeOrders")}</Link>
-                <Link to="/seller/commission" className="bsi" onClick={() => setIsMenuOpen(false)} style={{ color:C.primary, fontWeight:700 }}>💰 {t("navbar.commissionPanel")}</Link>
+                <Link to="/blogger/dashboard" className="bsi" onClick={() => setIsMenuOpen(false)} style={{ color:C.primary, fontWeight:700 }}>📊 Blogger Paneli</Link>
+                <button className="bsi red" onClick={() => { handleBloggerLogout(); setIsMenuOpen(false) }}>Çıxış</button>
+              </>
+            ) : (
+              <>
+                {isAdmin && (
+                  <>
+                    <Link to="/admin/products"    className="bsi" onClick={() => setIsMenuOpen(false)}>{t("navbar.adminProducts")}</Link>
+                    <Link to="/admin/product"     className="bsi" onClick={() => setIsMenuOpen(false)}>{t("navbar.addProduct")}</Link>
+                    <Link to="/admin/orders"      className="bsi" onClick={() => setIsMenuOpen(false)}>🏪 {t("navbar.storeOrders")}</Link>
+                    <Link to="/seller/commission" className="bsi" onClick={() => setIsMenuOpen(false)} style={{ color:C.primary, fontWeight:700 }}>💰 {t("navbar.commissionPanel")}</Link>
+                  </>
+                )}
+                <Link to="/my-orders" className="bsi" onClick={() => setIsMenuOpen(false)}><Package size={17} color={C.primary} /> {t("navbar.myOrders")}</Link>
+                <button className="bsi red" onClick={() => { handleLogout(); setIsMenuOpen(false) }}>{t("navbar.logout")}</button>
               </>
             )}
-            <Link to="/my-orders" className="bsi" onClick={() => setIsMenuOpen(false)}><Package size={17} color={C.primary} /> {t("navbar.myOrders")}</Link>
-            <button className="bsi red" onClick={() => { handleLogout(); setIsMenuOpen(false) }}>{t("navbar.logout")}</button>
           </div>
         )}
       </div>

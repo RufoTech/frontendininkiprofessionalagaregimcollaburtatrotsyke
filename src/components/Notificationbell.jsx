@@ -11,7 +11,7 @@ import {
   markAllNotificationsRead,
   deleteNotification,
   deleteAllNotifications,
-} from "../slices/notificationSlice"
+} from "../slices/Notificationslice"
 
 /* ── Rəng sabitleri ───────────────────────────────────────────── */
 const C = {

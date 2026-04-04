@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useLoginMutation } from '../redux/api/authApi'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import {
   Mail, Lock, Eye, EyeOff, ArrowRight, Loader2, User, Store,
   CheckCircle, Copy, ExternalLink, LayoutDashboard, Package,
   ShoppingBag, Settings, TrendingUp
 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { bloggerLogin } from '../slices/bloggerSlice'
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -19,9 +20,11 @@ const Login = () => {
   // Admin login-dən sonra göstəriləcək mağaza məlumatları
   const [adminData, setAdminData] = useState(null)
 
-  const navigate = useNavigate()
+  const navigate  = useNavigate()
+  const dispatch  = useDispatch()
   const [login, { isLoading }] = useLoginMutation()
-  const { isAuthenticated } = useSelector((state) => state.userSlice)
+  const { isAuthenticated }    = useSelector((state) => state.userSlice)
+  const { loading: bloggerLoading } = useSelector((s) => s.blogger)
 
   useEffect(() => {
     if (isAuthenticated && !adminData) navigate('/home')
@@ -38,6 +41,23 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
+    // ── Blogger girişi ──────────────────────────────────────────────
+    if (formData.role === 'blogger') {
+      try {
+        await dispatch(bloggerLogin({
+          email:    formData.email,
+          password: formData.password,
+        })).unwrap()
+        toast.success('Xoş gəldiniz! Blogger panelinə yönləndirilirsiniz.')
+        navigate('/blogger/dashboard')
+      } catch (err) {
+        toast.error(err || 'E-poçt və ya şifrə yanlışdır')
+      }
+      return
+    }
+
+    // ── İstifadəçi / Admin girişi ───────────────────────────────────
     try {
       const result = await login({
         email: formData.email,
@@ -66,7 +86,9 @@ const Login = () => {
     }
   }
 
-  const isAdmin = formData.role === 'admin'
+  const isAdmin   = formData.role === 'admin'
+  const isBlogger = formData.role === 'blogger'
+  const anyLoading = isLoading || bloggerLoading
 
   // ══════════════════════════════════════════════
   // ── ADMİN GİRİŞ SONRASI EKRAN ──
@@ -384,11 +406,14 @@ const Login = () => {
 
           {/* Role Toggle */}
           <div className="role-toggle">
-            <button type="button" className={`role-btn ${!isAdmin ? 'active' : ''}`} onClick={() => handleRoleChange('user')}>
+            <button type="button" className={`role-btn ${formData.role === 'user' ? 'active' : ''}`} onClick={() => handleRoleChange('user')}>
               <User size={16} /> Alıcı
             </button>
             <button type="button" className={`role-btn ${isAdmin ? 'active' : ''}`} onClick={() => handleRoleChange('admin')}>
               <Store size={16} /> Satıcı
+            </button>
+            <button type="button" className={`role-btn ${isBlogger ? 'active' : ''}`} onClick={() => handleRoleChange('blogger')}>
+              <TrendingUp size={16} /> Blogger
             </button>
           </div>
 
@@ -397,6 +422,14 @@ const Login = () => {
             <div className="admin-info-banner" style={{ marginBottom: '18px' }}>
               <Store size={16} color="#E8192C" style={{ flexShrink: 0 }} />
               <span>Satıcı hesabına daxil olursunuz. Giriş etdikdən sonra mağaza panelinizə yönləndiriləcəksiniz.</span>
+            </div>
+          )}
+
+          {/* Blogger seçiləndə info banner */}
+          {isBlogger && (
+            <div className="admin-info-banner" style={{ marginBottom: '18px' }}>
+              <TrendingUp size={16} color="#E8192C" style={{ flexShrink: 0 }} />
+              <span>Blogger hesabına daxil olursunuz. Giriş etdikdən sonra komissiya panelinizə yönləndiriləcəksiniz.</span>
             </div>
           )}
 
@@ -432,20 +465,34 @@ const Login = () => {
               <Link to="/forgot-password">Şifrənizi unutmusunuz?</Link>
             </div>
 
-            <button type="submit" disabled={isLoading} className="auth-btn">
-              {isLoading ? (
+            <button type="submit" disabled={anyLoading} className="auth-btn">
+              {anyLoading ? (
                 <><Loader2 size={20} className="animate-spin" /> Daxil olunur...</>
               ) : (
-                <>{isAdmin ? 'Admin Girişi' : 'Daxil Ol'} <ArrowRight size={18} /></>
+                <>
+                  {isAdmin ? 'Admin Girişi' : isBlogger ? 'Blogger Girişi' : 'Daxil Ol'}
+                  {' '}<ArrowRight size={18} />
+                </>
               )}
             </button>
           </form>
 
           <div className="auth-footer-link">
-            Hesabınız yoxdur?{' '}
-            <Link to="/register" style={{ color: '#E8192C', fontWeight: '700', textDecoration: 'none' }}>
-              Qeydiyyatdan keçin
-            </Link>
+            {isBlogger ? (
+              <>
+                Blogger hesabınız yoxdur?{' '}
+                <Link to="/blogger/register" style={{ color: '#E8192C', fontWeight: '700', textDecoration: 'none' }}>
+                  Qeydiyyatdan keçin
+                </Link>
+              </>
+            ) : (
+              <>
+                Hesabınız yoxdur?{' '}
+                <Link to="/register" style={{ color: '#E8192C', fontWeight: '700', textDecoration: 'none' }}>
+                  Qeydiyyatdan keçin
+                </Link>
+              </>
+            )}
           </div>
         </div>
 
@@ -457,7 +504,7 @@ const Login = () => {
               Brendex Ecosystem
             </p>
             <h3 className="auth-right-title">
-              {isAdmin ? 'Mağazanızı idarə etməyə hazır olun.' : 'Alış-verişin ən kəşf olunmamış yolu.'}
+              {isAdmin ? 'Mağazanızı idarə etməyə hazır olun.' : isBlogger ? 'Referral sistemi ilə qazanın.' : 'Alış-verişin ən kəşf olunmamış yolu.'}
             </h3>
             <div style={{ width: '50px', height: '4px', background: '#fff', borderRadius: '2px', marginBottom: '32px' }} />
             <div className="auth-right-features">
@@ -466,6 +513,13 @@ const Login = () => {
                   <div className="auth-right-feature"><CheckCircle size={18} /><span>Mağazanızı real vaxtda idarə edin</span></div>
                   <div className="auth-right-feature"><CheckCircle size={18} /><span>Satış statistikasını izləyin</span></div>
                   <div className="auth-right-feature"><CheckCircle size={18} /><span>Sifarişləri asanlıqla emal edin</span></div>
+                </>
+              ) : isBlogger ? (
+                <>
+                  <div className="auth-right-feature"><CheckCircle size={18} /><span>Promo kodunuzla alıcı gətirin</span></div>
+                  <div className="auth-right-feature"><CheckCircle size={18} /><span>Hər satışdan 20–41% komissiya</span></div>
+                  <div className="auth-right-feature"><CheckCircle size={18} /><span>6 aylıq ödəniş dövrü</span></div>
+                  <div className="auth-right-feature"><CheckCircle size={18} /><span>Real vaxt statistika paneli</span></div>
                 </>
               ) : (
                 <>

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE = "https://agminciqqaraminciq-production.up.railway.app/commerce/mehsullar/commission";
+const BASE = "http://localhost:3010/commerce/mehsullar/commission";
 
 // GET /commission/balance/:sellerId
 // Qaytarır: { availableBalance, pendingEarning, totalEarned,

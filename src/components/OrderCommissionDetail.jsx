@@ -11,7 +11,7 @@ import axios from "axios";
 //   • statusBadge bütün 4 statusu idarə edir: settled/pending/failed/refunded
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-const BASE = "https://agminciqqaraminciq-production.up.railway.app/commerce/mehsullar/commission";
+const BASE = "http://localhost:4000/commerce/mehsullar/commission";
 
 // Status badge konfiqurasiyası — bütün backend statusları burada
 const STATUS_CONFIG = {
