@@ -27,29 +27,36 @@ const C = {
 
 /* ── Bildiriş növü konfiqurasiyası ───────────────────────────── */
 const TYPE_CFG = {
-  order_status:      { emoji:"📦", bg:"#e0f2fe", color:"#0369a1", label:"Sifariş Statusu"   },
-  new_order:         { emoji:"🛒", bg:C.rose50,  color:C.primary,  label:"Yeni Sifariş"      },
-  low_stock:         { emoji:"⚠️", bg:"#fef9c3", color:"#854d0e", label:"Az Stok"            },
-  out_of_stock:      { emoji:"❌", bg:"#fee2e2", color:"#b91c1c", label:"Stok Bitti"         },
-  cart_added:        { emoji:"🛍️", bg:"#d1fae5", color:"#065f46", label:"Səbətə Əlavə"      },
-  favorite_price:    { emoji:"🎉", bg:C.rose50,  color:C.primary,  label:"Qiymət Dəyişdi"   },
-  commission_earned: { emoji:"💵", bg:"#d1fae5", color:"#065f46", label:"Komissiya"          },
-  new_user:          { emoji:"👤", bg:"#ede9fe", color:"#6d28d9", label:"Yeni İstifadəçi"    },
+  order_status:         { emoji:"📦", bg:"#e0f2fe", color:"#0369a1", label:"Sifariş Statusu"    },
+  new_order:            { emoji:"🛒", bg:C.rose50,  color:C.primary,  label:"Yeni Sifariş"       },
+  low_stock:            { emoji:"⚠️", bg:"#fef9c3", color:"#854d0e", label:"Az Stok"             },
+  out_of_stock:         { emoji:"❌", bg:"#fee2e2", color:"#b91c1c", label:"Stok Bitti"          },
+  cart_added:           { emoji:"🛍️", bg:"#d1fae5", color:"#065f46", label:"Səbətə Əlavə"       },
+  favorite_price:       { emoji:"🎉", bg:C.rose50,  color:C.primary,  label:"Qiymət Dəyişdi"    },
+  commission_earned:    { emoji:"💵", bg:"#d1fae5", color:"#065f46", label:"Komissiya"           },
+  new_user:             { emoji:"👤", bg:"#ede9fe", color:"#6d28d9", label:"Yeni İstifadəçi"    },
+  product_created:      { emoji:"📦", bg:"#dbeafe", color:"#1d4ed8", label:"Məhsul Əlavə Edildi" },
+  product_deleted:      { emoji:"🗑️", bg:"#f3f4f6", color:"#6b7280", label:"Məhsul Silindi"     },
+  payment_success:      { emoji:"💳", bg:"#d1fae5", color:"#065f46", label:"Ödəniş Uğurlu"      },
+  registration_welcome: { emoji:"🎉", bg:"#ede9fe", color:"#7c3aed", label:"Xoş Gəldiniz"       },
+  new_review:           { emoji:"⭐", bg:"#fef9c3", color:"#854d0e", label:"Yeni Rəy"           },
 }
 
 const TABS = [
-  { key:"all",   label:"Hamısı"       },
-  { key:"order", label:"📦 Sifarişlər" },
-  { key:"promo", label:"🎉 Endirimlər" },
-  { key:"stock", label:"⚠️ Stok"       },
-  { key:"other", label:"Digər"        },
+  { key:"all",     label:"Hamısı"        },
+  { key:"order",   label:"📦 Sifarişlər" },
+  { key:"promo",   label:"🎉 Endirimlər" },
+  { key:"stock",   label:"⚠️ Stok"        },
+  { key:"product", label:"🛍️ Məhsullar"  },
+  { key:"other",   label:"Digər"         },
 ]
 
 const TAB_TYPES = {
-  order: ["order_status","new_order"],
-  promo: ["favorite_price","cart_added"],
-  stock: ["low_stock","out_of_stock"],
-  other: ["commission_earned","new_user"],
+  order:   ["order_status","new_order","payment_success"],
+  promo:   ["favorite_price","cart_added"],
+  stock:   ["low_stock","out_of_stock"],
+  product: ["product_created","product_deleted","new_review"],
+  other:   ["commission_earned","new_user","registration_welcome"],
 }
 
 /* ── Vaxt formatı ─────────────────────────────────────────────── */
@@ -759,23 +766,31 @@ export default function NotificationsPage() {
 
                   {/* Footer — keç + sil */}
                   <div className="np-detail-foot">
-                    {/* Əlaqəli səhifəyə keç */}
-                    {n.data?.orderId && (
+                    {/* Əlaqəli səhifəyə keç — link varsa istifadə et */}
+                    {n.data?.link ? (
                       <button
                         className="np-btn-primary"
-                        onClick={() => navigate(`/my-orders`)}
+                        onClick={() => navigate(n.data.link)}
+                      >
+                        {n.data.orderId ? "📦 Sifarişə Bax"
+                          : n.data.productId ? "🛍️ Məhsula Bax"
+                          : "🔗 Ətrafla Bax"}
+                      </button>
+                    ) : n.data?.orderId ? (
+                      <button
+                        className="np-btn-primary"
+                        onClick={() => navigate("/my-orders")}
                       >
                         📦 Sifarişə Bax
                       </button>
-                    )}
-                    {n.data?.productId && !n.data?.orderId && (
+                    ) : n.data?.productId ? (
                       <button
                         className="np-btn-primary"
                         onClick={() => navigate(`/product/${n.data.productId}`)}
                       >
                         🛍️ Məhsula Bax
                       </button>
-                    )}
+                    ) : null}
 
                     {/* Sil düyməsi */}
                     <button

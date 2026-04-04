@@ -244,7 +244,7 @@ function ProductRow({ title, items, viewAll, isLoading, onAddToCart, favoriteIds
 
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {viewAll && (
-            <Link to="#" style={{
+            <Link to="/shop" style={{
               fontSize: 12.5, fontWeight: 800, color: "#E8192C",
               textDecoration: "none", marginRight: 4,
               display: "flex", alignItems: "center", gap: 3,

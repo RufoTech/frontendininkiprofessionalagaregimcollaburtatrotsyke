@@ -1,5 +1,7 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
+import { useSelector } from "react-redux"
+import toast from "react-hot-toast"
 
 /* ─── Brendex Logo (yeni B + araba logo) ─── */
 const BrendexLogo = ({ size = 56 }) => (
@@ -50,8 +52,18 @@ const GlobeIcon = () => (
 ══════════════════════════════════════════════ */
 const Welcome = () => {
   const navigate = useNavigate()
+  const { isAuthenticated } = useSelector((state) => state.userSlice)
   const [step, setStep] = useState(0)
   // 0: gizli  1: logo pop  2: brand yazısı  3: xətt  4: subtitle  5: düymələr  6: sosial
+  const [navigating, setNavigating] = useState(false)
+  const socialToastShown = useRef(false)
+
+  // TC-043: Artıq giriş etmiş istifadəçini /home-a yönləndir
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/home", { replace: true })
+    }
+  }, [isAuthenticated, navigate])
 
   useEffect(() => {
     // Splash Phase1 ilə eyni zamanlama
@@ -63,6 +75,24 @@ const Welcome = () => {
     const t6 = setTimeout(() => setStep(6), 1750)  // sosial
     return () => [t1,t2,t3,t4,t5,t6].forEach(clearTimeout)
   }, [])
+
+  // TC-013/014: Çoxlu klik qoruması
+  const handleNavigate = (path) => {
+    if (navigating) return
+    setNavigating(true)
+    navigate(path)
+  }
+
+  // TC-021–025: Sosial login handler
+  const handleSocialLogin = (provider) => {
+    if (socialToastShown.current) return
+    socialToastShown.current = true
+    toast(`${provider} ilə giriş tezliklə aktivləşdiriləcək`, {
+      icon: "🔜",
+      duration: 2500,
+    })
+    setTimeout(() => { socialToastShown.current = false }, 3000)
+  }
 
   return (
     <>
@@ -187,7 +217,7 @@ const Welcome = () => {
         /* Subtitle */
         .wl-sub {
           font-size: 14px; font-weight: 400;
-          color: rgba(255,255,255,0.50);
+          color: rgba(255,255,255,0.62);
           letter-spacing: 0.3px; opacity: 0;
         }
         .wl-sub.show {
@@ -279,12 +309,27 @@ const Welcome = () => {
 
         /* ── Terms ── */
         .wl-terms {
-          font-size: 11px; color:rgba(255,255,255,0.28);
+          font-size: 11px; color:rgba(255,255,255,0.45);
           text-align: center; line-height: 1.7;
           opacity: 0;
         }
         .wl-terms.show { animation: wlRise 0.44s ease both; }
-        .wl-terms a { color:rgba(255,255,255,0.50); text-decoration:underline; text-underline-offset:2px; }
+        .wl-terms a { color:rgba(255,255,255,0.72); text-decoration:underline; text-underline-offset:2px; }
+
+        /* ── Focus-visible (TC-036, TC-037) ── */
+        .wl-btn-reg:focus-visible,
+        .wl-btn-login:focus-visible {
+          outline: 3px solid rgba(255,255,255,0.80);
+          outline-offset: 3px;
+        }
+        .wl-soc:focus-visible {
+          outline: 2px solid rgba(255,255,255,0.70);
+          outline-offset: 2px;
+        }
+        .wl-terms a:focus-visible {
+          outline: 1px solid rgba(255,255,255,0.60);
+          border-radius: 2px;
+        }
 
         @media(max-width:380px) {
           .wl-brand-name { font-size:30px; }
@@ -333,10 +378,10 @@ const Welcome = () => {
 
           {/* Əsas düymələr */}
           <div className={`wl-btns ${step >= 5 ? "show" : ""}`}>
-            <button className="wl-btn-reg"   onClick={() => navigate("/register")}>
+            <button className="wl-btn-reg"   onClick={() => handleNavigate("/register")} disabled={navigating}>
               Qeydiyyat
             </button>
-            <button className="wl-btn-login" onClick={() => navigate("/login")}>
+            <button className="wl-btn-login" onClick={() => handleNavigate("/login")} disabled={navigating}>
               Daxil ol
             </button>
           </div>
@@ -350,15 +395,15 @@ const Welcome = () => {
 
           {/* Sosial düymələr */}
           <div className={`wl-social ${step >= 6 ? "show" : ""}`}>
-            <button className="wl-soc" title="Veb"><GlobeIcon /></button>
-            <button className="wl-soc" title="Apple"><AppleIcon /></button>
-            <button className="wl-soc" title="Google"><GoogleIcon /></button>
+            <button className="wl-soc" title="Veb"    onClick={() => handleSocialLogin("Veb")   }><GlobeIcon /></button>
+            <button className="wl-soc" title="Apple"  onClick={() => handleSocialLogin("Apple") }><AppleIcon /></button>
+            <button className="wl-soc" title="Google" onClick={() => handleSocialLogin("Google")}><GoogleIcon /></button>
           </div>
 
           {/* Terms */}
           <p className={`wl-terms ${step >= 6 ? "show" : ""}`}>
             Davam etməklə Brendex-in{" "}
-            <a href="#">Şərtlər və Qaydaları</a> ilə razılaşırsınız.
+            <a href="/terms" target="_blank" rel="noopener noreferrer">Şərtlər və Qaydaları</a> ilə razılaşırsınız.
           </p>
 
         </div>

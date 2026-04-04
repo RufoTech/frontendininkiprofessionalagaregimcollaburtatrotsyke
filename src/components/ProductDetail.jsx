@@ -9,6 +9,7 @@ import {
   useCreateOrUpdateReviewMutation,
   useGetProductReviewsQuery,
 } from "../redux/api/productsApi"
+import { useLazyGetStoreSlugBySellerQuery } from "../redux/api/authApi"
 
 import {
   Heart,
@@ -39,87 +40,74 @@ import { toast, Toaster } from "react-hot-toast"
 import StarRatings from "react-star-ratings"
 
 /* ═══════════════════════════════════════════════════════════════
-   DESIGN TOKENS — Qırmızı + Ağ palitra
-   Yaşıl yalnız stok / uğur bildirişləri üçün
+   DESIGN TOKENS
 ═══════════════════════════════════════════════════════════════ */
-const t = {
-  /* Qırmızı */
+const C = {
   red:         "#E8192C",
   redDark:     "#C0001A",
   redLight:    "#FFF5F5",
   redMid:      "#FFE0E3",
   redBorder:   "#FCCDD1",
-
-  /* Yaşıl — yalnız stok/uğur */
   green:       "#00A650",
   greenLight:  "#F0FDF4",
   greenBorder: "#BBF7D0",
-
-  /* Ağ / Neytral */
   white:       "#FFFFFF",
   bg:          "#F5F5F5",
   border:      "#E8E8E8",
   borderMid:   "#D1D1D1",
-
-  /* Mətn */
   textDark:    "#0F1111",
   textMid:     "#565959",
   textLight:   "#767676",
-
-  /* Qiymət */
   priceRed:    "#B12704",
-
-  /* Ulduz */
   star:        "#FFA41C",
-
-  /* Kölgə */
   shadow:      "0 2px 8px rgba(0,0,0,0.10)",
-  shadowCard:  "0 1px 3px rgba(0,0,0,0.08)",
+  shadowSm:    "0 1px 3px rgba(0,0,0,0.07)",
 }
+
+const font = "'Sora','Segoe UI',system-ui,sans-serif"
 
 /* ── Helpers ── */
 const Divider = () => (
-  <div style={{ height:1, background:t.border, margin:"14px 0" }}/>
+  <div style={{ height: 1, background: C.border, margin: "16px 0" }} />
+)
+
+const Section = ({ children, style = {} }) => (
+  <div style={{
+    background: C.white,
+    borderRadius: 16,
+    padding: "16px",
+    boxShadow: C.shadowSm,
+    ...style,
+  }}>
+    {children}
+  </div>
 )
 
 const GreenBadge = ({ children }) => (
   <span style={{
-    display:"inline-flex", alignItems:"center", gap:3,
-    background:t.greenLight, color:t.green,
-    border:`1px solid ${t.greenBorder}`,
-    fontSize:11, fontWeight:700, padding:"2px 7px", borderRadius:4,
-  }}>{children}</span>
-)
-
-const TrustItem = ({ icon, label, sub }) => (
-  <div style={{
-    display:"flex", alignItems:"center", gap:9,
-    flex:1, minWidth:130,
-    padding:"9px 12px", background:t.white,
-    border:`1px solid ${t.border}`, borderRadius:8,
+    display: "inline-flex", alignItems: "center", gap: 3,
+    background: C.greenLight, color: C.green,
+    border: `1px solid ${C.greenBorder}`,
+    fontSize: 11, fontWeight: 700, padding: "2px 7px", borderRadius: 6,
   }}>
-    <div style={{ color:t.red, flexShrink:0 }}>{icon}</div>
-    <div>
-      <div style={{ fontSize:12, fontWeight:700, color:t.textDark }}>{label}</div>
-      <div style={{ fontSize:11, color:t.textLight }}>{sub}</div>
-    </div>
-  </div>
+    {children}
+  </span>
 )
 
 const RatingBar = ({ value, count, total }) => {
   const pct = total > 0 ? (count / total) * 100 : 0
   return (
-    <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:5 }}>
-      <span style={{ fontSize:12, color:t.textMid, width:12, textAlign:"right", flexShrink:0 }}>{value}</span>
-      <Star size={11} fill={t.star} color={t.star} style={{ flexShrink:0 }}/>
-      <div style={{ flex:1, height:8, background:t.border, borderRadius:4, overflow:"hidden" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}>
+      <span style={{ fontSize: 12, color: C.textMid, width: 12, textAlign: "right", flexShrink: 0 }}>{value}</span>
+      <Star size={11} fill={C.star} color={C.star} style={{ flexShrink: 0 }} />
+      <div style={{ flex: 1, height: 7, background: C.border, borderRadius: 4, overflow: "hidden" }}>
         <div style={{
-          width:`${pct}%`, height:"100%",
-          background:`linear-gradient(90deg,${t.red},${t.redDark})`,
-          borderRadius:4, transition:"width 0.6s",
-        }}/>
+          width: `${pct}%`, height: "100%",
+          background: `linear-gradient(90deg,${C.red},${C.redDark})`,
+          borderRadius: 4, transition: "width 0.6s",
+        }} />
       </div>
-      <span style={{ fontSize:11, color:t.textLight, width:24, textAlign:"right", flexShrink:0 }}>{count}</span>
+      <span style={{ fontSize: 11, color: C.textLight, width: 24, textAlign: "right", flexShrink: 0 }}>{count}</span>
     </div>
   )
 }
@@ -128,7 +116,7 @@ const RatingBar = ({ value, count, total }) => {
    ANA KOMPONENT
 ═══════════════════════════════════════════════════════════════ */
 const ProductDetail = () => {
-  const params = useParams()
+  const params   = useParams()
   const navigate = useNavigate()
 
   const { data, isLoading, error } = useGetProductDetailsQuery(params?.id, {
@@ -142,6 +130,7 @@ const ProductDetail = () => {
   const [addToCart]            = useAddToCartMutation()
   const [addToFavorites]       = useAddToFavoritesMutation()
   const [createOrUpdateReview] = useCreateOrUpdateReviewMutation()
+  const [getStoreSlug]         = useLazyGetStoreSlugBySellerQuery()
 
   const [currentImg,    setCurrentImg]    = useState(0)
   const [reviewRating,  setReviewRating]  = useState(0)
@@ -152,15 +141,15 @@ const ProductDetail = () => {
   const [addedToCart,   setAddedToCart]   = useState(false)
 
   /* Countdown */
-  const [timeLeft, setTimeLeft] = useState(2*3600 + 30*60 + 45)
+  const [timeLeft, setTimeLeft] = useState(2 * 3600 + 30 * 60 + 45)
   useEffect(() => {
     if (timeLeft <= 0) return
-    const iv = setInterval(() => setTimeLeft(p => p > 0 ? p-1 : 0), 1000)
+    const iv = setInterval(() => setTimeLeft(p => p > 0 ? p - 1 : 0), 1000)
     return () => clearInterval(iv)
   }, [timeLeft])
   const fmt = s => {
-    const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60
-    return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`
   }
 
   const imgs   = product?.images || []
@@ -168,7 +157,6 @@ const ProductDetail = () => {
     ? imgs[currentImg].url
     : "https://flowbite.s3.amazonaws.com/blocks/e-commerce/imac-front-dark.svg"
 
-  /* seller — bazada string kimi saxlanılır */
   const sellerName =
     (typeof product?.seller === "string" && product.seller) ||
     product?.seller?.storeName ||
@@ -177,21 +165,21 @@ const ProductDetail = () => {
 
   const reviews    = reviewsData?.reviews || []
   const totalRev   = reviews.length
-  const ratingDist = [5,4,3,2,1].map(v => ({
-    v, count: reviews.filter(r => Math.round(r.rating) === v).length
+  const ratingDist = [5, 4, 3, 2, 1].map(v => ({
+    v, count: reviews.filter(r => Math.round(r.rating) === v).length,
   }))
 
   const navImg = dir =>
     setCurrentImg(p =>
       dir === "prev"
-        ? (p === 0 ? imgs.length-1 : p-1)
-        : (p === imgs.length-1 ? 0 : p+1)
+        ? (p === 0 ? imgs.length - 1 : p - 1)
+        : (p === imgs.length - 1 ? 0 : p + 1)
     )
 
   const handleAddToCart = async e => {
     e.preventDefault()
     try {
-      await addToCart({ productId:product._id, quantity }).unwrap()
+      await addToCart({ productId: product._id, quantity }).unwrap()
       setAddedToCart(true)
       toast.success("Məhsul səbətə əlavə edildi")
       setTimeout(() => setAddedToCart(false), 2500)
@@ -206,15 +194,14 @@ const ProductDetail = () => {
     } catch (err) {
       const msg = err.data?.message || "Xəta baş verdi"
       if (msg.toLowerCase().includes("already")) {
-        setIsFaved(true); toast("Artıq favorilərdədir", { icon:"ℹ️" })
+        setIsFaved(true); toast("Artıq favorilərdədir", { icon: "ℹ️" })
       } else toast.error(msg)
     }
   }
 
-  /* Specs */
   const getSpecs = () => {
     if (!product) return []
-    const p = product
+    const p   = product
     const map = {
       Phones:        [["Ekran","screenSize"],["Yaddaş","storage"],["RAM","ram"],["Ön Kamera","frontCamera"],["Arxa Kamera","backCamera"],["Batareya","battery"],["Prosessor","processor"],["OS","operatingSystem"]],
       Laptops:       [["Ekran","screenSize"],["Yaddaş","storage"],["RAM","ram"],["GPU","gpu"],["Kamera","camera"],["Prosessor","processor"],["Batareya Ömrü","batteryLife"],["OS","operatingSystem"]],
@@ -233,9 +220,9 @@ const ProductDetail = () => {
     }
     const rows  = map[p.category] || []
     const extra = []
-    if (p.category === "Console" && p.controllerIncluded) extra.push(["Controller","Daxildir"])
-    if (p.category === "iPad"    && p.cellular)           extra.push(["Cellular","Bəli"])
-    return [...rows.map(([l,k]) => p[k] ? [l,p[k]] : null).filter(Boolean), ...extra]
+    if (p.category === "Console" && p.controllerIncluded) extra.push(["Controller", "Daxildir"])
+    if (p.category === "iPad"    && p.cellular)           extra.push(["Cellular", "Bəli"])
+    return [...rows.map(([l, k]) => p[k] ? [l, p[k]] : null).filter(Boolean), ...extra]
   }
 
   const handleReviewSubmit = async e => {
@@ -243,542 +230,560 @@ const ProductDetail = () => {
     if (!reviewRating) { toast.error("Zəhmət olmasa ulduz seçin"); return }
     try {
       const res = await createOrUpdateReview({
-        productId:product._id, rating:reviewRating, comment:reviewComment,
+        productId: product._id, rating: reviewRating, comment: reviewComment,
       }).unwrap()
       toast.success(res.message || "Rəy göndərildi")
       setReviewRating(0); setReviewComment("")
     } catch (err) { toast.error(err.data?.message || "Xəta baş verdi") }
   }
 
-  /* Loading / Error */
+  /* ── Loading ── */
   if (isLoading)
     return (
-      <div style={{ display:"flex", justifyContent:"center", alignItems:"center", height:"100vh", background:t.bg }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", background: C.bg }}>
         <div style={{
-          width:44, height:44, borderRadius:"50%",
-          border:`4px solid ${t.redMid}`, borderTopColor:t.red,
-          animation:"_spin 0.75s linear infinite",
-        }}/>
+          width: 44, height: 44, borderRadius: "50%",
+          border: `4px solid ${C.redMid}`, borderTopColor: C.red,
+          animation: "_spin 0.75s linear infinite",
+        }} />
         <style>{`@keyframes _spin{to{transform:rotate(360deg)}}`}</style>
       </div>
     )
 
   if (error)
     return (
-      <div style={{ display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:"100vh",gap:12,color:t.red }}>
-        <AlertCircle size={48}/>
-        <p style={{ fontSize:18,fontWeight:600 }}>Xəta: {error.message}</p>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100vh", gap: 12, color: C.red }}>
+        <AlertCircle size={48} />
+        <p style={{ fontSize: 18, fontWeight: 600 }}>Xəta: {error.message}</p>
       </div>
     )
 
-  const origPrice = product?.originalPrice || Math.round((product?.price||0)*1.25)
+  const origPrice = product?.originalPrice || Math.round((product?.price || 0) * 1.25)
   const discount  = product?.discount || 25
   const inStock   = product?.stock > 0
   const lowStock  = inStock && product.stock <= 10
   const specs     = getSpecs()
 
+  /* ─────────────────────────────────────────── RENDER ── */
   return (
-    <div style={{ background:t.bg, minHeight:"100vh", fontFamily:"'Segoe UI',system-ui,sans-serif" }}>
-      <Toaster position="top-center" toastOptions={{ style:{ fontSize:13, borderRadius:8 }}}/>
+    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: font }}>
+      <Toaster position="top-center" toastOptions={{ style: { fontSize: 13, borderRadius: 10, fontFamily: font } }} />
 
-      {/* ── Üst bar ── */}
-      <div style={{ background:t.white, borderBottom:`1px solid ${t.border}`, padding:"10px 20px" }}>
+      {/* ── TOP BAR ── */}
+      <div style={{
+        position: "sticky", top: 0, zIndex: 50,
+        background: C.white,
+        borderBottom: `1px solid ${C.border}`,
+        display: "flex", alignItems: "center",
+        padding: "12px 16px", gap: 8,
+      }}>
         <button
-          onClick={()=>window.history.back()}
+          onClick={() => window.history.back()}
           style={{
-            display:"flex", alignItems:"center", gap:6,
-            background:"none", border:"none", cursor:"pointer",
-            fontSize:13, color:t.red, fontWeight:600,
+            width: 38, height: 38, borderRadius: 10,
+            background: C.bg, border: "none", cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: C.textDark, flexShrink: 0,
           }}
         >
-          <ArrowLeft size={15}/> Geri
+          <ArrowLeft size={20} />
         </button>
+
+        <span style={{ flex: 1, fontSize: 16, fontWeight: 700, color: C.textDark, textAlign: "center" }}>
+          Məhsul Detalı
+        </span>
+
+        <div style={{ display: "flex", gap: 6 }}>
+          <button
+            onClick={handleFav}
+            style={{
+              width: 38, height: 38, borderRadius: 10,
+              background: isFaved ? C.redLight : C.bg,
+              border: `1.5px solid ${isFaved ? C.red : C.border}`,
+              cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}
+          >
+            <Heart size={18} fill={isFaved ? C.red : "none"} color={isFaved ? C.red : C.textMid} />
+          </button>
+          <button
+            onClick={() => {
+              const productUrl  = `${window.location.origin}/product/${params?.id}`
+              const bloggerInfo = JSON.parse(localStorage.getItem("bloggerInfo") || "null")
+              const shareUrl    = bloggerInfo?.promoCode ? `${productUrl}?promo=${bloggerInfo.promoCode}` : productUrl
+              navigator.clipboard.writeText(shareUrl)
+              toast.success("Link kopyalandı!")
+            }}
+            style={{
+              width: 38, height: 38, borderRadius: 10,
+              background: C.bg, border: `1.5px solid ${C.border}`,
+              cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}
+          >
+            <Share2 size={17} color={C.textMid} />
+          </button>
+        </div>
       </div>
 
-      <div style={{ maxWidth:1200, margin:"0 auto", padding:"16px 16px 48px" }}>
+      {/* ── MAIN WRAPPER ── */}
+      <div style={{ padding: "12px 12px 48px" }}>
+        <div className="pd-main-grid">
 
-        {/* ── Əsas məhsul kartı ── */}
-        <div style={{
-          background:t.white, borderRadius:12,
-          border:`1px solid ${t.border}`,
-          boxShadow:t.shadowCard, overflow:"hidden",
-        }}>
-          <div className="pd-grid" style={{
-            display:"grid",
-            gridTemplateColumns:"minmax(280px,2fr) minmax(320px,3fr)",
-            gap:0,
-          }}>
-
-            {/* ════ SOL — Şəkillər ════ */}
+          {/* ════ SOL / ÜST — Şəkil bölməsi ════ */}
+          <div>
+            {/* Əsas şəkil */}
             <div style={{
-              padding:"24px 20px",
-              borderRight:`1px solid ${t.border}`,
-              position:"sticky", top:0, height:"fit-content",
+              position: "relative", borderRadius: 20, overflow: "hidden",
+              background: C.white, aspectRatio: "4/3",
+              boxShadow: C.shadow,
             }}>
+              <img
+                src={imgUrl}
+                alt={product?.name}
+                style={{ width: "100%", height: "100%", objectFit: "contain", padding: 16 }}
+              />
 
-              {/* Əsas şəkil */}
+              {/* Flash Sale overlay — sol yuxarı */}
               <div style={{
-                position:"relative", background:"#FAFAFA",
-                border:`1px solid ${t.border}`, borderRadius:10,
-                aspectRatio:"1/1", overflow:"hidden",
+                position: "absolute", top: 12, left: 12,
+                display: "flex", alignItems: "center", gap: 6,
+                background: C.red, borderRadius: 8, padding: "6px 10px",
               }}>
-                {/* Endirim badge */}
+                <Zap size={13} fill="white" color="white" />
+                <span style={{ color: "#fff", fontSize: 11, fontWeight: 800, letterSpacing: 0.6 }}>
+                  FLASH SALE
+                </span>
                 <div style={{
-                  position:"absolute", top:12, left:12, zIndex:2,
-                  background:t.red, color:"#fff",
-                  fontSize:12, fontWeight:800, padding:"3px 9px",
-                  borderRadius:5, letterSpacing:0.3,
+                  background: "rgba(0,0,0,0.22)",
+                  borderRadius: 5, padding: "1px 7px",
+                  display: "flex", alignItems: "center", gap: 4,
                 }}>
-                  -{discount}%
+                  <Clock size={10} color="white" />
+                  <span style={{ color: "#fff", fontFamily: "monospace", fontSize: 12, fontWeight: 700 }}>
+                    {fmt(timeLeft)}
+                  </span>
                 </div>
-
-                {/* Favori */}
-                <button onClick={handleFav} style={{
-                  position:"absolute", top:12, right:12, zIndex:2,
-                  width:36, height:36, borderRadius:"50%",
-                  background:isFaved ? t.redLight : t.white,
-                  border:`1.5px solid ${isFaved ? t.red : t.border}`,
-                  display:"flex", alignItems:"center", justifyContent:"center",
-                  cursor:"pointer", boxShadow:t.shadow, transition:"all 0.18s",
-                }}>
-                  <Heart size={17} fill={isFaved?t.red:"none"} color={isFaved?t.red:t.textMid}/>
-                </button>
-
-                <img
-                  src={imgUrl} alt={product?.name}
-                  style={{
-                    width:"100%", height:"100%", objectFit:"contain",
-                    padding:20, transition:"transform 0.3s",
-                  }}
-                  onMouseEnter={e=>e.currentTarget.style.transform="scale(1.05)"}
-                  onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}
-                />
-
-                {/* Naviqasiya oxları */}
-                {imgs.length > 1 && ["prev","next"].map(dir=>(
-                  <button key={dir} onClick={()=>navImg(dir)} style={{
-                    position:"absolute", top:"50%",
-                    [dir==="prev"?"left":"right"]:10,
-                    transform:"translateY(-50%)",
-                    width:32, height:32, borderRadius:"50%",
-                    background:"rgba(255,255,255,0.93)",
-                    border:`1px solid ${t.border}`,
-                    display:"flex", alignItems:"center", justifyContent:"center",
-                    cursor:"pointer", boxShadow:t.shadow,
-                  }}>
-                    {dir==="prev"
-                      ? <ChevronLeft  size={16} color={t.textDark}/>
-                      : <ChevronRight size={16} color={t.textDark}/>}
-                  </button>
-                ))}
               </div>
 
-              {/* Thumbnail-lər */}
+              {/* Endirim badge — sağ yuxarı */}
+              <div style={{
+                position: "absolute", top: 12, right: 12,
+                background: C.redDark, color: "#fff",
+                fontSize: 12, fontWeight: 800, padding: "4px 9px",
+                borderRadius: 8, letterSpacing: 0.3,
+              }}>
+                -{discount}%
+              </div>
+
+              {/* Naviqasiya oxları */}
+              {imgs.length > 1 && ["prev", "next"].map(dir => (
+                <button key={dir} onClick={() => navImg(dir)} style={{
+                  position: "absolute", top: "50%",
+                  [dir === "prev" ? "left" : "right"]: 10,
+                  transform: "translateY(-50%)",
+                  width: 34, height: 34, borderRadius: "50%",
+                  background: "rgba(255,255,255,0.92)",
+                  border: `1px solid ${C.border}`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  cursor: "pointer", boxShadow: C.shadow,
+                }}>
+                  {dir === "prev"
+                    ? <ChevronLeft  size={16} color={C.textDark} />
+                    : <ChevronRight size={16} color={C.textDark} />}
+                </button>
+              ))}
+
+              {/* Dots indikatoru */}
               {imgs.length > 1 && (
-                <div style={{ display:"flex", gap:7, marginTop:10, overflowX:"auto", paddingBottom:4 }}>
-                  {imgs.map((img,i)=>(
-                    <button key={i} onClick={()=>setCurrentImg(i)} style={{
-                      width:58, height:58, borderRadius:7, overflow:"hidden",
-                      border:`2px solid ${i===currentImg ? t.red : t.border}`,
-                      cursor:"pointer", background:t.white, padding:4, flexShrink:0,
-                      boxShadow:i===currentImg ? `0 0 0 2px ${t.redBorder}` : "none",
-                      transition:"all 0.15s",
-                    }}>
-                      <img src={img.url} alt="" style={{ width:"100%",height:"100%",objectFit:"contain" }}/>
-                    </button>
+                <div style={{
+                  position: "absolute", bottom: 10, left: "50%",
+                  transform: "translateX(-50%)",
+                  display: "flex", gap: 5,
+                }}>
+                  {imgs.map((_, i) => (
+                    <button key={i} onClick={() => setCurrentImg(i)} style={{
+                      width: i === currentImg ? 18 : 6,
+                      height: 6, borderRadius: 3,
+                      background: i === currentImg ? C.red : "rgba(255,255,255,0.7)",
+                      border: "none", cursor: "pointer", padding: 0,
+                      transition: "all 0.2s",
+                    }} />
                   ))}
                 </div>
               )}
-
-              {/* Paylaş */}
-              <button style={{
-                display:"flex", alignItems:"center", gap:5, marginTop:14,
-                background:"none", border:"none", cursor:"pointer",
-                fontSize:12, color:t.textLight,
-              }}>
-                <Share2 size={13}/> Paylaş
-              </button>
             </div>
 
-            {/* ════ SAĞ — Məlumatlar ════ */}
-            <div style={{ padding:"24px 28px" }}>
+            {/* Thumbnail-lər */}
+            {imgs.length > 1 && (
+              <div style={{ display: "flex", gap: 8, marginTop: 10, overflowX: "auto", paddingBottom: 4 }}>
+                {imgs.map((img, i) => (
+                  <button key={i} onClick={() => setCurrentImg(i)} style={{
+                    width: 62, height: 62, borderRadius: 10, overflow: "hidden", flexShrink: 0,
+                    border: `2px solid ${i === currentImg ? C.red : C.border}`,
+                    cursor: "pointer", background: C.white, padding: 4,
+                    boxShadow: i === currentImg ? `0 0 0 2px ${C.redBorder}` : "none",
+                    transition: "all 0.15s",
+                  }}>
+                    <img src={img.url} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
-              {/* Başlıq */}
+          {/* ════ SAĞ / ALT — Məlumat bölməsi ════ */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+
+            {/* Qiymət + Ad + Rating */}
+            <Section>
+              {/* Qiymət sətri */}
+              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 8 }}>
+                <span style={{ fontSize: 30, fontWeight: 800, color: C.priceRed, lineHeight: 1 }}>
+                  ₼{product?.price}
+                </span>
+                <span style={{ fontSize: 15, color: C.textLight, textDecoration: "line-through" }}>
+                  ₼{origPrice}
+                </span>
+                <span style={{
+                  fontSize: 12, fontWeight: 700, color: C.white,
+                  background: C.red, padding: "3px 8px", borderRadius: 6,
+                }}>
+                  ₼{(origPrice - (product?.price || 0)).toFixed(2)} qənaət
+                </span>
+              </div>
+
+              {/* Məhsul adı */}
               <h1 style={{
-                fontSize:20, fontWeight:600, color:t.textDark,
-                lineHeight:1.45, margin:"0 0 10px",
+                fontSize: 18, fontWeight: 700, color: C.textDark,
+                lineHeight: 1.4, margin: "0 0 10px",
               }}>
                 {product?.name}
               </h1>
 
-              {/* Reytinq */}
-              <div style={{
-                display:"flex", alignItems:"center", gap:8,
-                margin:"0 0 14px", flexWrap:"wrap",
-              }}>
-                <div style={{ display:"flex", gap:1 }}>
-                  {[1,2,3,4,5].map(i=>(
+              {/* Rating + Stok */}
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                <div style={{ display: "flex", gap: 2 }}>
+                  {[1, 2, 3, 4, 5].map(i => (
                     <Star key={i} size={14}
-                      fill={i<=Math.round(product?.ratings||0)?t.star:"#DDD"}
-                      color={i<=Math.round(product?.ratings||0)?t.star:"#DDD"}
+                      fill={i <= Math.round(product?.ratings || 0) ? C.star : "#DDD"}
+                      color={i <= Math.round(product?.ratings || 0) ? C.star : "#DDD"}
                     />
                   ))}
                 </div>
-                <span style={{ fontSize:14, color:t.red, fontWeight:600 }}>
-                  {product?.ratings?.toFixed(1)||"0.0"}
+                <span style={{ fontSize: 13, color: C.red, fontWeight: 700 }}>
+                  {product?.ratings?.toFixed(1) || "0.0"}
                 </span>
-                <span style={{ fontSize:13, color:t.textLight }}>({totalRev} rəy)</span>
-                <span style={{ width:1, height:14, background:t.borderMid }}/>
-                <GreenBadge><BadgeCheck size={10}/> Doğrulanmış Satıcı</GreenBadge>
-              </div>
-
-              <Divider/>
-
-              {/* Qiymət bloku */}
-              <div style={{
-                background:t.redLight, border:`1px solid ${t.redBorder}`,
-                borderRadius:10, padding:"14px 16px", marginBottom:14,
-              }}>
-                {/* Flash sale sayacı */}
-                <div style={{
-                  display:"flex", alignItems:"center", gap:8, marginBottom:12,
-                  background:t.red, borderRadius:6, padding:"6px 10px",
-                }}>
-                  <Zap size={13} fill="white" color="white"/>
-                  <span style={{ color:"#fff", fontSize:11, fontWeight:800, letterSpacing:0.8 }}>
-                    FLASH SALE
+                <span style={{ fontSize: 12, color: C.textLight }}>({totalRev} rəy)</span>
+                <span style={{ width: 1, height: 12, background: C.borderMid }} />
+                {inStock ? (
+                  <span style={{ fontSize: 12, fontWeight: 600, color: C.green }}>
+                    ✓ Stokda var{lowStock ? ` — ${product.stock} ədəd` : ""}
                   </span>
-                  <div style={{
-                    marginLeft:"auto",
-                    background:"rgba(0,0,0,0.22)",
-                    borderRadius:4, padding:"2px 8px",
-                    display:"flex", alignItems:"center", gap:5,
-                  }}>
-                    <Clock size={11} color="white"/>
-                    <span style={{ color:"#fff", fontFamily:"monospace", fontSize:13, fontWeight:700 }}>
-                      {fmt(timeLeft)}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Qiymət */}
-                <div style={{ display:"flex", alignItems:"flex-end", gap:10, flexWrap:"wrap" }}>
-                  <span style={{ fontSize:34, fontWeight:700, color:t.priceRed, lineHeight:1 }}>
-                    ₼{product?.price}
+                ) : (
+                  <span style={{ fontSize: 12, fontWeight: 600, color: C.red }}>
+                    Stokda yoxdur
                   </span>
-                  <div style={{ marginBottom:4 }}>
-                    <span style={{ fontSize:15, color:t.textLight, textDecoration:"line-through" }}>
-                      ₼{origPrice}
-                    </span>
-                    <span style={{
-                      marginLeft:7, fontSize:12, fontWeight:700, color:t.white,
-                      background:t.red, padding:"2px 7px", borderRadius:4,
-                    }}>
-                      ₼{(origPrice-(product?.price||0)).toFixed(2)} qənaət
-                    </span>
-                  </div>
-                </div>
-                <div style={{ fontSize:11, color:t.textLight, marginTop:5 }}>
-                  Vergi daxil • Çatdırılma pulsuz
-                </div>
+                )}
               </div>
+            </Section>
 
-              {/* Stok — yaşıl / qırmızı */}
-              <div style={{
-                display:"flex", alignItems:"center", gap:8,
-                padding:"9px 14px", borderRadius:8, marginBottom:14,
-                background:inStock ? t.greenLight : t.redLight,
-                border:`1px solid ${inStock ? t.greenBorder : t.redBorder}`,
-              }}>
-                {inStock
-                  ? <>
-                      <CheckCircle size={16} color={t.green}/>
-                      <span style={{ fontSize:14, fontWeight:600, color:t.green }}>Stokda var</span>
-                      {lowStock && (
-                        <span style={{ fontSize:12, color:t.red, fontWeight:500 }}>
-                          — yalnız {product.stock} ədəd qalıb!
-                        </span>
-                      )}
-                    </>
-                  : <>
-                      <AlertCircle size={16} color={t.red}/>
-                      <span style={{ fontSize:14, fontWeight:600, color:t.red }}>Stokda yoxdur</span>
-                    </>
-                }
-              </div>
-
-              {/* Satıcı */}
-              <div style={{
-                display:"flex", alignItems:"center", justifyContent:"space-between",
-                padding:"12px 14px", background:t.white,
-                border:`1px solid ${t.border}`, borderRadius:10, marginBottom:14,
-              }}>
-                <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+            {/* Satıcı */}
+            <Section>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <div style={{
-                    width:40, height:40, borderRadius:9,
-                    background:`linear-gradient(135deg,${t.red} 0%,${t.redDark} 100%)`,
-                    display:"flex", alignItems:"center", justifyContent:"center",
+                    width: 44, height: 44, borderRadius: 12,
+                    background: `linear-gradient(135deg,${C.red} 0%,${C.redDark} 100%)`,
+                    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
                   }}>
-                    <Store size={19} color="white"/>
+                    <Store size={20} color="white" />
                   </div>
                   <div>
-                    <div style={{ fontSize:11, color:t.textLight, marginBottom:1 }}>Satıcı</div>
-                    {/* sellerName — bazadan gələn string: product.seller */}
-                    <div style={{ fontSize:15, fontWeight:700, color:t.textDark }}>{sellerName}</div>
-                    <div style={{ display:"flex", alignItems:"center", gap:2, marginTop:2 }}>
-                      {[1,2,3,4,5].map(i=>(
-                        <Star key={i} size={10} fill={t.star} color={t.star}/>
+                    <div style={{ fontSize: 11, color: C.textLight }}>Satıcı</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: C.textDark }}>{sellerName}</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 2, marginTop: 2 }}>
+                      {[1,2,3,4,5].map(i => (
+                        <Star key={i} size={10} fill={C.star} color={C.star} />
                       ))}
-                      <span style={{ fontSize:11, color:t.textLight, marginLeft:3 }}>4.8</span>
+                      <span style={{ fontSize: 11, color: C.textLight, marginLeft: 3 }}>4.8</span>
+                      <GreenBadge><BadgeCheck size={9}/> Doğrulanmış</GreenBadge>
                     </div>
                   </div>
                 </div>
                 <button
                   style={{
-                    fontSize:12, fontWeight:600, color:t.red,
-                    border:`1.5px solid ${t.red}`, borderRadius:7,
-                    padding:"7px 12px", background:t.redLight,
-                    cursor:"pointer", transition:"all 0.15s", whiteSpace:"nowrap",
+                    fontSize: 12, fontWeight: 700, color: C.red,
+                    border: `1.5px solid ${C.red}`, borderRadius: 10,
+                    padding: "8px 14px", background: C.redLight,
+                    cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
                   }}
-                  onMouseEnter={e=>{e.currentTarget.style.background=t.red; e.currentTarget.style.color="#fff"}}
-                  onMouseLeave={e=>{e.currentTarget.style.background=t.redLight; e.currentTarget.style.color=t.red}}
+                  onMouseEnter={e => { e.currentTarget.style.background = C.red; e.currentTarget.style.color = "#fff" }}
+                  onMouseLeave={e => { e.currentTarget.style.background = C.redLight; e.currentTarget.style.color = C.red }}
+                  onClick={async () => {
+                    if (!sellerName || sellerName === "Satıcı") return
+                    try {
+                      const result = await getStoreSlug(sellerName, false).unwrap()
+                      if (result?.storeSlug) {
+                        navigate(`/store/${result.storeSlug}`)
+                      } else {
+                        alert("Bu satıcının mağazası tapılmadı")
+                      }
+                    } catch (err) {
+                      console.error("Store lookup error:", err)
+                      alert("Mağaza tapılmadı: " + (err?.data?.message || "Xəta baş verdi"))
+                    }
+                  }}
                 >
-                  Mağazaya bax
+                  Mağazaya bax →
                 </button>
               </div>
+            </Section>
 
-              {/* Miqdar + Səbətə əlavə et */}
-              <div style={{ display:"flex", gap:10, marginBottom:10, flexWrap:"wrap" }}>
-
-                {/* Miqdar seçici */}
+            {/* Miqdar + Düymələr */}
+            <Section>
+              {/* Miqdar seçici */}
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: C.textMid }}>Miqdar:</span>
                 <div style={{
-                  display:"flex", alignItems:"center",
-                  border:`1.5px solid ${t.border}`, borderRadius:8,
-                  background:t.white, overflow:"hidden",
+                  display: "flex", alignItems: "center",
+                  border: `1.5px solid ${C.border}`, borderRadius: 10,
+                  background: C.white, overflow: "hidden",
                 }}>
                   <button
-                    onClick={()=>setQuantity(q=>Math.max(1,q-1))}
+                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
                     style={{
-                      width:38, height:46,
-                      display:"flex", alignItems:"center", justifyContent:"center",
-                      background:"none", border:"none", cursor:"pointer",
-                      color:quantity<=1?t.textLight:t.red,
-                      borderRight:`1px solid ${t.border}`,
+                      width: 40, height: 40,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      background: "none", border: "none", cursor: "pointer",
+                      color: quantity <= 1 ? C.textLight : C.red,
+                      borderRight: `1px solid ${C.border}`,
                     }}
-                  ><Minus size={14}/></button>
-                  <span style={{ width:46, textAlign:"center", fontSize:15, fontWeight:700, color:t.textDark }}>
+                  >
+                    <Minus size={15} />
+                  </button>
+                  <span style={{ width: 48, textAlign: "center", fontSize: 16, fontWeight: 700, color: C.textDark }}>
                     {quantity}
                   </span>
                   <button
-                    onClick={()=>setQuantity(q=>q+1)}
+                    onClick={() => setQuantity(q => q + 1)}
                     style={{
-                      width:38, height:46,
-                      display:"flex", alignItems:"center", justifyContent:"center",
-                      background:"none", border:"none", cursor:"pointer",
-                      color:t.red, borderLeft:`1px solid ${t.border}`,
+                      width: 40, height: 40,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      background: "none", border: "none", cursor: "pointer",
+                      color: C.red, borderLeft: `1px solid ${C.border}`,
                     }}
-                  ><Plus size={14}/></button>
+                  >
+                    <Plus size={15} />
+                  </button>
                 </div>
-
-                {/* Səbət — qırmızı əsas düymə */}
-                <button
-                  onClick={handleAddToCart}
-                  style={{
-                    flex:1, minWidth:160, height:46,
-                    background: addedToCart
-                      ? `linear-gradient(180deg,${t.green},#028040)`
-                      : `linear-gradient(180deg,${t.red} 0%,${t.redDark} 100%)`,
-                    border:`1px solid ${addedToCart ? "#028040" : t.redDark}`,
-                    borderRadius:8, cursor:"pointer",
-                    fontSize:14, fontWeight:700, color:"#fff",
-                    display:"flex", alignItems:"center", justifyContent:"center", gap:7,
-                    boxShadow:`0 2px 8px rgba(232,25,44,0.25)`,
-                    transition:"all 0.25s",
-                  }}
-                  onMouseEnter={e=>!addedToCart&&(e.currentTarget.style.filter="brightness(1.08)")}
-                  onMouseLeave={e=>e.currentTarget.style.filter="brightness(1)"}
-                >
-                  {addedToCart
-                    ? <><CheckCircle size={16}/> Əlavə edildi</>
-                    : <><ShoppingCart size={17}/> Səbətə əlavə et</>
-                  }
-                </button>
               </div>
 
-              {/* İndi al — ağ/qırmızı outlined düymə */}
-              <button style={{
-                width:"100%", height:46,
-                background:t.white,
-                border:`2px solid ${t.red}`,
-                borderRadius:8, cursor:"pointer",
-                fontSize:14, fontWeight:700, color:t.red,
-                display:"flex", alignItems:"center", justifyContent:"center", gap:7,
-                marginBottom:16,
-                transition:"all 0.18s",
-              }}
+              {/* Səbətə əlavə et */}
+              <button
+                onClick={handleAddToCart}
+                disabled={!inStock}
+                style={{
+                  width: "100%", height: 52,
+                  background: !inStock
+                    ? C.border
+                    : addedToCart
+                      ? `linear-gradient(135deg,${C.green},#028040)`
+                      : `linear-gradient(135deg,${C.red} 0%,${C.redDark} 100%)`,
+                  border: "none", borderRadius: 14, cursor: inStock ? "pointer" : "default",
+                  fontSize: 15, fontWeight: 700, color: "#fff",
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                  boxShadow: inStock ? `0 4px 14px rgba(232,25,44,0.30)` : "none",
+                  transition: "all 0.25s", marginBottom: 10,
+                }}
+              >
+                {addedToCart
+                  ? <><CheckCircle size={18} /> Əlavə edildi</>
+                  : <><ShoppingCart size={18} /> Səbətə əlavə et</>
+                }
+              </button>
+
+              {/* İndi al */}
+              <button
                 onClick={() => navigate("/payment")}
-                onMouseEnter={e=>{e.currentTarget.style.background=t.red; e.currentTarget.style.color="#fff"}}
-                onMouseLeave={e=>{e.currentTarget.style.background=t.white; e.currentTarget.style.color=t.red}}
+                style={{
+                  width: "100%", height: 48,
+                  background: C.white,
+                  border: `2px solid ${C.red}`,
+                  borderRadius: 14, cursor: "pointer",
+                  fontSize: 15, fontWeight: 700, color: C.red,
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                  transition: "all 0.18s",
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = C.red; e.currentTarget.style.color = "#fff" }}
+                onMouseLeave={e => { e.currentTarget.style.background = C.white; e.currentTarget.style.color = C.red }}
               >
                 İndi Al
               </button>
+            </Section>
 
-              {/* Güvən ikonlar */}
-              <div style={{ display:"flex", gap:8, marginBottom:16, flexWrap:"wrap" }}>
-                <TrustItem icon={<Truck     size={18}/>} label="Pulsuz Çatdırılma" sub="24–48 saat"/>
-                <TrustItem icon={<RotateCcw size={18}/>} label="30 Gün İadə"       sub="Problemsiz"/>
-                <TrustItem icon={<Shield    size={18}/>} label="Rəsmi Zəmanət"     sub="Orijinal məhsul"/>
-              </div>
-
-              <Divider/>
-
-              {/* Açıqlama */}
-              <div style={{ marginBottom:16 }}>
-                <h3 style={{ fontSize:15, fontWeight:700, color:t.textDark, marginBottom:8 }}>
-                  Məhsul Haqqında
-                </h3>
-                <div style={{
-                  fontSize:14, color:t.textMid, lineHeight:1.72,
-                  overflow:"hidden",
-                  display:"-webkit-box",
-                  WebkitLineClamp:descExpanded?"unset":4,
-                  WebkitBoxOrient:"vertical",
+            {/* Güvən sətri */}
+            <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4 }}>
+              {[
+                { icon: <Truck size={18} />,     label: "Pulsuz Çatdırılma", sub: "24–48 saat" },
+                { icon: <RotateCcw size={18} />, label: "30 Gün İadə",       sub: "Problemsiz" },
+                { icon: <Shield size={18} />,    label: "Rəsmi Zəmanət",     sub: "Orijinal məhsul" },
+              ].map((item, i) => (
+                <div key={i} style={{
+                  display: "flex", alignItems: "center", gap: 8,
+                  flex: 1, minWidth: 120,
+                  padding: "10px 12px", background: C.white,
+                  border: `1px solid ${C.border}`, borderRadius: 12,
+                  boxShadow: C.shadowSm, flexShrink: 0,
                 }}>
-                  {product?.description || "Məhsul haqqında məlumat yoxdur."}
+                  <div style={{ color: C.red }}>{item.icon}</div>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: C.textDark }}>{item.label}</div>
+                    <div style={{ fontSize: 11, color: C.textLight }}>{item.sub}</div>
+                  </div>
                 </div>
-                <button
-                  onClick={()=>setDescExpanded(v=>!v)}
-                  style={{
-                    display:"flex", alignItems:"center", gap:4, marginTop:7,
-                    background:"none", border:"none", cursor:"pointer",
-                    fontSize:13, fontWeight:600, color:t.red,
-                  }}
-                >
-                  {descExpanded?"Daha az":"Daha çox oxu"}
-                  <ChevronDown size={13} style={{
-                    transform:descExpanded?"rotate(180deg)":"rotate(0)",
-                    transition:"0.2s",
-                  }}/>
-                </button>
-              </div>
-
-              {/* Texniki göstəricilər */}
-              {specs.length > 0 && (
-                <div>
-                  <h3 style={{ fontSize:15, fontWeight:700, color:t.textDark, marginBottom:10 }}>
-                    Texniki Göstəricilər
-                  </h3>
-                  <table style={{
-                    width:"100%", borderCollapse:"collapse",
-                    fontSize:13, borderRadius:8, overflow:"hidden",
-                  }}>
-                    <tbody>
-                      {specs.map(([label,val],i)=>(
-                        <tr key={i} style={{ background:i%2===0?"#FFF5F5":t.white }}>
-                          <td style={{
-                            padding:"9px 14px", color:t.textMid, fontWeight:500,
-                            width:"42%", borderBottom:`1px solid ${t.border}`,
-                          }}>
-                            {label}
-                          </td>
-                          <td style={{
-                            padding:"9px 14px", color:t.textDark, fontWeight:600,
-                            borderBottom:`1px solid ${t.border}`,
-                          }}>
-                            {val}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+              ))}
             </div>
+
+            {/* Açıqlama */}
+            <Section>
+              <h3 style={{ fontSize: 15, fontWeight: 700, color: C.textDark, margin: "0 0 10px" }}>
+                Məhsul Haqqında
+              </h3>
+              <div style={{
+                fontSize: 14, color: C.textMid, lineHeight: 1.75,
+                overflow: "hidden",
+                display: "-webkit-box",
+                WebkitLineClamp: descExpanded ? "unset" : 4,
+                WebkitBoxOrient: "vertical",
+              }}>
+                {product?.description || "Məhsul haqqında məlumat yoxdur."}
+              </div>
+              <button
+                onClick={() => setDescExpanded(v => !v)}
+                style={{
+                  display: "flex", alignItems: "center", gap: 4, marginTop: 8,
+                  background: "none", border: "none", cursor: "pointer",
+                  fontSize: 13, fontWeight: 700, color: C.red,
+                }}
+              >
+                {descExpanded ? "Daha az" : "Daha çox oxu"}
+                <ChevronDown size={14} style={{
+                  transform: descExpanded ? "rotate(180deg)" : "rotate(0)",
+                  transition: "0.2s",
+                }} />
+              </button>
+            </Section>
+
+            {/* Texniki göstəricilər */}
+            {specs.length > 0 && (
+              <Section>
+                <h3 style={{ fontSize: 15, fontWeight: 700, color: C.textDark, margin: "0 0 12px" }}>
+                  Texniki Göstəricilər
+                </h3>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, borderRadius: 10, overflow: "hidden" }}>
+                  <tbody>
+                    {specs.map(([label, val], i) => (
+                      <tr key={i} style={{ background: i % 2 === 0 ? "#FFF5F5" : C.white }}>
+                        <td style={{
+                          padding: "9px 12px", color: C.textMid, fontWeight: 500,
+                          width: "42%", borderBottom: `1px solid ${C.border}`,
+                        }}>
+                          {label}
+                        </td>
+                        <td style={{
+                          padding: "9px 12px", color: C.textDark, fontWeight: 600,
+                          borderBottom: `1px solid ${C.border}`,
+                        }}>
+                          {val}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Section>
+            )}
           </div>
         </div>
 
-        {/* ════ Rəylər kartı ════ */}
-        <div style={{
-          background:t.white, borderRadius:12, border:`1px solid ${t.border}`,
-          boxShadow:t.shadowCard, padding:"28px 32px", marginTop:16,
-        }}>
-          <h2 style={{ fontSize:20, fontWeight:700, color:t.textDark, marginBottom:22 }}>
+        {/* ════ Rəylər bölməsi (full-width) ════ */}
+        <Section style={{ marginTop: 12, borderRadius: 16 }}>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: C.textDark, margin: "0 0 20px" }}>
             Müştəri Rəyləri
           </h2>
 
           {/* Statistika + Form */}
-          <div style={{ display:"flex", gap:32, flexWrap:"wrap", marginBottom:24 }}>
+          <div className="pd-reviews-top">
 
             {/* Ümumi reytinq */}
-            <div style={{ textAlign:"center", minWidth:90 }}>
-              <div style={{ fontSize:54, fontWeight:800, color:t.red, lineHeight:1 }}>
-                {product?.ratings?.toFixed(1)||"0.0"}
+            <div style={{ textAlign: "center", minWidth: 90 }}>
+              <div style={{ fontSize: 52, fontWeight: 800, color: C.red, lineHeight: 1 }}>
+                {product?.ratings?.toFixed(1) || "0.0"}
               </div>
-              <div style={{ display:"flex", justifyContent:"center", gap:2, margin:"6px 0" }}>
-                {[1,2,3,4,5].map(i=>(
-                  <Star key={i} size={15}
-                    fill={i<=Math.round(product?.ratings||0)?t.star:"#DDD"}
-                    color={i<=Math.round(product?.ratings||0)?t.star:"#DDD"}
+              <div style={{ display: "flex", justifyContent: "center", gap: 2, margin: "6px 0" }}>
+                {[1, 2, 3, 4, 5].map(i => (
+                  <Star key={i} size={14}
+                    fill={i <= Math.round(product?.ratings || 0) ? C.star : "#DDD"}
+                    color={i <= Math.round(product?.ratings || 0) ? C.star : "#DDD"}
                   />
                 ))}
               </div>
-              <div style={{ fontSize:12, color:t.textLight }}>{totalRev} rəy</div>
+              <div style={{ fontSize: 12, color: C.textLight }}>{totalRev} rəy</div>
             </div>
 
             {/* Bar chart */}
-            <div style={{ flex:1, minWidth:160, paddingTop:4 }}>
-              {ratingDist.map(({v,count})=>(
-                <RatingBar key={v} value={v} count={count} total={totalRev}/>
+            <div style={{ flex: 1, minWidth: 140, paddingTop: 4 }}>
+              {ratingDist.map(({ v, count }) => (
+                <RatingBar key={v} value={v} count={count} total={totalRev} />
               ))}
             </div>
 
             {/* Rəy formu */}
             <div style={{
-              flex:1, minWidth:230,
-              background:t.redLight, border:`1px solid ${t.redBorder}`,
-              borderRadius:10, padding:16,
+              flex: 1, minWidth: 220,
+              background: C.redLight, border: `1px solid ${C.redBorder}`,
+              borderRadius: 12, padding: 16,
             }}>
-              <h4 style={{ fontSize:14, fontWeight:700, color:t.textDark, marginBottom:12 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 700, color: C.textDark, margin: "0 0 10px" }}>
                 Rəy Bildirin
               </h4>
               <form onSubmit={handleReviewSubmit}>
-                <div style={{ marginBottom:10 }}>
+                <div style={{ marginBottom: 10 }}>
                   <StarRatings
                     rating={reviewRating}
                     changeRating={setReviewRating}
                     numberOfStars={5}
-                    starRatedColor={t.star}
-                    starHoverColor={t.star}
+                    starRatedColor={C.star}
+                    starHoverColor={C.star}
                     starDimension="24px"
                     starSpacing="2px"
                   />
                 </div>
                 <textarea
                   value={reviewComment}
-                  onChange={e=>setReviewComment(e.target.value)}
+                  onChange={e => setReviewComment(e.target.value)}
                   placeholder="Məhsul haqqında fikirləriniz..."
                   style={{
-                    width:"100%", height:88, padding:"8px 10px",
-                    border:`1px solid ${t.redBorder}`, borderRadius:8,
-                    fontSize:13, color:t.textDark, resize:"none",
-                    outline:"none", background:t.white,
-                    boxSizing:"border-box", fontFamily:"inherit",
-                    transition:"border-color 0.15s",
+                    width: "100%", height: 84, padding: "8px 10px",
+                    border: `1px solid ${C.redBorder}`, borderRadius: 10,
+                    fontSize: 13, color: C.textDark, resize: "none",
+                    outline: "none", background: C.white,
+                    boxSizing: "border-box", fontFamily: font,
+                    transition: "border-color 0.15s",
                   }}
-                  onFocus={e=>e.target.style.borderColor=t.red}
-                  onBlur={e=>e.target.style.borderColor=t.redBorder}
+                  onFocus={e => e.target.style.borderColor = C.red}
+                  onBlur={e => e.target.style.borderColor = C.redBorder}
                 />
                 <button type="submit" style={{
-                  marginTop:8, width:"100%", padding:"9px 0",
-                  background:`linear-gradient(180deg,${t.red} 0%,${t.redDark} 100%)`,
-                  border:`1px solid ${t.redDark}`,
-                  borderRadius:8, fontSize:13, fontWeight:700,
-                  color:"#fff", cursor:"pointer",
-                  transition:"filter 0.15s",
-                  boxShadow:`0 2px 8px rgba(232,25,44,0.20)`,
+                  marginTop: 8, width: "100%", padding: "10px 0",
+                  background: `linear-gradient(135deg,${C.red} 0%,${C.redDark} 100%)`,
+                  border: "none", borderRadius: 10,
+                  fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer",
+                  boxShadow: `0 2px 8px rgba(232,25,44,0.22)`,
+                  transition: "filter 0.15s",
                 }}
-                  onMouseEnter={e=>e.currentTarget.style.filter="brightness(1.08)"}
-                  onMouseLeave={e=>e.currentTarget.style.filter="brightness(1)"}
+                  onMouseEnter={e => e.currentTarget.style.filter = "brightness(1.08)"}
+                  onMouseLeave={e => e.currentTarget.style.filter = "brightness(1)"}
                 >
                   Rəyi Göndər
                 </button>
@@ -786,60 +791,59 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          <Divider/>
+          <Divider />
 
           {/* Rəy siyahısı */}
           {reviewsLoading ? (
-            <div style={{ textAlign:"center", padding:"30px 0", color:t.textLight, fontSize:14 }}>
+            <div style={{ textAlign: "center", padding: "30px 0", color: C.textLight, fontSize: 14 }}>
               Yüklənir...
             </div>
           ) : reviewsError ? (
-            <div style={{ color:t.red, fontSize:14 }}>Rəyləri gətirmək mümkün olmadı.</div>
+            <div style={{ color: C.red, fontSize: 14 }}>Rəyləri gətirmək mümkün olmadı.</div>
           ) : reviews.length > 0 ? (
             <div>
-              {reviews.map((review,idx)=>(
+              {reviews.map((review, idx) => (
                 <div key={idx} style={{
-                  padding:"18px 0",
-                  borderBottom:idx < reviews.length-1 ? `1px solid ${t.border}` : "none",
+                  padding: "16px 0",
+                  borderBottom: idx < reviews.length - 1 ? `1px solid ${C.border}` : "none",
                 }}>
-                  <div style={{ display:"flex", gap:12, alignItems:"flex-start" }}>
+                  <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
                     <div style={{
-                      width:40, height:40, borderRadius:"50%", flexShrink:0,
-                      background:t.redMid,
-                      display:"flex", alignItems:"center", justifyContent:"center",
+                      width: 40, height: 40, borderRadius: "50%", flexShrink: 0,
+                      background: C.redMid,
+                      display: "flex", alignItems: "center", justifyContent: "center",
                     }}>
-                      <User size={18} color={t.red}/>
+                      <User size={18} color={C.red} />
                     </div>
-                    <div style={{ flex:1 }}>
-                      <div style={{ display:"flex", alignItems:"center", gap:8, flexWrap:"wrap", marginBottom:5 }}>
-                        {/* review.name — controller: name: req.user.name */}
-                        <span style={{ fontSize:14, fontWeight:700, color:t.textDark }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: C.textDark }}>
                           {review.name || "İstifadəçi"}
                         </span>
-                        <GreenBadge><CheckCircle size={10}/> Doğrulanmış alış</GreenBadge>
+                        <GreenBadge><CheckCircle size={9} /> Doğrulanmış alış</GreenBadge>
                       </div>
-                      <div style={{ display:"flex", gap:2, marginBottom:7 }}>
-                        {[1,2,3,4,5].map(i=>(
+                      <div style={{ display: "flex", gap: 2, marginBottom: 6 }}>
+                        {[1, 2, 3, 4, 5].map(i => (
                           <Star key={i} size={13}
-                            fill={i<=review.rating?t.star:"#DDD"}
-                            color={i<=review.rating?t.star:"#DDD"}
+                            fill={i <= review.rating ? C.star : "#DDD"}
+                            color={i <= review.rating ? C.star : "#DDD"}
                           />
                         ))}
                       </div>
-                      <p style={{ fontSize:14, color:t.textMid, lineHeight:1.65, margin:0 }}>
+                      <p style={{ fontSize: 14, color: C.textMid, lineHeight: 1.65, margin: 0 }}>
                         {review.comment}
                       </p>
                       <button style={{
-                        display:"flex", alignItems:"center", gap:5, marginTop:8,
-                        background:"none", border:`1px solid ${t.border}`,
-                        borderRadius:6, padding:"4px 10px",
-                        cursor:"pointer", fontSize:12, color:t.textLight,
-                        transition:"all 0.15s",
+                        display: "flex", alignItems: "center", gap: 5, marginTop: 8,
+                        background: "none", border: `1px solid ${C.border}`,
+                        borderRadius: 7, padding: "4px 10px",
+                        cursor: "pointer", fontSize: 12, color: C.textLight,
+                        transition: "all 0.15s",
                       }}
-                        onMouseEnter={e=>e.currentTarget.style.borderColor=t.borderMid}
-                        onMouseLeave={e=>e.currentTarget.style.borderColor=t.border}
+                        onMouseEnter={e => e.currentTarget.style.borderColor = C.borderMid}
+                        onMouseLeave={e => e.currentTarget.style.borderColor = C.border}
                       >
-                        <ThumbsUp size={12}/> Faydalıdır
+                        <ThumbsUp size={12} /> Faydalıdır
                       </button>
                     </div>
                   </div>
@@ -848,31 +852,64 @@ const ProductDetail = () => {
             </div>
           ) : (
             <div style={{
-              textAlign:"center", padding:"36px 0",
-              border:`1.5px dashed ${t.redBorder}`, borderRadius:10,
-              background:t.redLight,
+              textAlign: "center", padding: "36px 0",
+              border: `1.5px dashed ${C.redBorder}`, borderRadius: 12,
+              background: C.redLight,
             }}>
-              <Package size={34} color={t.redBorder} style={{ marginBottom:10 }}/>
-              <p style={{ fontSize:14, color:t.textLight, margin:0 }}>
+              <Package size={34} color={C.redBorder} style={{ marginBottom: 10 }} />
+              <p style={{ fontSize: 14, color: C.textLight, margin: 0 }}>
                 Bu məhsul üçün hələ heç kim rəy yazmayıb. İlk siz olun!
               </p>
             </div>
           )}
-        </div>
+        </Section>
       </div>
 
-      {/* Responsive */}
+      {/* ── Responsive styles ── */}
       <style>{`
-        @media (max-width: 768px) {
-          .pd-grid {
-            grid-template-columns: 1fr !important;
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+
+        * { box-sizing: border-box; }
+
+        .pd-main-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          margin-bottom: 12px;
+        }
+
+        .pd-reviews-top {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          margin-bottom: 20px;
+        }
+
+        @media (min-width: 768px) {
+          .pd-main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            align-items: start;
           }
-          .pd-grid > *:first-child {
-            border-right: none !important;
-            border-bottom: 1px solid #E8E8E8 !important;
-            position: static !important;
+          .pd-reviews-top {
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 24px;
           }
         }
+
+        @media (min-width: 1024px) {
+          .pd-main-grid {
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            grid-template-columns: minmax(340px, 2fr) minmax(360px, 3fr);
+            gap: 24px;
+          }
+        }
+
+        @keyframes _spin { to { transform: rotate(360deg); } }
       `}</style>
     </div>
   )

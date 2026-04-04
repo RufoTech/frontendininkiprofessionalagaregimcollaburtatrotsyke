@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import {
   useGetCartQuery,
   useRemoveFromCartMutation,
@@ -9,377 +10,331 @@ import {
 } from "../redux/api/productsApi"
 import { Link, useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
-import {
-  ShoppingBag, Trash2, Plus, Minus, ArrowRight,
-  ChevronLeft, Heart, Shield, RotateCcw, Loader2, Tag
-} from "lucide-react"
+import { Trash2, Plus, Minus, ArrowRight, ChevronLeft, Shield, RotateCcw, Loader2, ShoppingBag, Heart } from "lucide-react"
 
-const SebetCart = () => {
+/* ─── ProductCard (tövsiyə olunanlar üçün) ─── */
+const MiniCard = ({ product, onAdd }) => {
+  const [hov, setHov] = useState(false)
   const navigate = useNavigate()
-  const { data: cartData, isLoading, error } = useGetCartQuery()
-  const [removeFromCart] = useRemoveFromCartMutation()
-  const [updateQuantity] = useUpdateCartQuantityMutation()
-  const [addToCart] = useAddToCartMutation()
-
-  // Fetch ALL products (no limit) for recommendations
-  const { data: productsData, isLoading: productsLoading } = useGetProductsQuery({})
-
-  const calculateTotal = () => {
-    if (!cartData?.cart) return 0
-    return cartData.cart.reduce((total, item) => total + item.product.price * item.quantity, 0)
-  }
-
-  const subtotal = calculateTotal()
-  const shipping = subtotal > 100 ? 0 : 5
-  const total = subtotal + shipping
-
-  const handleQuantityChange = async (productId, currentQuantity, stock, change) => {
-    const newQuantity = currentQuantity + change
-    if (newQuantity < 1 || newQuantity > stock) {
-      toast.error(newQuantity < 1 ? "Minimum say 1 olmalıdır" : "Stokda kifayət qədər məhsul yoxdur")
-      return
-    }
-    try {
-      await updateQuantity({ productId, quantity: newQuantity }).unwrap()
-    } catch {
-      toast.error("Xəta baş verdi")
-    }
-  }
-
-  const handleRemoveFromCart = async (productId) => {
-    try {
-      await removeFromCart(productId).unwrap()
-      toast.success("Məhsul silindi")
-    } catch {
-      toast.error("Silinmə zamanı xəta baş verdi")
-    }
-  }
-
-  const handleAddToCart = async (productId) => {
-    try {
-      await addToCart({ productId, quantity: 1 }).unwrap()
-      toast.success("Məhsul səbətə əlavə edildi")
-    } catch {
-      toast.error("Xəta baş verdi")
-    }
-  }
-
-  const handleGoToPayment = () => {
-    navigate("/payment")
-  }
-
-  // Normalize products from any API shape
-  const allProducts =
-    productsData?.products ||
-    productsData?.data ||
-    (Array.isArray(productsData) ? productsData : [])
-
-  // ─── Loading ───────────────────────────────────────────────
-  if (isLoading) {
-    return (
-      <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50">
-        <Loader2 className="h-8 w-8 text-[#E63946] animate-spin mb-3" />
-        <p className="text-gray-400 text-sm">Səbətiniz yüklənir...</p>
+  const img = product.images?.[0]?.url || "https://flowbite.s3.amazonaws.com/blocks/e-commerce/imac-front-dark.svg"
+  const disc = product.discount > 0
+  return (
+    <div
+      onClick={() => navigate(`/product/${product._id}`)}
+      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      style={{
+        background: "#fff", borderRadius: 16, overflow: "hidden",
+        boxShadow: hov ? "0 8px 28px rgba(232,25,44,.14)" : "0 2px 10px rgba(0,0,0,.06)",
+        transform: hov ? "translateY(-4px)" : "none",
+        transition: "all .28s cubic-bezier(.34,1.56,.64,1)",
+        cursor: "pointer", border: "1.5px solid #f5f5f5",
+      }}
+    >
+      <div style={{ position: "relative", height: 130, background: "#f8f8f8", overflow: "hidden" }}>
+        <img src={img} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        {disc && (
+          <span style={{
+            position: "absolute", top: 8, left: 8,
+            background: "#E8192C", color: "#fff",
+            fontSize: 10, fontWeight: 800, padding: "2px 8px", borderRadius: 20,
+          }}>-{product.discount}%</span>
+        )}
+        <button
+          onClick={e => { e.stopPropagation(); onAdd(product._id) }}
+          style={{
+            position: "absolute", bottom: 8, right: 8,
+            background: "#E8192C", border: "none", borderRadius: "50%",
+            width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "pointer", boxShadow: "0 4px 12px rgba(232,25,44,.4)",
+          }}
+        >
+          <Plus size={14} color="#fff" />
+        </button>
       </div>
-    )
-  }
-
-  // ─── Empty Cart ────────────────────────────────────────────
-  if (error || !cartData?.cart?.length) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        {/* Top bar */}
-        <div className="bg-white border-b border-gray-100 px-6 py-4">
-          <div className="max-w-7xl mx-auto flex items-center gap-3">
-            <Link to="/shop" className="text-gray-500 hover:text-[#E63946] transition-colors">
-              <ChevronLeft className="w-5 h-5" />
-            </Link>
-            <h1 className="text-lg font-bold text-gray-900">Səbət</h1>
-          </div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          {/* Empty state card */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 flex flex-col items-center mb-10">
-            <div className="w-24 h-24 bg-red-50 rounded-2xl flex items-center justify-center mb-5">
-              <ShoppingBag className="w-12 h-12 text-[#E63946]" strokeWidth={1.5} />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Səbətiniz boşdur</h2>
-            <p className="text-gray-500 text-sm text-center mb-6 max-w-xs">
-              Gəlin bunu düzəldək! Arzuladığınız məhsulları tapmaq üçün indi başlayın.
-            </p>
-            <Link
-              to="/shop"
-              className="flex items-center gap-2 bg-[#E63946] text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-red-600 transition-colors shadow-sm"
-            >
-              <ShoppingBag className="w-4 h-4" />
-              Alış-verişə başla
-            </Link>
-          </div>
-
-          {/* Recommendations */}
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-base font-bold text-gray-900">Sizin üçün tövsiyə olunanlar</h3>
-            <Link to="/shop" className="text-xs text-[#E63946] font-medium hover:underline">
-              Hamısına bax →
-            </Link>
-          </div>
-
-          {productsLoading ? (
-            <div className="flex justify-center py-10">
-              <Loader2 className="w-6 h-6 text-[#E63946] animate-spin" />
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {allProducts.map((product) => (
-                <ProductCard
-                  key={product._id}
-                  product={product}
-                  onAddToCart={handleAddToCart}
-                />
-              ))}
-            </div>
+      <div style={{ padding: "10px 12px 12px" }}>
+        <p style={{ fontSize: 12, fontWeight: 700, color: "#111", marginBottom: 4, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
+          {product.name}
+        </p>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontSize: 13, fontWeight: 800, color: "#E8192C" }}>{product.price} ₼</span>
+          {product.originalPrice && (
+            <span style={{ fontSize: 10, color: "#aaa", textDecoration: "line-through" }}>{product.originalPrice} ₼</span>
           )}
         </div>
       </div>
+    </div>
+  )
+}
+
+/* ══════════════════════════════════════════
+   SEBET CART
+══════════════════════════════════════════ */
+const SebetCart = () => {
+  const navigate = useNavigate()
+  const { data: cartData, isLoading, error } = useGetCartQuery()
+  const [removeFromCart]  = useRemoveFromCartMutation()
+  const [updateQuantity]  = useUpdateCartQuantityMutation()
+  const [addToCart]       = useAddToCartMutation()
+  const { data: productsData, isLoading: productsLoading } = useGetProductsQuery({})
+
+  const items    = cartData?.cart || []
+  const subtotal = items.reduce((s, it) => s + it.product.price * it.quantity, 0)
+  const shipping = subtotal > 100 ? 0 : 5
+  const total    = subtotal + shipping
+
+  const handleQty = async (productId, qty, stock, delta) => {
+    const next = qty + delta
+    if (next < 1)     { toast.error("Minimum say 1 olmalıdır"); return }
+    if (next > stock) { toast.error("Stokda kifayət qədər məhsul yoxdur"); return }
+    try { await updateQuantity({ productId, quantity: next }).unwrap() }
+    catch { toast.error("Xəta baş verdi") }
+  }
+
+  const handleRemove = async (productId) => {
+    try { await removeFromCart(productId).unwrap(); toast.success("Məhsul silindi") }
+    catch { toast.error("Silinmə zamanı xəta baş verdi") }
+  }
+
+  const handleAdd = async (productId) => {
+    try { await addToCart({ productId, quantity: 1 }).unwrap(); toast.success("Məhsul səbətə əlavə edildi") }
+    catch { toast.error("Xəta baş verdi") }
+  }
+
+  const allProducts = productsData?.products || productsData?.data || (Array.isArray(productsData) ? productsData : [])
+
+  /* ─── Yüklənir ─── */
+  if (isLoading) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8f8f8", fontFamily: "'Sora',sans-serif" }}>
+        <div style={{ textAlign: "center" }}>
+          <Loader2 size={36} color="#E8192C" style={{ animation: "spin 1s linear infinite", marginBottom: 12 }} />
+          <p style={{ color: "#aaa", fontSize: 14 }}>Səbətiniz yüklənir...</p>
+        </div>
+        <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      </div>
     )
   }
 
-  // ─── Full Cart ─────────────────────────────────────────────
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Top bar */}
-      <div className="bg-white border-b border-gray-100 px-6 py-4 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto flex items-center gap-3">
-          <Link to="/shop" className="text-gray-500 hover:text-[#E63946] transition-colors">
-            <ChevronLeft className="w-5 h-5" />
-          </Link>
-          <h1 className="text-lg font-bold text-gray-900">Səbət</h1>
-          <span className="text-xs bg-[#E63946] text-white rounded-full px-2 py-0.5 font-semibold">
-            {cartData.cart.length}
-          </span>
+  /* ─── BOŞ SƏBƏT ─── */
+  if (error || !items.length) {
+    return (
+      <div style={{ minHeight: "100vh", background: "#f8f8f8", fontFamily: "'Sora',sans-serif" }}>
+        <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap');`}</style>
+
+        {/* Header */}
+        <div style={{ background: "#fff", padding: "16px 20px", display: "flex", alignItems: "center", gap: 12, borderBottom: "1px solid #f0f0f0", position: "sticky", top: 0, zIndex: 10 }}>
+          <button onClick={() => navigate(-1)} style={{ background: "none", border: "none", cursor: "pointer", padding: 4, borderRadius: 8, display: "flex", alignItems: "center" }}>
+            <ChevronLeft size={22} color="#111" />
+          </button>
+          <h1 style={{ fontSize: 18, fontWeight: 800, color: "#111", margin: 0 }}>Səbət</h1>
         </div>
+
+        {/* Empty state */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 24px 40px" }}>
+          <div style={{ width: 130, height: 130, background: "linear-gradient(135deg,#fff5f5,#ffe4e6)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24 }}>
+            <ShoppingBag size={60} color="#E8192C" strokeWidth={1.2} />
+          </div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: "#111", marginBottom: 10 }}>Səbətiniz boşdur</h2>
+          <p style={{ fontSize: 14, color: "#888", textAlign: "center", lineHeight: 1.6, maxWidth: 260, marginBottom: 28 }}>
+            Gəlin bunu düzəldək! Arzuladığınız məhsulları tapmaq üçün indi başlayın.
+          </p>
+          <button
+            onClick={() => navigate("/shop")}
+            style={{
+              background: "#E8192C", color: "#fff", border: "none",
+              borderRadius: 40, padding: "14px 32px",
+              fontSize: 14, fontWeight: 700, cursor: "pointer",
+              display: "flex", alignItems: "center", gap: 8,
+              boxShadow: "0 8px 24px rgba(232,25,44,.4)",
+            }}
+          >
+            <ShoppingBag size={16} /> Alış-verişə başla
+          </button>
+        </div>
+
+        {/* Tövsiyə olunanlar */}
+        <div style={{ padding: "0 20px 40px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 800, color: "#111", margin: 0 }}>Sizin üçün tövsiyə olunanlar</h3>
+            <Link to="/shop" style={{ fontSize: 12, color: "#E8192C", fontWeight: 600, textDecoration: "none" }}>Hamısına bax</Link>
+          </div>
+          {productsLoading ? (
+            <div style={{ textAlign: "center", padding: 40 }}><Loader2 size={24} color="#E8192C" style={{ animation: "spin 1s linear infinite" }} /></div>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
+              {allProducts.slice(0, 6).map(p => <MiniCard key={p._id} product={p} onAdd={handleAdd} />)}
+            </div>
+          )}
+        </div>
+        <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      </div>
+    )
+  }
+
+  /* ─── DOLU SƏBƏT ─── */
+  return (
+    <div style={{ minHeight: "100vh", background: "#f8f8f8", fontFamily: "'Sora',sans-serif" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap');
+        @keyframes spin{to{transform:rotate(360deg)}}
+
+        .cart-item { background:#fff; border-radius:16px; padding:14px; display:flex; align-items:center; gap:12px; box-shadow:0 2px 10px rgba(0,0,0,.05); margin-bottom:10px; }
+        .cart-qty-btn { width:30px; height:30px; border-radius:50%; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .18s; flex-shrink:0; }
+        .cart-qty-btn:active { transform:scale(.9); }
+        .checkout-btn { width:100%; background:#E8192C; color:#fff; border:none; borderRadius:40px; padding:16px; font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; font-family:'Sora',sans-serif; box-shadow:0 8px 24px rgba(232,25,44,.4); transition:all .2s; }
+        .checkout-btn:hover { transform:translateY(-2px); box-shadow:0 12px 32px rgba(232,25,44,.5); }
+        .checkout-btn:active { transform:scale(.97); }
+
+        @media(min-width:900px){
+          .cart-layout{ display:grid; grid-template-columns:1fr 360px; gap:20px; }
+        }
+      `}</style>
+
+      {/* ── Header ── */}
+      <div style={{ background: "#fff", padding: "16px 20px", display: "flex", alignItems: "center", gap: 12, borderBottom: "1px solid #f0f0f0", position: "sticky", top: 0, zIndex: 10, boxShadow: "0 2px 8px rgba(0,0,0,.04)" }}>
+        <button onClick={() => navigate(-1)} style={{ background: "none", border: "none", cursor: "pointer", padding: 4, borderRadius: 8, display: "flex" }}>
+          <ChevronLeft size={22} color="#111" />
+        </button>
+        <h1 style={{ fontSize: 18, fontWeight: 800, color: "#111", margin: 0 }}>Səbət</h1>
+        <span style={{ background: "#E8192C", color: "#fff", fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 20 }}>
+          {items.length}
+        </span>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "20px 16px 40px" }}>
+        <div className="cart-layout">
 
-          {/* ── Cart Items (left 2/3) ── */}
-          <div className="lg:col-span-2 space-y-3">
-            {cartData.cart.map((item) => (
-              <div
-                key={item.product._id}
-                className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-4 hover:shadow-md transition-shadow"
-              >
-                {/* Image */}
-                <Link to={`/product/${item.product._id}`} className="shrink-0">
-                  <div className="w-16 h-16 bg-gray-100 rounded-xl overflow-hidden">
-                    <img
-                      className="w-full h-full object-cover"
-                      src={item.product.images?.[0]?.url || "/placeholder.svg"}
-                      alt={item.product.name}
-                    />
-                  </div>
-                </Link>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <Link to={`/product/${item.product._id}`}>
-                    <h3 className="text-sm font-semibold text-gray-900 hover:text-[#E63946] transition-colors line-clamp-1 mb-0.5">
-                      {item.product.name}
-                    </h3>
+          {/* ── Məhsullar ── */}
+          <div>
+            {items.map((item) => {
+              const img = item.product.images?.[0]?.url || "https://flowbite.s3.amazonaws.com/blocks/e-commerce/imac-front-dark.svg"
+              return (
+                <div key={item.product._id} className="cart-item">
+                  {/* Şəkil */}
+                  <Link to={`/product/${item.product._id}`} style={{ flexShrink: 0 }}>
+                    <div style={{ width: 72, height: 72, borderRadius: 12, overflow: "hidden", background: "#f5f5f5" }}>
+                      <img src={img} alt={item.product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    </div>
                   </Link>
-                  {item.product.color && (
-                    <p className="text-xs text-gray-400">
-                      Rəng: {item.product.color}
-                      {item.product.size ? ` · Ölçü: ${item.product.size}` : ""}
-                      {item.product.memory ? ` · Yaddaş: ${item.product.memory}` : ""}
+
+                  {/* Məlumat */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <Link to={`/product/${item.product._id}`} style={{ textDecoration: "none" }}>
+                      <p style={{ fontSize: 13, fontWeight: 700, color: "#111", marginBottom: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {item.product.name}
+                      </p>
+                    </Link>
+                    <p style={{ fontSize: 11, color: "#aaa", marginBottom: 6 }}>
+                      {[item.product.color && `Rəng: ${item.product.color}`, item.product.size && `Ölçü: ${item.product.size}`, item.product.memory && `Yaddaş: ${item.product.memory}`].filter(Boolean).join(", ")}
                     </p>
-                  )}
-                </div>
+                    <span style={{ fontSize: 15, fontWeight: 800, color: "#E8192C" }}>
+                      {(item.product.price * item.quantity).toFixed(2)} ₼
+                    </span>
+                  </div>
 
-                {/* Quantity */}
-                <div className="flex items-center gap-1.5 shrink-0">
+                  {/* Miqdar */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+                    <button
+                      className="cart-qty-btn"
+                      style={{ background: item.quantity <= 1 ? "#f5f5f5" : "#E8192C" }}
+                      onClick={() => handleQty(item.product._id, item.quantity, item.product.stock, -1)}
+                      disabled={item.quantity <= 1}
+                    >
+                      <Minus size={12} color={item.quantity <= 1 ? "#ccc" : "#fff"} />
+                    </button>
+                    <span style={{ fontSize: 15, fontWeight: 800, color: "#111", minWidth: 20, textAlign: "center" }}>{item.quantity}</span>
+                    <button
+                      className="cart-qty-btn"
+                      style={{ background: "#fff3f4", border: "1.5px solid #E8192C" }}
+                      onClick={() => handleQty(item.product._id, item.quantity, item.product.stock, 1)}
+                    >
+                      <Plus size={12} color="#E8192C" />
+                    </button>
+                  </div>
+
+                  {/* Sil */}
                   <button
-                    onClick={() => handleQuantityChange(item.product._id, item.quantity, item.product.stock, -1)}
-                    disabled={item.quantity <= 1}
-                    className={`w-6 h-6 rounded-md border flex items-center justify-center transition-all text-xs
-                      ${item.quantity <= 1
-                        ? 'border-gray-200 text-gray-300 cursor-not-allowed'
-                        : 'border-[#E63946] bg-[#E63946] text-white hover:bg-red-600'}`}
+                    onClick={() => handleRemove(item.product._id)}
+                    style={{ background: "#fff5f5", border: "none", borderRadius: 10, padding: "8px", cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}
                   >
-                    <Minus className="w-2.5 h-2.5" />
-                  </button>
-                  <span className="w-7 text-center text-sm font-bold text-gray-800">{item.quantity}</span>
-                  <button
-                    onClick={() => handleQuantityChange(item.product._id, item.quantity, item.product.stock, 1)}
-                    className="w-6 h-6 rounded-md border border-[#E63946] text-[#E63946] flex items-center justify-center hover:bg-[#E63946] hover:text-white transition-all"
-                  >
-                    <Plus className="w-2.5 h-2.5" />
+                    <Trash2 size={16} color="#E8192C" />
                   </button>
                 </div>
+              )
+            })}
 
-                {/* Price */}
-                <div className="shrink-0 text-right w-20">
-                  <p className="text-sm font-bold text-[#E63946]">
-                    {(item.product.price * item.quantity).toFixed(2)} ₼
-                  </p>
-                  {item.quantity > 1 && (
-                    <p className="text-[10px] text-gray-400">{item.product.price} ₼ / ədəd</p>
-                  )}
-                </div>
-
-                {/* Delete */}
-                <button
-                  onClick={() => handleRemoveFromCart(item.product._id)}
-                  className="shrink-0 p-1.5 text-gray-300 hover:text-[#E63946] hover:bg-red-50 rounded-lg transition-all"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
-
-            {/* Continue shopping */}
-            <Link
-              to="/shop"
-              className="inline-flex items-center gap-1.5 text-sm text-[#E63946] font-medium hover:underline mt-2"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Alış-verişə davam et
+            <Link to="/shop" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#E8192C", fontWeight: 600, textDecoration: "none", marginTop: 8 }}>
+              <ChevronLeft size={16} /> Alış-verişə davam et
             </Link>
           </div>
 
-          {/* ── Order Summary (right 1/3) ── */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 sticky top-24">
-              <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Tag className="w-4 h-4 text-[#E63946]" />
-                Sifariş Məlumatı
+          {/* ── Sifariş xülasəsi ── */}
+          <div>
+            <div style={{ background: "#fff", borderRadius: 20, padding: "22px 20px", boxShadow: "0 4px 20px rgba(0,0,0,.07)", position: "sticky", top: 80 }}>
+              <h3 style={{ fontSize: 15, fontWeight: 800, color: "#111", marginBottom: 18, paddingBottom: 14, borderBottom: "1px solid #f0f0f0" }}>
+                SİFARİŞ MƏLUMAT
               </h3>
 
-              <div className="space-y-3 text-sm mb-4">
-                <div className="flex justify-between text-gray-500">
-                  <span>Məhsullar ({cartData.cart.length} ədəd)</span>
-                  <span className="font-medium text-gray-800">{subtotal.toFixed(2)} ₼</span>
+              <div style={{ marginBottom: 18 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12, fontSize: 14 }}>
+                  <span style={{ color: "#888" }}>Məhsullar</span>
+                  <span style={{ fontWeight: 700, color: "#111" }}>{subtotal.toFixed(2)} ₼</span>
                 </div>
-                <div className="flex justify-between text-gray-500">
-                  <span>Çatdırılma</span>
-                  <span className={`font-medium ${shipping === 0 ? 'text-green-600' : 'text-gray-800'}`}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12, fontSize: 14 }}>
+                  <span style={{ color: "#888" }}>Çatdırılma</span>
+                  <span style={{ fontWeight: 700, color: shipping === 0 ? "#16a34a" : "#111" }}>
                     {shipping === 0 ? "Pulsuz" : `${shipping} ₼`}
                   </span>
                 </div>
                 {subtotal <= 100 && (
-                  <p className="text-[11px] text-gray-400 bg-gray-50 rounded-lg px-3 py-2">
-                    💡 {(100 - subtotal).toFixed(2)} ₼ daha əlavə et — çatdırılma pulsuz olsun!
-                  </p>
+                  <div style={{ background: "#fff5f5", borderRadius: 10, padding: "10px 12px", fontSize: 11, color: "#E8192C", fontWeight: 600 }}>
+                    💡 {(100 - subtotal).toFixed(2)} ₼ daha əlavə et — pulsuz çatdırılma!
+                  </div>
                 )}
               </div>
 
-              <div className="border-t border-dashed border-gray-200 pt-4 mb-5 flex justify-between items-center">
-                <span className="text-sm font-bold text-gray-900">Cəmi</span>
-                <span className="text-xl font-extrabold text-[#E63946]">{total.toFixed(2)} ₼</span>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 16, borderTop: "2px dashed #f0f0f0", marginBottom: 22 }}>
+                <span style={{ fontSize: 15, fontWeight: 800, color: "#111" }}>Cəmi</span>
+                <span style={{ fontSize: 22, fontWeight: 800, color: "#E8192C" }}>{total.toFixed(2)} ₼</span>
               </div>
 
-              {/* ── Payment Button (useNavigate ilə) ── */}
-              <button
-                onClick={handleGoToPayment}
-                className="w-full bg-[#E63946] text-white py-3 rounded-xl text-sm font-bold hover:bg-red-600 active:scale-95 transition-all shadow-sm flex items-center justify-center gap-2"
-              >
-                Sifarişi tamamla
-                <ArrowRight className="w-4 h-4" />
+              <button className="checkout-btn" style={{ borderRadius: 40 }} onClick={() => navigate("/payment")}>
+                Sifarişi tamamla <ArrowRight size={16} />
               </button>
 
-              <div className="mt-4 flex items-center justify-center gap-5 text-xs text-gray-400">
-                <span className="flex items-center gap-1">
-                  <Shield className="w-3 h-3 text-[#E63946]" />
-                  Təhlükəsiz ödəniş
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 20, marginTop: 16, fontSize: 11, color: "#aaa" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  <Shield size={12} color="#E8192C" /> Təhlükəsiz ödəniş
                 </span>
-                <span className="flex items-center gap-1">
-                  <RotateCcw className="w-3 h-3 text-[#E63946]" />
-                  Asan qaytarılma
+                <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  <RotateCcw size={12} color="#E8192C" /> Asan qaytarılma
                 </span>
               </div>
             </div>
           </div>
-
         </div>
 
-        {/* ── Recommendations below cart ── */}
+        {/* ── Tövsiyə olunanlar ── */}
         {allProducts.length > 0 && (
-          <div className="mt-12">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-bold text-gray-900">Sizin üçün tövsiyə olunanlar</h3>
-              <Link to="/shop" className="text-xs text-[#E63946] font-medium hover:underline">
-                Hamısına bax →
-              </Link>
+          <div style={{ marginTop: 40 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: "#111", margin: 0 }}>Sizin üçün tövsiyə olunanlar</h3>
+              <Link to="/shop" style={{ fontSize: 12, color: "#E8192C", fontWeight: 600, textDecoration: "none" }}>Hamısına bax</Link>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {allProducts.map((product) => (
-                <ProductCard
-                  key={product._id}
-                  product={product}
-                  onAddToCart={handleAddToCart}
-                />
-              ))}
-            </div>
+            {productsLoading ? (
+              <div style={{ textAlign: "center", padding: 40 }}>
+                <Loader2 size={24} color="#E8192C" style={{ animation: "spin 1s linear infinite" }} />
+              </div>
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px,1fr))", gap: 14 }}>
+                {allProducts.slice(0, 8).map(p => <MiniCard key={p._id} product={p} onAdd={handleAdd} />)}
+              </div>
+            )}
           </div>
         )}
       </div>
     </div>
   )
 }
-
-// ─── Reusable Product Card ─────────────────────────────────
-const ProductCard = ({ product, onAddToCart }) => (
-  <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow group relative">
-    {product.discount > 0 && (
-      <span className="absolute top-2 left-2 z-10 text-[10px] font-bold bg-[#E63946] text-white px-1.5 py-0.5 rounded-full">
-        -{product.discount}%
-      </span>
-    )}
-
-    <button className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-      <Heart className="w-3.5 h-3.5 text-gray-400 hover:text-[#E63946] transition-colors" />
-    </button>
-
-    <Link to={`/product/${product._id}`}>
-      <div className="w-full aspect-square bg-gray-50 overflow-hidden">
-        {product.images?.[0]?.url ? (
-          <img
-            src={product.images[0].url}
-            alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <ShoppingBag className="w-8 h-8 text-gray-300" />
-          </div>
-        )}
-      </div>
-    </Link>
-
-    <div className="p-2.5">
-      <Link to={`/product/${product._id}`}>
-        <p className="text-xs text-gray-700 font-medium line-clamp-2 leading-relaxed mb-1.5 hover:text-[#E63946] transition-colors">
-          {product.name}
-        </p>
-      </Link>
-
-      {product.originalPrice && product.originalPrice > product.price && (
-        <p className="text-[10px] text-gray-400 line-through">{product.originalPrice} ₼</p>
-      )}
-
-      <div className="flex items-center justify-between mt-1">
-        <span className="text-sm font-bold text-gray-900">{product.price} ₼</span>
-        <button
-          onClick={() => onAddToCart(product._id)}
-          className="w-6 h-6 bg-[#E63946] rounded-full flex items-center justify-center hover:bg-red-600 active:scale-90 transition-all shadow-sm"
-        >
-          <Plus className="w-3 h-3 text-white" />
-        </button>
-      </div>
-    </div>
-  </div>
-)
 
 export default SebetCart

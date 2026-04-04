@@ -1,36 +1,53 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import ProductCard from './ProductCard';
-import { useGetProductsQuery } from '../redux/api/productsApi';
+import {
+  useGetProductsQuery,
+  useGetFilteredProductsQuery,
+} from '../redux/api/productsApi';
 import { toast } from 'react-hot-toast';
-import { useParams, useNavigate } from 'react-router-dom';
-import { PackageSearch, Boxes } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { PackageSearch } from 'lucide-react';
 
-const Product = ({ category }) => {
-  const { data, error, isError } = useGetProductsQuery();
-  const { name } = useParams();
+// Product — mağaza məhsul siyahısı komponenti.
+// category/subcategory prop-ları varsa → filter API-sini çağırır.
+// Yoxdursa → bütün məhsulları gətirir (köhnə davranış qorunur).
+const Product = ({ category, subcategory }) => {
   const navigate = useNavigate();
+
+  // Filter varsa filter API, yoxsa adi getProducts API istifadə edilir.
+  const hasFilter = !!(category || subcategory);
+
+  const {
+    data: allData,
+    error: allError,
+    isError: allIsError,
+    isLoading: allLoading,
+  } = useGetProductsQuery(undefined, { skip: hasFilter });
+
+  const {
+    data: filteredData,
+    error: filterError,
+    isError: filterIsError,
+    isLoading: filterLoading,
+  } = useGetFilteredProductsQuery(
+    { category: category || undefined, subcategory: subcategory || undefined },
+    { skip: !hasFilter }
+  );
+
+  const isLoading = hasFilter ? filterLoading : allLoading;
+  const isError   = hasFilter ? filterIsError : allIsError;
+  const error     = hasFilter ? filterError   : allError;
+
+  // Filter API məhsulları products key-i altında gəlir
+  const products = hasFilter
+    ? (filteredData?.products || [])
+    : (allData?.products || []);
 
   useEffect(() => {
     if (isError) {
-      toast.error(error?.data?.message);
+      toast.error(error?.data?.message || "Məhsulları yükləmək mümkün olmadı");
     }
   }, [isError, error]);
-
-  const filteredProducts = data?.products?.filter((product) => {
-    if (name) {
-      return (
-        product.name.toLowerCase().includes(name.toLowerCase()) &&
-        (!category || product.category === category)
-      );
-    }
-    return !category || product.category === category;
-  });
-
-  useEffect(() => {
-    if (name && filteredProducts?.length === 0) {
-      navigate('/404');
-    }
-  }, [name, filteredProducts, navigate]);
 
   return (
     <>
@@ -130,6 +147,25 @@ const Product = ({ category }) => {
           transform: rotate(-5deg);
           box-shadow: 8px 8px 0px #E8192C;
         }
+
+        .skeleton-grid {
+          display: grid;
+          gap: 24px;
+          grid-template-columns: repeat(1, minmax(0, 1fr));
+        }
+        @media (min-width: 768px)  { .skeleton-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        @media (min-width: 1024px) { .skeleton-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+        .skeleton-card {
+          background: #fff;
+          border-radius: 12px;
+          border: 1px solid rgba(0,0,0,0.06);
+          padding: 16px;
+          animation: pulse 1.5s infinite;
+        }
+        .skeleton-img  { height: 180px; background: #f0f0f0; border-radius: 8px; margin-bottom: 12px; }
+        .skeleton-line { height: 14px; background: #f0f0f0; border-radius: 4px; margin-bottom: 8px; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
       `}</style>
 
       <div>
@@ -138,28 +174,41 @@ const Product = ({ category }) => {
           <div className="section-title-wrapper">
             <div className="red-accent" />
             <h2 className="section-title">
-              {category ? `${category}` : "Bütün Məhsullar"}
+              {category ? category : "Bütün Məhsullar"}
+              {subcategory ? ` — ${subcategory}` : ""}
             </h2>
           </div>
-          
-          {filteredProducts?.length > 0 && (
+
+          {!isLoading && products.length > 0 && (
             <div className="result-badge">
-              {filteredProducts.length} MƏHSUL
+              {products.length} MƏHSUL
             </div>
           )}
         </div>
 
-        {/* Məhsullar Şəbəkəsi */}
-        {filteredProducts?.length > 0 ? (
+        {/* Yüklənmə skeleton */}
+        {isLoading ? (
+          <div className="skeleton-grid">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="skeleton-card">
+                <div className="skeleton-img" />
+                <div className="skeleton-line" style={{ width: "75%" }} />
+                <div className="skeleton-line" style={{ width: "50%" }} />
+                <div className="skeleton-line" style={{ width: "35%" }} />
+              </div>
+            ))}
+          </div>
+        ) : products.length > 0 ? (
+          /* Məhsullar Şəbəkəsi */
           <div className="product-grid">
-            {filteredProducts.map((product) => (
-              <div key={product.id || product._id} className="product-card-wrapper">
+            {products.map((product) => (
+              <div key={product._id} className="product-card-wrapper">
                 <ProductCard mehsul={product} />
               </div>
             ))}
           </div>
         ) : (
-          /* Boş vəziyyət (Tapılmadıqda) */
+          /* Boş vəziyyət */
           <div className="empty-state">
             <div className="empty-icon-box">
               <PackageSearch size={40} />
@@ -168,10 +217,13 @@ const Product = ({ category }) => {
               Məhsul tapılmadı
             </h3>
             <p style={{ color: '#666', marginTop: '8px', fontSize: '14px' }}>
-              Axtarışınıza uyğun heç bir nəticə tapılmadı. <br /> 
+              {category
+                ? `"${category}" kateqoriyasında hələ məhsul yoxdur.`
+                : "Axtarışınıza uyğun heç bir nəticə tapılmadı."}
+              <br />
               Zəhmət olmasa digər kateqoriyalara nəzər yetirin.
             </p>
-            <button 
+            <button
               onClick={() => navigate('/shop')}
               style={{
                 marginTop: '25px',
@@ -180,10 +232,12 @@ const Product = ({ category }) => {
                 color: '#fff',
                 fontWeight: 'bold',
                 borderRadius: '6px',
-                fontSize: '13px'
+                fontSize: '13px',
+                border: 'none',
+                cursor: 'pointer',
               }}
             >
-              Mağazaya qayıt
+              Bütün məhsullara bax
             </button>
           </div>
         )}

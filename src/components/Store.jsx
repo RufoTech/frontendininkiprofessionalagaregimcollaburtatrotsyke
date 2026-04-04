@@ -1,18 +1,18 @@
 import React from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { MapPin, Phone, Mail, Facebook, Instagram, Loader2, Store as StoreIcon, Package, ArrowLeft, ShoppingBag } from 'lucide-react'
+import {
+  MapPin, Phone, Mail, Facebook, Instagram,
+  Loader2, Package, ArrowLeft, ShoppingBag,
+  AlertTriangle,
+} from 'lucide-react'
+import StarRatings from 'react-star-ratings'
 import { useGetStoreBySlugQuery } from '../redux/api/authApi'
 import ProductCard from './ProductCard'
 
 const Store = () => {
-  const { slug } = useParams()       // URL-dəki 'vsal-market-4114' hissəsini tutur
+  const { slug } = useParams()
   const navigate  = useNavigate()
 
-  // ════════════════════════════════════════════════════
-  // Backend-dən mağaza məlumatlarını + məhsulları çək
-  // authApi-dəki getStoreBySlug endpoint-i çağırılır
-  // Cavab: { success, store, products, totalProducts }
-  // ════════════════════════════════════════════════════
   const { data, isLoading, isError } = useGetStoreBySlugQuery(slug)
 
   // ── Yüklənmə ekranı ──
@@ -87,7 +87,20 @@ const Store = () => {
         }
       `}</style>
 
-      {/* ════════ MAĞAZA BAŞLIĞI (köhnə dizayn qorunur) ════════ */}
+      {/* ── BLOKLANMIŞ MAĞAZA XƏBƏRDARLIĞI ── */}
+      {store.isBlocked && (
+        <div style={{
+          background: "#fef2f2", border: "1px solid #fecaca",
+          borderRadius: 12, padding: "14px 20px", margin: "16px auto",
+          maxWidth: 1100, display: "flex", alignItems: "center", gap: 10,
+          color: "#dc2626", fontWeight: 600, fontSize: 14,
+        }}>
+          <AlertTriangle size={18} />
+          Bu mağaza hazırda superadmin tərəfindən bloklanıb.
+        </div>
+      )}
+
+      {/* ════════ MAĞAZA BAŞLIĞI ════════ */}
       <section className="py-20 bg-gray-50 font-sans">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -107,6 +120,28 @@ const Store = () => {
             <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
               Mağazamızın keyfiyyətli məhsullarını kəşf edin.
             </p>
+
+            {/* Reytinq */}
+            {store.totalReviews > 0 ? (
+              <div className="mt-4 flex items-center justify-center gap-3">
+                <StarRatings
+                  rating={store.storeRating || 0}
+                  starRatedColor="#FBBF24"
+                  numberOfStars={5}
+                  starDimension="20px"
+                  starSpacing="2px"
+                />
+                <span className="text-gray-700 font-semibold text-lg">
+                  {store.storeRating}
+                </span>
+                <span className="text-gray-400 text-sm">
+                  ({store.totalReviews} rəy)
+                </span>
+              </div>
+            ) : (
+              <p className="mt-3 text-gray-400 text-sm">Hələ rəy yoxdur</p>
+            )}
+
             {/* Məhsul sayı badge */}
             <div className="mt-4 inline-flex items-center gap-2 bg-red-50 text-red-600 px-4 py-2 rounded-full text-sm font-semibold">
               <Package size={15} />
@@ -128,7 +163,7 @@ const Store = () => {
               </div>
             </div>
 
-            {/* SOL SÜTUN - Bazadan gələn real məlumatlar */}
+            {/* SOL SÜTUN - Məlumatlar */}
             <div className="lg:order-1 space-y-10">
               <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 space-y-6">
                 <h3 className="text-2xl font-bold text-gray-800 border-b pb-4">Mağaza Məlumatları</h3>
@@ -142,18 +177,19 @@ const Store = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-start">
-                    <Phone className="w-6 h-6 text-red-600 mr-4 mt-1" />
-                    <div>
-                      <p className="text-base font-semibold text-gray-700">Telefon</p>
-                      <a href={`tel:${store.phone}`}
-                        className="text-lg text-gray-900 hover:text-red-600 transition-colors">
-                        {store.phone}
-                      </a>
+                  {store.phone && (
+                    <div className="flex items-start">
+                      <Phone className="w-6 h-6 text-red-600 mr-4 mt-1" />
+                      <div>
+                        <p className="text-base font-semibold text-gray-700">Telefon</p>
+                        <a href={`tel:${store.phone}`}
+                          className="text-lg text-gray-900 hover:text-red-600 transition-colors">
+                          {store.phone}
+                        </a>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  {/* VÖN — backend cavabında vonNumber yoxdur, store.storeSlug göstərə bilərik */}
                   <div className="flex items-start">
                     <Mail className="w-6 h-6 text-red-600 mr-4 mt-1" />
                     <div>
@@ -182,7 +218,7 @@ const Store = () => {
         </div>
       </section>
 
-      {/* ════════ MAĞAZA MƏHSULLARİ (YENİ ƏLAVƏ) ════════ */}
+      {/* ════════ MAĞAZA MƏHSULLARİ ════════ */}
       <div className="store-products-section">
         <div className="section-header">
           <div className="section-title-wrap">

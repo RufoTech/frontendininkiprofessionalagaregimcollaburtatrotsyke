@@ -1,8 +1,58 @@
-import React from 'react';
+import { useLocation } from 'react-router-dom';
 import Product from '../components/Product';
-import { ChevronRight, Home, ShoppingBag, Star, Package, Layers } from 'lucide-react';
+import { ChevronRight, Home, ShoppingBag, Layers } from 'lucide-react';
+
+// Kateqoriya adlarını istifadəçi dostu Azərbaycan dilinə çeviririk
+const CATEGORY_LABELS = {
+  // Elektronika
+  Electronics_TV:      "Televizorlar",
+  Electronics_Photo:   "Foto Avadanlıq",
+  Electronics_Console: "Oyun Konsolları",
+  // Telefonlar
+  Phones:              "Telefonlar",
+  Phones_Smartphone:   "Smartfonlar",
+  Phones_Basic:        "Sadə Telefonlar",
+  Phones_Headphones:   "Qulaqlıqlar",
+  // Kompüterlər
+  Computers_Laptop:    "Noutbuklar",
+  Computers_Desktop:   "Masaüstü Kompüterlər",
+  Computers_Monitor:   "Monitorlar",
+  // Ağ texnika
+  HomeAppliances_Large:   "Iri Məişət Texnikası",
+  HomeAppliances_Small:   "Kiçik Məişət Texnikası",
+  HomeAppliances_Kitchen: "Mətbəx Texnikası",
+  // Mebel
+  Furniture_Living:   "Qonaq Otağı Mebelləri",
+  Furniture_Bedroom:  "Yataq Otağı Mebelləri",
+  Furniture_Kitchen:  "Mətbəx Mebelləri",
+  // Geyim
+  Clothing:           "Geyim",
+  WomenClothing:      "Qadın Geyimi",
+  MenClothing:        "Kişi Geyimi",
+  KidsClothing:       "Uşaq Geyimi",
+  // Köhnə kateqoriyalar
+  Laptops:            "Noutbuklar",
+  Cameras:            "Fotoaparatlar",
+  Headphones:         "Qulaqlıqlar",
+  Console:            "Oyun Konsolları",
+  iPad:               "Planşetlər",
+  HomeAppliances:     "Məişət Texnikası",
+  Beauty:             "Gözəllik",
+  Sports:             "İdman",
+  Automotive:         "Avtomobil",
+};
 
 const Shop = () => {
+  const location = useLocation();
+  const params   = new URLSearchParams(location.search);
+  const category    = params.get("category") || "";
+  const subcategory = params.get("subcategory") || "";
+
+  // Banner başlığı — aktiv kateqoriyaya uyğun
+  const categoryLabel = category
+    ? (CATEGORY_LABELS[category] || category)
+    : "Bütün Kateqoriyalar";
+
   return (
     <>
       <style>{`
@@ -20,7 +70,7 @@ const Shop = () => {
           position: relative;
           border-radius: 32px;
           overflow: hidden;
-          background: #0f0606; /* Tünd fon */
+          background: #0f0606;
           margin-top: 20px;
           box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
@@ -47,7 +97,6 @@ const Shop = () => {
           .banner-content { flex-direction: row; padding: 70px 80px; text-align: left; }
         }
 
-        /* Dekorativ dairələr (Login-dəki kimi) */
         .banner-circle {
           position: absolute;
           border-radius: 50%;
@@ -55,7 +104,6 @@ const Shop = () => {
           pointer-events: none;
         }
 
-        /* Yazı Stilləri */
         .banner-tag {
           display: inline-flex;
           align-items: center;
@@ -76,7 +124,7 @@ const Shop = () => {
 
         .banner-title {
           font-family: 'Syne', sans-serif;
-          font-size: clamp(2.5rem, 6vw, 4rem);
+          font-size: clamp(2rem, 5vw, 3.5rem);
           font-weight: 800;
           color: #fff;
           line-height: 1.1;
@@ -88,7 +136,6 @@ const Shop = () => {
           font-style: italic;
         }
 
-        /* Breadcrumb */
         .shop-breadcrumb {
           display: flex;
           align-items: center;
@@ -111,7 +158,6 @@ const Shop = () => {
           font-weight: 700;
         }
 
-        /* Stats */
         .shop-stats {
           display: flex;
           gap: 30px;
@@ -167,27 +213,26 @@ const Shop = () => {
 
       <div className="shop-root">
         <div className="container mx-auto px-4">
-          
+
           {/* BANNER SECTION */}
           <div className="shop-banner">
             <div className="banner-overlay" />
-            
-            {/* Dekorativ dairələr */}
+
             <div className="banner-circle" style={{ width: 400, height: 400, top: -100, left: -100 }} />
             <div className="banner-circle" style={{ width: 300, height: 300, bottom: -50, right: 100 }} />
 
             <div className="banner-content">
-              
+
               {/* Sol tərəf: Mətnlər */}
               <div className="max-w-2xl">
                 <div className="banner-tag">
                   <Layers size={14} />
-                  Bütün Kateqoriyalar
+                  {categoryLabel}
                 </div>
 
                 <h1 className="banner-title">
                   Brendex <span>Mağaza</span><br />
-                  Premium Seçimlər
+                  {category ? categoryLabel : "Premium Seçimlər"}
                 </h1>
 
                 {/* Breadcrumb */}
@@ -197,10 +242,24 @@ const Shop = () => {
                     Ana Səhifə
                   </div>
                   <ChevronRight size={14} color="rgba(255,255,255,0.3)" />
-                  <div className="breadcrumb-item active">
+                  <div className="breadcrumb-item">
                     <ShoppingBag size={14} />
                     Mağaza
                   </div>
+                  {category && (
+                    <>
+                      <ChevronRight size={14} color="rgba(255,255,255,0.3)" />
+                      <div className="breadcrumb-item active">
+                        {categoryLabel}
+                      </div>
+                    </>
+                  )}
+                  {subcategory && (
+                    <>
+                      <ChevronRight size={14} color="rgba(255,255,255,0.3)" />
+                      <div className="breadcrumb-item active">{subcategory}</div>
+                    </>
+                  )}
                 </div>
 
                 {/* Stats */}
@@ -236,12 +295,13 @@ const Shop = () => {
           {/* PRODUCTS SECTION */}
           <div className="mt-16">
             <div className="flex items-center gap-3 mb-8">
-               <div style={{ width: 40, height: 3, background: '#E8192C', borderRadius: 2 }} />
-               <h2 style={{ fontFamily: 'Syne', fontSize: 24, fontWeight: 800, color: '#111' }}>
-                 Sizin üçün seçilənlər
-               </h2>
+              <div style={{ width: 40, height: 3, background: '#E8192C', borderRadius: 2 }} />
+              <h2 style={{ fontFamily: 'Syne', fontSize: 24, fontWeight: 800, color: '#111' }}>
+                {category ? `${categoryLabel} Məhsulları` : "Sizin üçün seçilənlər"}
+              </h2>
             </div>
-            <Product />
+            {/* category və subcategory prop-larını Product komponentinə ötürürük */}
+            <Product category={category} subcategory={subcategory} />
           </div>
 
         </div>

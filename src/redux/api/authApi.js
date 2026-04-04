@@ -104,6 +104,14 @@ export const authApi = createApi({
             query: (slug) => `/store/${slug}`,
         }),
 
+        // ════════════════════════════════════════════════════
+        // ── MAĞAZA SLUG-U — satıcı adından ──
+        // ProductDetail "Mağazaya bax" üçün
+        // ════════════════════════════════════════════════════
+        getStoreSlugBySeller: builder.query({
+            query: (sellerName) => `/store-by-seller/${encodeURIComponent(sellerName)}`,
+        }),
+
     }),
 });
 
@@ -114,4 +122,6 @@ export const {
     useForgotPasswordMutation,
     useResetPasswordMutation,
     useGetStoreBySlugQuery,
+    useGetStoreSlugBySellerQuery,
+    useLazyGetStoreSlugBySellerQuery,
 } = authApi;

@@ -1,46 +1,51 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
 import { useRegisterMutation } from '../redux/api/authApi'
+import { registerBlogger } from '../slices/bloggerSlice'
 import {
   User, Mail, Lock, Eye, EyeOff, ArrowRight, Loader2,
   CheckCircle, Store, MapPin, Phone, FileText, Hash,
-  Copy, ExternalLink
+  Copy, ExternalLink, Rss, ShieldCheck
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const Register = () => {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState('user') // 'user' | 'admin' | 'blogger'
+
+  // ── İstifadəçi / Admin formu ──
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    role: 'user',
-    storeName: '',
-    storeAddress: '',
-    phone: '',
-    taxNumber: '',
-    vonNumber: '',
+    name: '', email: '', password: '', confirmPassword: '',
+    role: 'user', storeName: '', storeAddress: '',
+    phone: '', taxNumber: '', vonNumber: '',
   })
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword]           = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  // Qeydiyyatdan sonra mağaza linki
-  const [storeLink, setStoreLink] = useState(null)
+  const [storeLink, setStoreLink]                 = useState(null)
+
+  // ── Blogger formu ──
+  const [bloggerForm, setBloggerForm] = useState({
+    firstName: '', lastName: '', fatherName: '',
+    email: '', phone: '', password: '', confirmPassword: '',
+  })
+  const [showBloggerPw, setShowBloggerPw]     = useState(false)
+  const [bloggerLoading, setBloggerLoading]   = useState(false)
 
   const [register, { isLoading, isSuccess, error }] = useRegisterMutation()
-  const navigate = useNavigate()
+  const { isAuthenticated } = useSelector((state) => state.userSlice)
+
+  useEffect(() => {
+    if (isAuthenticated) navigate('/home', { replace: true })
+  }, [isAuthenticated, navigate])
 
   useEffect(() => {
     if (isSuccess) {
       toast.success("Hesab uğurla yaradıldı!")
-      // Adi istifadəçi login-ə yönlənir
-      if (formData.role !== 'admin') {
-        setTimeout(() => navigate('/login'), 1500)
-      }
-      // Admin üçün storeLink useEffect-də deyil, handleSubmit-də set olunur
+      if (formData.role !== 'admin') setTimeout(() => navigate('/login'), 1500)
     }
-    if (error) {
-      toast.error(error?.data?.message || "Qeydiyyat zamanı xəta baş verdi")
-    }
+    if (error) toast.error(error?.data?.message || "Qeydiyyat zamanı xəta baş verdi")
   }, [isSuccess, error, navigate, formData.role])
 
   const handleChange = (e) => {
@@ -48,23 +53,21 @@ const Register = () => {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleRoleChange = (role) => {
-    setFormData(prev => ({ ...prev, role }))
+  const handleBloggerChange = (e) => {
+    const { name, value } = e.target
+    setBloggerForm(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab)
+    setFormData(prev => ({ ...prev, role: tab === 'blogger' ? 'user' : tab }))
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Şifrələr eyni deyil")
-      return
-    }
+    if (formData.password !== formData.confirmPassword) { toast.error("Şifrələr eyni deyil"); return }
     try {
-      const payload = {
-        name:     formData.name,
-        email:    formData.email,
-        password: formData.confirmPassword,
-        role:     formData.role,
-      }
+      const payload = { name: formData.name, email: formData.email, password: formData.confirmPassword, role: formData.role }
       if (formData.role === 'admin') {
         payload.storeName    = formData.storeName
         payload.storeAddress = formData.storeAddress
@@ -72,21 +75,36 @@ const Register = () => {
         payload.taxNumber    = formData.taxNumber
         payload.vonNumber    = formData.vonNumber
       }
-
       const result = await register(payload).unwrap()
-
-      // ── Backend storeSlug qaytarırsa mağaza linkini qur ──
-      // result.storeSlug — backend registerUser-da saxlanır
-      if (formData.role === 'admin' && result?.storeSlug) {
+      if (formData.role === 'admin' && result?.storeSlug)
         setStoreLink(`${window.location.origin}/store/${result.storeSlug}`)
-      }
+    } catch (_) {}
+  }
 
-    } catch (_err) {
-      // useEffect-dəki error bloku idarə edir
+  const handleBloggerSubmit = async (e) => {
+    e.preventDefault()
+    if (bloggerForm.password !== bloggerForm.confirmPassword) { toast.error("Şifrələr eyni deyil"); return }
+    if (bloggerForm.password.length < 6) { toast.error("Şifrə ən azı 6 simvol olmalıdır"); return }
+    setBloggerLoading(true)
+    try {
+      await dispatch(registerBlogger({
+        firstName:  bloggerForm.firstName,
+        lastName:   bloggerForm.lastName,
+        fatherName: bloggerForm.fatherName,
+        email:      bloggerForm.email,
+        phone:      bloggerForm.phone,
+        password:   bloggerForm.password,
+      })).unwrap()
+      toast.success("Blogger hesabı yaradıldı!")
+      navigate('/blogger/dashboard')
+    } catch (err) {
+      toast.error(err || "Qeydiyyat xətası")
+    } finally {
+      setBloggerLoading(false)
     }
   }
 
-  const isAdmin = formData.role === 'admin'
+  const isAdmin = activeTab === 'admin'
 
   // ════════════════════════════════════════════
   // ── MAĞAZA LİNKİ EKRANI ──
@@ -212,7 +230,7 @@ const Register = () => {
         .reg-label { display: block; font-size: 12px; font-weight: 500; color: #444; margin-bottom: 5px; }
         .reg-input-wrap { position: relative; }
         .reg-input-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: #bbb; width: 15px; height: 15px; pointer-events: none; }
-        .reg-input { width: 100%; padding: 11px 13px 11px 40px; border: 1.5px solid #eee; border-radius: 11px; background: #fafafa; font-size: 13.5px; font-family: 'DM Sans', sans-serif; color: #111; outline: none; transition: border-color 0.2s, background 0.2s, box-shadow 0.2s; box-sizing: border-box; }
+        .reg-input { width: 100%; padding: 11px 13px 11px 40px; border: 1.5px solid #eee; border-radius: 11px; background: #fafafa; font-size: max(16px, 13.5px); font-family: 'DM Sans', sans-serif; color: #111; outline: none; transition: border-color 0.2s, background 0.2s, box-shadow 0.2s; box-sizing: border-box; }
         .reg-input:focus { border-color: #E8192C; background: #fff; box-shadow: 0 0 0 3px rgba(232,25,44,0.07); }
         .reg-input::placeholder { color: #ccc; }
         .reg-eye-btn { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #bbb; display: flex; padding: 0; transition: color 0.2s; }
@@ -244,23 +262,95 @@ const Register = () => {
 
       <div className="reg-root">
         <div className="reg-left">
-          <a href="/" className="reg-logo">
+          <Link to="/" className="reg-logo">
             <div className="reg-logo-icon">B</div>
             <span className="reg-logo-name">Brend<span>ex</span></span>
-          </a>
+          </Link>
 
           <h2 className="reg-heading">Yeni Hesab Yaradın 🚀</h2>
           <p className="reg-sub">Bütün imkanlardan yararlanmaq üçün qeydiyyatdan keçin.</p>
 
           <div className="role-toggle">
-            <button type="button" className={`role-btn ${!isAdmin ? 'active' : ''}`} onClick={() => handleRoleChange('user')}>
+            <button type="button" className={`role-btn ${activeTab === 'user' ? 'active' : ''}`} onClick={() => handleTabChange('user')}>
               <User size={14} /> Alıcı
             </button>
-            <button type="button" className={`role-btn ${isAdmin ? 'active' : ''}`} onClick={() => handleRoleChange('admin')}>
-              <Store size={14} /> Satıcı / Admin
+            <button type="button" className={`role-btn ${activeTab === 'admin' ? 'active' : ''}`} onClick={() => handleTabChange('admin')}>
+              <Store size={14} /> Satıcı
+            </button>
+            <button type="button" className={`role-btn ${activeTab === 'blogger' ? 'active' : ''}`} onClick={() => handleTabChange('blogger')}>
+              <Rss size={14} /> Blogger
+            </button>
+            <button type="button" className="role-btn" onClick={() => navigate('/superadmin/register')}>
+              <ShieldCheck size={14} /> SuperAdmin
             </button>
           </div>
 
+          {/* ── BLOGGER FORMU ── */}
+          {activeTab === 'blogger' && (
+            <form onSubmit={handleBloggerSubmit} className="reg-form">
+              <div className="seller-section" style={{ marginBottom: 0 }}>
+                <p className="seller-section-title"><Rss size={13} /> Blogger Məlumatları</p>
+                <div>
+                  <label className="reg-label">Ad</label>
+                  <div className="reg-input-wrap">
+                    <User className="reg-input-icon" />
+                    <input type="text" name="firstName" value={bloggerForm.firstName} onChange={handleBloggerChange} required className="reg-input" placeholder="Adınız" />
+                  </div>
+                </div>
+                <div>
+                  <label className="reg-label">Soyad</label>
+                  <div className="reg-input-wrap">
+                    <User className="reg-input-icon" />
+                    <input type="text" name="lastName" value={bloggerForm.lastName} onChange={handleBloggerChange} required className="reg-input" placeholder="Soyadınız" />
+                  </div>
+                </div>
+                <div>
+                  <label className="reg-label">Ata adı</label>
+                  <div className="reg-input-wrap">
+                    <User className="reg-input-icon" />
+                    <input type="text" name="fatherName" value={bloggerForm.fatherName} onChange={handleBloggerChange} className="reg-input" placeholder="Ata adı (istəyə bağlı)" />
+                  </div>
+                </div>
+                <div>
+                  <label className="reg-label">E-poçt</label>
+                  <div className="reg-input-wrap">
+                    <Mail className="reg-input-icon" />
+                    <input type="email" name="email" value={bloggerForm.email} onChange={handleBloggerChange} required className="reg-input" placeholder="email@nümunə.com" />
+                  </div>
+                </div>
+                <div>
+                  <label className="reg-label">Telefon</label>
+                  <div className="reg-input-wrap">
+                    <Phone className="reg-input-icon" />
+                    <input type="tel" name="phone" value={bloggerForm.phone} onChange={handleBloggerChange} className="reg-input" placeholder="+994 50 000 00 00" />
+                  </div>
+                </div>
+                <div>
+                  <label className="reg-label">Şifrə</label>
+                  <div className="reg-input-wrap">
+                    <Lock className="reg-input-icon" />
+                    <input type={showBloggerPw ? "text" : "password"} name="password" value={bloggerForm.password} onChange={handleBloggerChange} required className="reg-input" placeholder="••••••" />
+                    <button type="button" className="reg-eye-btn" onClick={() => setShowBloggerPw(p => !p)}>
+                      {showBloggerPw ? <EyeOff size={15} /> : <Eye size={15} />}
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label className="reg-label">Şifrənin Təkrarı</label>
+                  <div className="reg-input-wrap">
+                    <Lock className="reg-input-icon" />
+                    <input type="password" name="confirmPassword" value={bloggerForm.confirmPassword} onChange={handleBloggerChange} required className="reg-input" placeholder="••••••" />
+                  </div>
+                </div>
+              </div>
+              <button type="submit" disabled={bloggerLoading} className="reg-btn">
+                {bloggerLoading ? <><Loader2 size={18} className="animate-spin" /> Qeydiyyat gedir...</> : <>Blogger Ol <ArrowRight size={16} /></>}
+              </button>
+            </form>
+          )}
+
+          {/* ── USER / ADMIN FORMU ── */}
+          {activeTab !== 'blogger' && (
           <form onSubmit={handleSubmit} className="reg-form">
             <div>
               <label className="reg-label">Ad və Soyad</label>
@@ -349,6 +439,7 @@ const Register = () => {
               )}
             </button>
           </form>
+          )}
 
           <div className="reg-login-link">
             Artıq hesabınız var?{" "}
@@ -366,10 +457,16 @@ const Register = () => {
             <p className="reg-right-tagline">Brendex platforması</p>
             <div className="reg-divider" />
             <h3 className="reg-right-title">
-              {isAdmin ? 'Satıcı Hesabı ilə Çox Qazanın' : 'Bizə Qoşulun və İmkanlardan Yararlanın'}
+              {isAdmin ? 'Satıcı Hesabı ilə Çox Qazanın' : activeTab === 'blogger' ? 'Blogger Ol, Qazanmağa Başla' : 'Bizə Qoşulun və İmkanlardan Yararlanın'}
             </h3>
             <ul className="reg-features">
-              {isAdmin ? (
+              {activeTab === 'blogger' ? (
+                <>
+                  <li className="reg-feature-item"><div className="reg-feature-dot"><CheckCircle size={14} color="#fff" /></div>Unikal promo kod alın</li>
+                  <li className="reg-feature-item"><div className="reg-feature-dot"><CheckCircle size={14} color="#fff" /></div>Hər satışdan komissiya qazanın</li>
+                  <li className="reg-feature-item"><div className="reg-feature-dot"><CheckCircle size={14} color="#fff" /></div>Panelinizi real vaxtda izləyin</li>
+                </>
+              ) : isAdmin ? (
                 <>
                   <li className="reg-feature-item"><div className="reg-feature-dot"><CheckCircle size={14} color="#fff" /></div>Öz mağazanızı asanlıqla idarə edin</li>
                   <li className="reg-feature-item"><div className="reg-feature-dot"><CheckCircle size={14} color="#fff" /></div>Minlərlə müştəriyə çatın</li>

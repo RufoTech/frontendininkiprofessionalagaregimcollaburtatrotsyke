@@ -24,7 +24,7 @@ import {
   Wrench, ShoppingBag,
 } from "lucide-react"
 
-import { fetchUnreadCount } from "../slices/notificationSlice"
+import { fetchUnreadCount } from "../slices/Notificationslice"
 
 /* ─────────────────────────────────────────────
    LOGO SVG
@@ -1081,6 +1081,7 @@ const Navbar = () => {
                           </>
                         )}
                         <Link to="/my-orders" onClick={() => setIsUserMenuOpen(false)} style={dropLink} onMouseEnter={e => e.currentTarget.style.background="#f9fafb"} onMouseLeave={e => e.currentTarget.style.background="transparent"}>📦 {t("navbar.myOrders")}</Link>
+                        <Link to="/my-bonus" onClick={() => setIsUserMenuOpen(false)} style={dropLink} onMouseEnter={e => e.currentTarget.style.background="#f9fafb"} onMouseLeave={e => e.currentTarget.style.background="transparent"}>⭐ Bonus Hesabım</Link>
                         <button onClick={handleLogout} style={{ display:"block", width:"100%", textAlign:"left", padding:"8px 12px", borderRadius:10, fontSize:13, color:C.primary, background:"none", border:"none", cursor:"pointer", fontFamily:"'Sora',sans-serif", transition:"background .12s" }} onMouseEnter={e => e.currentTarget.style.background=C.rose50} onMouseLeave={e => e.currentTarget.style.background="transparent"}>{t("navbar.logout")}</button>
                       </div>
                     </div>
