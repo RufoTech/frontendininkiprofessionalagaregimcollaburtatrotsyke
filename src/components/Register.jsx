@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { useRegisterMutation } from '../redux/api/authApi'
@@ -24,6 +24,7 @@ const Register = () => {
   const [showPassword, setShowPassword]           = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [storeLink, setStoreLink]                 = useState(null)
+  const justRegisteredAsSeller                     = useRef(false)
 
   // ── Blogger formu ──
   const [bloggerForm, setBloggerForm] = useState({
@@ -37,16 +38,13 @@ const Register = () => {
   const { isAuthenticated } = useSelector((state) => state.userSlice)
 
   useEffect(() => {
-    if (isAuthenticated) navigate('/home', { replace: true })
+    if (isAuthenticated && !justRegisteredAsSeller.current) navigate('/home', { replace: true })
   }, [isAuthenticated, navigate])
 
   useEffect(() => {
-    if (isSuccess) {
-      toast.success("Hesab uğurla yaradıldı!")
-      if (formData.role !== 'admin') setTimeout(() => navigate('/login'), 1500)
-    }
+    if (isSuccess) toast.success("Hesab uğurla yaradıldı!")
     if (error) toast.error(error?.data?.message || "Qeydiyyat zamanı xəta baş verdi")
-  }, [isSuccess, error, navigate, formData.role])
+  }, [isSuccess, error])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -69,6 +67,7 @@ const Register = () => {
     try {
       const payload = { name: formData.name, email: formData.email, password: formData.confirmPassword, role: formData.role }
       if (formData.role === 'admin') {
+        justRegisteredAsSeller.current = true
         payload.storeName    = formData.storeName
         payload.storeAddress = formData.storeAddress
         payload.phone        = formData.phone
