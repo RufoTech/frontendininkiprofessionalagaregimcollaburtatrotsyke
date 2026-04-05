@@ -32,8 +32,8 @@ export default function BloggerRegister() {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (!form.firstName || !form.email || !form.password) {
-      return toast.error('Ad, e-poçt və şifrə mütləqdir')
+    if (!form.firstName || !form.lastName || !form.email || !form.password) {
+      return toast.error('Ad, soyad, e-poçt və şifrə mütləqdir')
     }
     if (form.password !== form.confirm) {
       return toast.error('Şifrələr uyğun gəlmir')

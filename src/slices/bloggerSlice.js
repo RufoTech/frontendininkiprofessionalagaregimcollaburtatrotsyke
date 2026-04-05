@@ -320,16 +320,25 @@ const bloggerSlice = createSlice({
       .addCase(deleteBlogger.rejected,  setRejected)
 
       // ── registerBlogger ─────────────────────────────────────────────
+      // sendToken cavabı: { success, token, user: { id, name, email, role, ... } }
+      // Bu token cavabıdır, profil deyil. Profile null saxlanır — dashboard
+      // özü getBloggerProfile() çağırır ki, { blogger, stats } formatı gəlsin.
       .addCase(registerBlogger.pending,   setPending)
-      .addCase(registerBlogger.fulfilled, (state, action) => {
-        setAndPersist(state, action.payload);
+      .addCase(registerBlogger.fulfilled, (state) => {
+        state.loading = false;
+        state.profile = null;
+        clearProfile();
       })
       .addCase(registerBlogger.rejected,  setRejected)
 
       // ── bloggerLogin ────────────────────────────────────────────────
+      // Eyni səbəb: token cavabını profil kimi saxlamırıq.
+      // Dashboard mount-da getBloggerProfile() çağıraraq əsl profili yükləyir.
       .addCase(bloggerLogin.pending,   setPending)
-      .addCase(bloggerLogin.fulfilled, (state, action) => {
-        setAndPersist(state, action.payload);
+      .addCase(bloggerLogin.fulfilled, (state) => {
+        state.loading = false;
+        state.profile = null;
+        clearProfile();
       })
       .addCase(bloggerLogin.rejected,  setRejected)
 

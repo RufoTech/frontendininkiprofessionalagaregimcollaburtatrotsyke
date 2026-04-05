@@ -1,7 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Phone, Package, Award, Truck } from 'lucide-react';
 
 const Sever = () => {
+  const navigate = useNavigate();
   const features = [
     {
       icon: <Phone className="w-12 h-12" />,
@@ -58,6 +60,7 @@ const Sever = () => {
                 <p className="text-white text-4xl font-extrabold leading-tight">-30%</p>
               </div>
               <button
+                onClick={() => navigate('/shop')}
                 style={{
                   background: 'linear-gradient(90deg, #e6a800, #ffcc00)',
                   color: '#1a0000',
@@ -120,6 +123,7 @@ const Sever = () => {
                 <p className="text-white text-2xl font-extrabold leading-tight">Məhsullarında Endirim</p>
               </div>
               <button
+                onClick={() => navigate('/shop')}
                 style={{
                   background: 'linear-gradient(90deg, #e6a800, #ffcc00)',
                   color: '#1a0000',

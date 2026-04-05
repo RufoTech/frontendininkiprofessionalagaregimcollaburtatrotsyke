@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const BASE = "http://localhost:3010/commerce/mehsullar/bonus";
+const BASE = "/commerce/mehsullar/bonus";
 const cfg  = { withCredentials: true };
 
 // ── Ümumi konfiqurasiya (public) ─────────────────────────────────────

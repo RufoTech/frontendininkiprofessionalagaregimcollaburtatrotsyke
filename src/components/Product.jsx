@@ -45,6 +45,7 @@ const Product = ({ category, subcategory }) => {
 
   useEffect(() => {
     if (isError) {
+      if (error?.status === 304) return;
       toast.error(error?.data?.message || "Məhsulları yükləmək mümkün olmadı");
     }
   }, [isError, error]);

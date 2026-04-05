@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { useSelector } from "react-redux"
 import toast from "react-hot-toast"
 
@@ -403,7 +403,7 @@ const Welcome = () => {
           {/* Terms */}
           <p className={`wl-terms ${step >= 6 ? "show" : ""}`}>
             Davam etməklə Brendex-in{" "}
-            <a href="/terms" target="_blank" rel="noopener noreferrer">Şərtlər və Qaydaları</a> ilə razılaşırsınız.
+            <Link to="/terms" target="_blank">Şərtlər və Qaydaları</Link> ilə razılaşırsınız.
           </p>
 
         </div>

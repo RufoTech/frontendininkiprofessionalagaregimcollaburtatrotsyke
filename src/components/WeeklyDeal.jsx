@@ -123,7 +123,7 @@ const ProductCard = ({ product, onAddToCart }) => (
 export default function BestSellers() {
   const rowRef = useRef(null);
   const [addToCart] = useAddToCartMutation();
-  const { data: productsData, isLoading } = useGetProductsQuery({});
+  const { data: productsData, isLoading } = useGetProductsQuery();
 
   const allProducts =
     productsData?.products ||

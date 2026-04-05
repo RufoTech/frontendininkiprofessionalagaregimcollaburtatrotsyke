@@ -45,6 +45,7 @@ import MyOrders from './pages/MyOrders'
 import AdminOrders from './pages/AdminOrders'
 import CommissionPage from './pages/seller/CommissionPage'
 import NotificationsPage from './components/Notificationbell'
+import Notificationbell from './components/Notificationbell'
 import Profile from './pages/Profile'
 import BloggerManagement from './pages/superadmin/BloggerManagement'
 import BloggerDashboard from './pages/blogger/BloggerDashboard'
@@ -79,14 +80,14 @@ function AppContent() {
         <Route path="/search-results" element={<SearchResults />} />
         <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
         <Route path="/product/:id" element={<ProductDetail />} />
-        <Route path="/cart" element={<SebetCart />} />
+        <Route path="/cart" element={<UserRoute><SebetCart /></UserRoute>} />
         <Route path="/shop" element={<EcommerceApp />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/favori" element={<FavoriteButton />} />
+        <Route path="/favori" element={<UserRoute><FavoriteButton /></UserRoute>} />
         <Route path="/password/reset/:token" element={<ResetPassword />} />
         <Route path="/forgot-password" element={<GuestRoute><ForgotPassword /></GuestRoute>} />
-        <Route path="/payment" element={<PaymentComponent />} />
+        <Route path="/payment" element={<UserRoute><PaymentComponent /></UserRoute>} />
         <Route path="/notifications" element={<UserRoute><NotificationsPage /></UserRoute>} />
         <Route path="/profile" element={<UserRoute><Profile /></UserRoute>} />
 
@@ -111,6 +112,7 @@ function AppContent() {
         {/* Admin — yalnız admin */}
         <Route path="/admin/orders" element={<PrivateRoute><AdminOrders /></PrivateRoute>} />
         <Route path="/admin/products" element={<PrivateRoute><AdminProducts /></PrivateRoute>} />
+        <Route path="/admin/dashboard" element={<PrivateRoute><AdminProducts /></PrivateRoute>} />
 
         {/* ✅ HƏR İKİ ROUTE — /admin/product VƏ /admin/create-product eyni komponenti açır */}
         <Route path="/admin/product" element={<PrivateRoute><AddProducts /></PrivateRoute>} />

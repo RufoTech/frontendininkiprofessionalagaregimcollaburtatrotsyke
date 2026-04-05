@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useGetProductsQuery, useAddToCartMutation } from "../redux/api/productsApi";
 import { toast } from "react-toastify";
 import { Plus, Heart, ShoppingBag, Loader2 } from "lucide-react";
@@ -120,7 +120,7 @@ const RealProductCard = ({ product, onAddToCart }) => (
 function RealProductRow({ title }) {
   const rowRef = useRef(null);
   const [addToCart] = useAddToCartMutation();
-  const { data: productsData, isLoading } = useGetProductsQuery({});
+  const { data: productsData, isLoading } = useGetProductsQuery();
 
   const allProducts =
     productsData?.products ||
@@ -182,6 +182,7 @@ function RealProductRow({ title }) {
 
 export default function EcommerceHome() {
   const [slide, setSlide] = useState(0);
+  const navigate = useNavigate();
   const slides = [
     { title: "50%-dək", bold: "ENDİRİM!", sub: "Ən yaxşı elektronika məhsulları", emoji: "🎧" },
     { title: "30%-dək", bold: "ENDİRİM!", sub: "Yeni gələn məhsullar", emoji: "📱" },
@@ -269,7 +270,7 @@ export default function EcommerceHome() {
                 <span style={{ color: "#ffd600" }}>Möhtəşəm Endirimlər</span>i<br />
                 Qaçırmayın!
               </div>
-              <button className="promo-btn">İndi Al →</button>
+              <button className="promo-btn" onClick={() => navigate("/shop")}>İndi Al →</button>
             </div>
             <div className="promo-emoji">🛍️</div>
           </div>

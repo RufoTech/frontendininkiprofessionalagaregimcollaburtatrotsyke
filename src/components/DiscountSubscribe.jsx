@@ -183,7 +183,7 @@ export default function BestSellers() {
   const [addToCart] = useAddToCartMutation();
 
   // Bütün məhsulları API-dən çəkirik
-  const { data: productsData, isLoading } = useGetProductsQuery({});
+  const { data: productsData, isLoading } = useGetProductsQuery();
 
   // ── MƏHSUL SİYAHISININ NORMALLAŞDIRILMASI ──
   // API fərqli strukturlarda cavab verə bilər:

@@ -1,16 +1,21 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "/commerce/mehsullar";
+
 export const productApi = createApi({
   reducerPath: "productApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "/commerce/mehsullar",
+    baseUrl: API_BASE,
     credentials: "include", // ✅ düzgün yer - fetchBaseQuery içində
   }),
   tagTypes: ["Cart", "Favorites", "Products", "Reviews"],
   endpoints: (builder) => ({
 
     getProducts: builder.query({
-      query: () => "/products",
+      query: (params) => ({
+        url: "/products",
+        params,
+      }),
     }),
 
     getProductDetails: builder.query({
@@ -133,7 +138,7 @@ export const productApi = createApi({
     createOrUpdateReview: builder.mutation({
       query: (reviewData) => ({
         url: "/products/review",
-        method: "POST",
+        method: "PUT",
         body: reviewData,
       }),
       invalidatesTags: ["Products"],

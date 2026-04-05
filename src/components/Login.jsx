@@ -93,7 +93,7 @@ const Login = () => {
             <div className="ap-divider" />
             <p className="ap-label">Funksiyalar</p>
             <div className="ap-grid">
-              <Link to="/admin/dashboard" className="ap-btn">
+              <Link to="/admin/products" className="ap-btn">
                 <div className="ap-btn-icon"><LayoutDashboard size={16} color="#E8192C" /></div>
                 <div><div style={{fontSize:12,fontWeight:700}}>Dashboard</div><div style={{fontSize:11,color:'#999'}}>Statistika</div></div>
               </Link>
@@ -105,7 +105,7 @@ const Login = () => {
                 <div className="ap-btn-icon"><ShoppingBag size={16} color="#E8192C" /></div>
                 <div><div style={{fontSize:12,fontWeight:700}}>Sifarişlər</div><div style={{fontSize:11,color:'#999'}}>İzləmə</div></div>
               </Link>
-              <Link to="/admin/settings" className="ap-btn">
+              <Link to="/admin/product" className="ap-btn">
                 <div className="ap-btn-icon"><Settings size={16} color="#E8192C" /></div>
                 <div><div style={{fontSize:12,fontWeight:700}}>Parametrlər</div><div style={{fontSize:11,color:'#999'}}>Tənzimləmə</div></div>
               </Link>
@@ -115,7 +115,7 @@ const Login = () => {
                 <ExternalLink size={15} /> Mağazamı Aç
               </a>
             )}
-            <button className="ap-secondary" onClick={() => navigate('/admin/dashboard')}>
+            <button className="ap-secondary" onClick={() => navigate('/admin/products')}>
               <LayoutDashboard size={15} /> Admin Panelinə Keç
             </button>
           </div>

@@ -271,6 +271,7 @@ const EcommerceApp = () => {
   // Ümumi sorğu xətası bildirişi
   useEffect(() => {
     if (isAllError) {
+      if (allError?.status === 304) return;
       console.log(allError);
       toast.error(allError?.data?.message || "Bir xəta baş verdi.");
     }
@@ -448,8 +449,8 @@ const EcommerceApp = () => {
   // Seçilmiş dəyərləri vergüllə birləşdirib API-yə göndəririk
   // Boş massivlər undefined olaraq göndərilir (API-yə lazımsız parametr getməsin)
   const filterParams = {
-    priceMin,
-    priceMax,
+    ...(priceMin > 0 ? { priceMin } : {}),
+    ...(priceMax < 5000 ? { priceMax } : {}),
     category: selectedCategories.length ? selectedCategories.join(",") : undefined,
     seller: selectedBrands.length ? selectedBrands.join(",") : undefined,
     ram: selectedMemory.length ? selectedMemory.join(",") : undefined,
@@ -467,8 +468,10 @@ const EcommerceApp = () => {
 
   // Filter sorğusu xətası bildirişi
   useEffect(() => {
-    if (isFilterError) {
-      console.log(filterError);
+    if (isFilterError && filterError) {
+      // 401 xətalarını authApi idarə etdiyi üçün burada göstərmirik
+      if (filterError.status === 401 || filterError.status === 304) return;
+      
       toast.error(
         filterError?.data?.message || "Məhsullar filterlənərkən xəta baş verdi."
       );

@@ -14,16 +14,19 @@ import { Navigate } from 'react-router-dom'
 // =====================================================================
 const GuestRoute = ({ children }) => {
   let superAdminInfo = null
-  let bloggerInfo    = null
+  let bloggerProfile = null
   let userInfo       = null
+  let isAuthenticated = false
 
   try { superAdminInfo = JSON.parse(localStorage.getItem('superAdminInfo') || 'null') } catch {}
-  try { bloggerInfo    = JSON.parse(localStorage.getItem('bloggerInfo')    || 'null') } catch {}
-  try { userInfo       = JSON.parse(localStorage.getItem('userInfo')       || 'null') } catch {}
+  try { bloggerProfile = JSON.parse(localStorage.getItem('bloggerProfile') || 'null') } catch {}
+  try { userInfo       = JSON.parse(localStorage.getItem('user') || 'null') } catch {}
+  try { isAuthenticated = JSON.parse(localStorage.getItem('isAuthenticated') || 'false') } catch {}
 
   if (superAdminInfo) return <Navigate to="/superadmin/dashboard" replace />
-  if (bloggerInfo)    return <Navigate to="/blogger/dashboard"    replace />
-  if (userInfo)       return <Navigate to="/home"                 replace />
+  if (bloggerProfile?.blogger) return <Navigate to="/blogger/dashboard" replace />
+  if (isAuthenticated && userInfo?.user?.role === 'admin') return <Navigate to="/admin/products" replace />
+  if (isAuthenticated && userInfo) return <Navigate to="/home" replace />
 
   return children
 }

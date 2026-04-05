@@ -329,8 +329,8 @@ const LOCAL_PRODUCTS = [
 
 const languages = [
   { code:"az", label:"Azərbaycan", flag:"🇦🇿", short:"AZ"  },
-  { code:"en", label:"English",    flag:"🇬🇧", short:"EN"  },
-  { code:"ru", label:"Русский",    flag:"🇷🇺", short:"RUS" },
+  { code:"en", label:"English",    flag:"🇺🇸", short:"EN"  },
+  { code:"ru", label:"Русский",    flag:"🇷🇺", short:"RU"  },
   { code:"tr", label:"Türkçe",     flag:"🇹🇷", short:"TR"  },
 ]
 
@@ -808,22 +808,30 @@ const Navbar = () => {
 
   // 🔔 BİLDİRİŞ POLLING (Yalnız Navbar-da 1 dəfə işləyir)
   // Bildiriş sayını çəkən effekt - hər 60 saniyədən bir yenilənir (limitli)
+  const syncUnreadCount = useCallback(() => {
+    return dispatch(fetchUnreadCount())
+      .unwrap()
+      .then((payload) => {
+        if (payload?.unauthorized) {
+          dispatch(logout())
+        }
+      })
+      .catch(() => {})
+  }, [dispatch])
+
   useEffect(() => {
     if (!isAuthenticated) return;
 
-    // İlk yüklənmədə dərhal çək (əgər loading deyilsə)
-    dispatch(fetchUnreadCount());
+    syncUnreadCount()
 
-    // İntervalı 60 saniyəyə qaldırırıq (daha optimal performans üçün)
     const intervalId = setInterval(() => {
-      // Səhifə aktiv deyilsə sorğu göndərməyək (isteğe bağlı, amma faydalıdır)
-      if (document.visibilityState === 'visible') {
-        dispatch(fetchUnreadCount());
+      if (document.visibilityState === "visible") {
+        syncUnreadCount()
       }
-    }, 60000); 
+    }, 60000)
 
     return () => clearInterval(intervalId);
-  }, [dispatch, isAuthenticated]);
+  }, [isAuthenticated, syncUnreadCount]);
 
   useEffect(() => {
     const fn = e => {
@@ -849,8 +857,8 @@ const Navbar = () => {
   const handleCategorySelect   = cat => { setIsCategoryOpen(false); setIsMenuOpen(false); setActiveCatPanel(cat) }
   const handleCategoryNavigate = cat => { setActiveCatPanel(null); navigate(cat.slug ? `/shop?category=${cat.slug}` : "/shop") }
 
-  const { data:cartData,     isLoading:cartLd, error:cartErr } = useGetCartQuery()
-  const { data:favoriteData, isLoading:favLd,  error:favErr  } = useGetFavoritesQuery()
+  const { data:cartData,     isLoading:cartLd, error:cartErr } = useGetCartQuery(undefined, { skip: !isAuthenticated })
+  const { data:favoriteData, isLoading:favLd,  error:favErr  } = useGetFavoritesQuery(undefined, { skip: !isAuthenticated })
   const cartCount = (!cartErr && !cartLd && cartData?.cart)           ? cartData.cart.length          : 0
   const favCount  = (!favErr  && !favLd  && favoriteData?.favorites)  ? favoriteData.favorites.length : 0
 

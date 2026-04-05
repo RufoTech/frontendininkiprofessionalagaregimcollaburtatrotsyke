@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import {
-  useGetProductsQuery,
+  useGetFilteredProductsQuery,
   useAddToCartMutation,
   useAddToFavoritesMutation,
   useRemoveFromFavoritesMutation,
   useGetFavoritesQuery,
 } from "../redux/api/productsApi";
+import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Plus, Heart, ShoppingBag, Loader2, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
@@ -321,16 +322,17 @@ export default function EcommerceHome() {
   const [slide,     setSlide]     = useState(0);
   const [animating, setAnimating] = useState(false);
   const navigate = useNavigate();
+  const isAuthenticated = useSelector((state) => state.userSlice.isAuthenticated);
 
   const [addToCart] = useAddToCartMutation();
 
   const { data: recommendedData, isLoading: loadingRec } =
-    useGetProductsQuery({ sort: "rating", limit: 12 });
+    useGetFilteredProductsQuery({ sort: "rating" }); // ✅ Backend supports 'rating'
 
   const { data: newArrivalsData, isLoading: loadingNew } =
-    useGetProductsQuery({ sort: "createdAt", limit: 12 });
+    useGetFilteredProductsQuery({ sort: "newest" }); // ✅ Backend supports 'newest' for createdAt: -1
 
-  const { data: favData } = useGetFavoritesQuery();
+  const { data: favData } = useGetFavoritesQuery(undefined, { skip: !isAuthenticated });
   const favoriteIds = (favData?.favorites || []).map(f => f._id);
 
   const recommendedProducts =
@@ -645,6 +647,7 @@ export default function EcommerceHome() {
                 display: "inline-flex", alignItems: "center", gap: 6,
                 transition: "transform 0.2s cubic-bezier(0.34,1.56,0.64,1)",
               }}
+              onClick={() => navigate("/shop")}
               onMouseEnter={e => e.currentTarget.style.transform = "scale(1.05)"}
               onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
             >

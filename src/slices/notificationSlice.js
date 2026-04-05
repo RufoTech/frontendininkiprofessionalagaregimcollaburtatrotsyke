@@ -1,15 +1,28 @@
 // store/slices/notificationSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-const BASE = "/commerce/mehsullar/notifications";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "/commerce/mehsullar";
+const BASE = `${API_BASE}/notifications`;
+
+const parseJsonSafely = async (response) => {
+    const text = await response.text();
+    if (!text) return {};
+
+    try {
+        return JSON.parse(text);
+    } catch {
+        return {};
+    }
+};
 
 // apiFetch — status kodu da qaytarır ki, 401 ayrıca işlənə bilsin
 const apiFetch = (url, options = {}) =>
-    fetch(url, { credentials: "include", ...options }).then(async (r) => {
-        const data = await r.json();
+    fetch(url, { credentials: "include", cache: "no-store", ...options }).then(async (r) => {
+        const data = await parseJsonSafely(r);
         if (!r.ok) {
             const err = new Error(data.message || "Xəta baş verdi");
             err.status = r.status;
+            err.data = data;
             throw err;
         }
         return data;
@@ -22,7 +35,16 @@ export const fetchNotifications = createAsyncThunk(
         try { return await apiFetch(`${BASE}?page=${page}&unreadOnly=${unreadOnly}`); }
         catch (e) {
             // 401 — istifadəçi giriş etməyib, xəta göstərmə, sadəcə boş qaytar
-            if (e.status === 401) return { notifications: [], unreadCount: 0, total: 0, totalPages: 1, currentPage: 1 };
+            if (e.status === 401) {
+                return {
+                    notifications: [],
+                    unreadCount: 0,
+                    total: 0,
+                    totalPages: 1,
+                    currentPage: 1,
+                    unauthorized: true,
+                };
+            }
             return rejectWithValue(e.message);
         }
     }
@@ -33,7 +55,7 @@ export const fetchUnreadCount = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try { return await apiFetch(`${BASE}/unread-count`); }
         catch (e) {
-            if (e.status === 401) return { unreadCount: 0 };
+            if (e.status === 401) return { unreadCount: 0, unauthorized: true };
             return rejectWithValue(e.message);
         }
     }

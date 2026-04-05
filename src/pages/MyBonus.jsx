@@ -48,14 +48,18 @@ export default function MyBonus() {
   const handleCancelRedeem = () => dispatch(cancelRedeem())
 
   const copyRef = () => {
-    const link = referral?.referralLink || referral?.referralCode
+    const link = referralData?.referralLink || referralData?.referralCode
     if (link) { navigator.clipboard.writeText(link); toast.success("Kopyalandı!") }
   }
 
+  const referralData = referral?.referral || referral
   const balance     = myBonus?.balance ?? 0
   const pending     = myBonus?.pendingRedemption ?? 0
   const txs         = myBonus?.transactions ?? []
-  const maxRedeem   = config ? Math.floor(balance * (config.maxRedemptionPercent / 100) * 100) / 100 : 0
+  
+  // Backend-dən gələn data: { success, config: { ... } }
+  const configData = config?.config || config
+  const maxRedeem   = configData ? Math.floor(balance * (configData.maxRedemptionPercent / 100) * 100) / 100 : 0
 
   const typeIcon = { earn: "⬆️", use: "⬇️", expire: "⏰" }
   const typeColor = { earn: "#16a34a", use: R, expire: "#d97706" }
@@ -76,8 +80,8 @@ export default function MyBonus() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 14, marginBottom: 28 }}>
         <StatBox icon={<Star size={20} color={R} />} label="Mevcut Balans" value={`${balance.toFixed(2)} B`} />
         <StatBox icon={<Clock size={20} color="#d97706" />} label="Gözləyən" value={`${pending.toFixed(2)} B`} color="#d97706" />
-        <StatBox icon={<Users size={20} color="#2563eb" />} label="Referallar" value={referral?.totalReferrals ?? 0} color="#2563eb" />
-        <StatBox icon={<Zap size={20} color="#16a34a" />} label="Ümumi Qazanılan" value={`${(referral?.totalBonus ?? 0).toFixed(2)} B`} color="#16a34a" />
+        <StatBox icon={<Users size={20} color="#2563eb" />} label="Referallar" value={referralData?.totalReferrals ?? 0} color="#2563eb" />
+        <StatBox icon={<Zap size={20} color="#16a34a" />} label="Ümumi Qazanılan" value={`${(referralData?.totalBonus ?? 0).toFixed(2)} B`} color="#16a34a" />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>

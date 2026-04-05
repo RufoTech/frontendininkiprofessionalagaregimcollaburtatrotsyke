@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { useRegisterMutation } from '../redux/api/authApi'
@@ -24,7 +24,6 @@ const Register = () => {
   const [showPassword, setShowPassword]           = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [storeLink, setStoreLink]                 = useState(null)
-  const justRegisteredAsSeller                     = useRef(false)
 
   // ── Blogger formu ──
   const [bloggerForm, setBloggerForm] = useState({
@@ -38,13 +37,17 @@ const Register = () => {
   const { isAuthenticated } = useSelector((state) => state.userSlice)
 
   useEffect(() => {
-    if (isAuthenticated && !justRegisteredAsSeller.current) navigate('/home', { replace: true })
-  }, [isAuthenticated, navigate])
+    if (isAuthenticated && !(activeTab === 'admin' && storeLink)) {
+      navigate('/home', { replace: true })
+    }
+  }, [activeTab, isAuthenticated, navigate, storeLink])
 
   useEffect(() => {
-    if (isSuccess) toast.success("Hesab uğurla yaradıldı!")
+    if (isSuccess) {
+      toast.success("Hesab uğurla yaradıldı!")
+    }
     if (error) toast.error(error?.data?.message || "Qeydiyyat zamanı xəta baş verdi")
-  }, [isSuccess, error])
+  }, [error, isSuccess])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -64,10 +67,10 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (formData.password !== formData.confirmPassword) { toast.error("Şifrələr eyni deyil"); return }
+    if (formData.password.length < 8) { toast.error("Şifrə ən azı 8 simvol olmalıdır"); return }
     try {
       const payload = { name: formData.name, email: formData.email, password: formData.confirmPassword, role: formData.role }
       if (formData.role === 'admin') {
-        justRegisteredAsSeller.current = true
         payload.storeName    = formData.storeName
         payload.storeAddress = formData.storeAddress
         payload.phone        = formData.phone
@@ -76,14 +79,14 @@ const Register = () => {
       }
       const result = await register(payload).unwrap()
       if (formData.role === 'admin' && result?.storeSlug)
-        setStoreLink(`${window.location.origin}/store/${result.storeSlug}`)
+        setStoreLink(result?.storeLink || `${window.location.origin}/store/${result.storeSlug}`)
     } catch (_) {}
   }
 
   const handleBloggerSubmit = async (e) => {
     e.preventDefault()
     if (bloggerForm.password !== bloggerForm.confirmPassword) { toast.error("Şifrələr eyni deyil"); return }
-    if (bloggerForm.password.length < 6) { toast.error("Şifrə ən azı 6 simvol olmalıdır"); return }
+    if (bloggerForm.password.length < 8) { toast.error("Şifrə ən azı 8 simvol olmalıdır"); return }
     setBloggerLoading(true)
     try {
       await dispatch(registerBlogger({

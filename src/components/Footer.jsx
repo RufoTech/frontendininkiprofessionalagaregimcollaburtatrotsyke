@@ -7,9 +7,10 @@
 // ============================================================
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 // Sosial media və UI ikonları
 import { Facebook, Twitter, Instagram, Youtube, X, ChevronRight, Shield, Store, Users, FileText, Scale, Handshake, HelpCircle, Truck, RotateCcw, MessageSquare, ChevronDown } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 // =====================================================================
 // Modal Komponenti
@@ -475,7 +476,17 @@ const Footer = () => {
               />
               {/* Email boş deyilsə abunəlik uğurlu bildirişi göstərir */}
               <button
-                onClick={() => { if (email) { alert("Abunəlik uğurlu!"); setEmail(''); } }}
+                onClick={() => {
+                  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                  if (!email) {
+                    toast.error("Zəhmət olmasa e-poçt daxil edin");
+                  } else if (!emailRegex.test(email)) {
+                    toast.error("Yanlış e-poçt formatı");
+                  } else {
+                    toast.success("Abunəlik uğurludur! 🎉");
+                    setEmail('');
+                  }
+                }}
                 style={{ padding: "10px 14px", background: "#E8192C", border: "none", cursor: "pointer", color: "white", fontWeight: 800, fontSize: 14 }}>
                 →
               </button>
@@ -490,10 +501,10 @@ const Footer = () => {
               {/* Hər müqavilə linki — tıklandıqda həmin modalı açır */}
               <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                 {legalLinks.map(({ label, key }) => (
-                  <button key={key} onClick={() => setActiveModal(key)}
+                  <Link key={key} to="/terms"
                     style={{ background: "none", border: "none", cursor: "pointer", textAlign: "left", fontSize: 11, color: "#E8192C", fontWeight: 600, padding: "2px 0", fontFamily: "'Sora',sans-serif", textDecoration: "underline" }}>
                     → {label}
-                  </button>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -541,7 +552,17 @@ const Footer = () => {
                 style={{ flex: 1, padding: "11px 13px", border: "none", outline: "none", fontSize: 13, color: "#1a1a1a", background: "white", fontFamily: "'Sora',sans-serif" }}
               />
               <button
-                onClick={() => { if (email) { alert("Abunəlik uğurlu!"); setEmail(''); } }}
+                onClick={() => {
+                  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                  if (!email) {
+                    toast.error("Zəhmət olmasa e-poçt daxil edin");
+                  } else if (!emailRegex.test(email)) {
+                    toast.error("Yanlış e-poçt formatı");
+                  } else {
+                    toast.success("Abunəlik uğurludur! 🎉");
+                    setEmail('');
+                  }
+                }}
                 style={{ padding: "11px 16px", background: "#E8192C", border: "none", cursor: "pointer", color: "white", fontWeight: 800, fontSize: 15 }}>
                 →
               </button>

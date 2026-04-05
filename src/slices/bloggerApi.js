@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE = "http://localhost:3010/commerce/mehsullar";
+const BASE = "/commerce/mehsullar";
 
 // ─── ADMIN: BLOGER YÖNETIMI ────────────────────────────────────────────────
 

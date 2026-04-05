@@ -25,8 +25,12 @@ const SearchResults = () => {
   const navigate = useNavigate(); // React Router üçün düzgün yönləndirmə
   const searchParams = new URLSearchParams(location.search);
   const query = searchParams.get("query") || "";
-  const { data: results, isLoading, isError } = useSearchProductsQuery({ query });
+  const { data: results, isLoading, isError, error } = useSearchProductsQuery(
+    { query },
+    { skip: !query.trim() }
+  );
   const [searchInput, setSearchInput] = useState(query);
+  const products = results?.products || [];
   const defaultImageUrl = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Crect width='300' height='300' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' fill='%239ca3af'%3EŞəkil yoxdur%3C/text%3E%3C/svg%3E";
 
   const handleSearchSubmit = (e) => {
@@ -44,12 +48,12 @@ const SearchResults = () => {
     );
   }
 
-  // Xəta Ekranı
-  if (isError) {
+  // Xəta Ekranı — 401 xətalarını authApi idarə edir
+  if (isError && error?.status !== 304) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center text-center p-6">
         <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
-        <h2 className="text-2xl font-bold text-gray-800">Xəta baş verdi</h2>
+        <h2 className="text-2xl font-bold text-gray-900">Xəta baş verdi</h2>
         <p className="text-gray-500 mt-2">Məlumatları yükləyərkən problem yarandı. Zəhmət olmasa yenidən cəhd edin.</p>
       </div>
     );
@@ -101,7 +105,7 @@ const SearchResults = () => {
 
             {results && (
                <p className="text-gray-500 mt-4 font-medium">
-                 {results.totalProducts} məhsul tapıldı
+                 {results.total || results.totalProducts || 0} məhsul tapıldı
                </p>
             )}
           </div>
@@ -111,7 +115,7 @@ const SearchResults = () => {
       <div className="container mx-auto px-4 max-w-6xl">
         
         {/* Nəticə Tapılmadıqda */}
-        {(!results || results.products.length === 0) ? (
+        {(!results || products.length === 0) ? (
           <div className="bg-white rounded-2xl p-12 text-center shadow-sm border border-gray-100">
             <div className="bg-gray-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
               <FilterX className="w-12 h-12 text-gray-400" />
@@ -127,7 +131,7 @@ const SearchResults = () => {
         ) : (
           /* Məhsul Siyahısı */
           <div className="space-y-4">
-            {results.products.map((product) => {
+            {products.map((product) => {
               const imageUrl = product?.images?.[0]?.url || defaultImageUrl;
               const inStock = product.stock > 0;
 

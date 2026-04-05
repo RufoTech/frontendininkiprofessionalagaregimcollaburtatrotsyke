@@ -1,9 +1,11 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { setIsAuthenticated, setUser, logout } from "../features/userSlice.js";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "/commerce/mehsullar";
+
 export const authApi = createApi({
     reducerPath: "authApi",
-    baseQuery: fetchBaseQuery({ baseUrl: "/commerce/mehsullar", credentials: "include" }),
+    baseQuery: fetchBaseQuery({ baseUrl: API_BASE, credentials: "include" }),
     endpoints: (builder) => ({
 
         // ── Qeydiyyat ──
@@ -109,7 +111,7 @@ export const authApi = createApi({
         // ProductDetail "Mağazaya bax" üçün
         // ════════════════════════════════════════════════════
         getStoreSlugBySeller: builder.query({
-            query: (sellerName) => `/store-by-seller/${encodeURIComponent(sellerName)}`,
+            query: (sellerName) => `/store/seller/${encodeURIComponent(sellerName)}`,
         }),
 
     }),
