@@ -60,8 +60,12 @@ export const deleteAdminBySA = createAsyncThunk("superAdmin/deleteAdmin", async 
     catch (e) { return rejectWithValue(e.response?.data?.message || "Xəta"); }
 });
 
+// FIX: controller sellerStatus gözləyir, əvvəlki versiyada "status" göndərilirdi
 export const updateAdminStatus = createAsyncThunk("superAdmin/updateAdminStatus", async ({ id, status, reason }, { rejectWithValue }) => {
-    try { const { data } = await axios.patch(`${BASE}/admins/${id}/status`, { status, reason }, cfg); return { id, ...data }; }
+    try {
+        const { data } = await axios.patch(`${BASE}/admins/${id}/status`, { sellerStatus: status, reason }, cfg);
+        return { id, status, ...data };
+    }
     catch (e) { return rejectWithValue(e.response?.data?.message || "Xəta"); }
 });
 
@@ -155,18 +159,18 @@ const savedAdmin = (() => {
 const superAdminSlice = createSlice({
     name: "superAdmin",
     initialState: {
-        adminInfo:      savedAdmin,
-        isLoggedIn:     !!savedAdmin,
-        users:          [],  totalUsers: 0,
-        admins:         [],  totalAdmins: 0,
-        bloggers:       [],  totalBloggers: 0,
-        superAdmins:    [],
-        selectedUser:   null,
-        selectedAdmin:  null,
+        adminInfo:       savedAdmin,
+        isLoggedIn:      !!savedAdmin,
+        users:           [],  totalUsers: 0,
+        admins:          [],  totalAdmins: 0,
+        bloggers:        [],  totalBloggers: 0,
+        superAdmins:     [],
+        selectedUser:    null,
+        selectedAdmin:   null,
         selectedBlogger: null,
-        loading:        false,
-        error:          null,
-        actionResult:   null,
+        loading:         false,
+        error:           null,
+        actionResult:    null,
     },
     reducers: {
         clearSAError:  (s) => { s.error = null; },
@@ -180,7 +184,7 @@ const superAdminSlice = createSlice({
         // Auth
         b.addCase(superAdminLogin.pending, p)
          .addCase(superAdminLogin.fulfilled, (s, a) => {
-             s.loading = false;
+             s.loading    = false;
              s.isLoggedIn = true;
              s.adminInfo  = a.payload.superAdmin || a.payload.user || a.payload;
              localStorage.setItem("superAdminInfo", JSON.stringify(s.adminInfo));
@@ -189,7 +193,7 @@ const superAdminSlice = createSlice({
 
          .addCase(superAdminRegister.pending, p)
          .addCase(superAdminRegister.fulfilled, (s, a) => {
-             s.loading = false;
+             s.loading    = false;
              s.isLoggedIn = true;
              s.adminInfo  = a.payload.superAdmin || a.payload.user || a.payload;
              localStorage.setItem("superAdminInfo", JSON.stringify(s.adminInfo));
@@ -210,7 +214,11 @@ const superAdminSlice = createSlice({
 
         // Admins
          .addCase(fetchAllAdmins.pending, p)
-         .addCase(fetchAllAdmins.fulfilled, (s, a) => { s.loading = false; s.admins = a.payload.admins || a.payload; s.totalAdmins = a.payload.total || a.payload.length; })
+         .addCase(fetchAllAdmins.fulfilled, (s, a) => {
+             s.loading     = false;
+             s.admins      = a.payload.admins || a.payload;
+             s.totalAdmins = a.payload.total  || (a.payload.admins || a.payload).length;
+         })
          .addCase(fetchAllAdmins.rejected, r)
 
          .addCase(fetchAdminById.fulfilled, (s, a) => { s.selectedAdmin = a.payload; })
@@ -224,7 +232,11 @@ const superAdminSlice = createSlice({
          .addCase(updateAdminBySA.rejected, r)
 
          .addCase(deleteAdminBySA.pending, p)
-         .addCase(deleteAdminBySA.fulfilled, (s, a) => { s.loading = false; s.admins = s.admins.filter(ad => ad._id !== a.payload); s.actionResult = { type: "adminDeleted" }; })
+         .addCase(deleteAdminBySA.fulfilled, (s, a) => {
+             s.loading = false;
+             s.admins  = s.admins.filter(ad => ad._id !== a.payload);
+             s.actionResult = { type: "adminDeleted", message: "Admin silindi" };
+         })
          .addCase(deleteAdminBySA.rejected, r)
 
          .addCase(updateAdminStatus.pending, p)
@@ -265,7 +277,11 @@ const superAdminSlice = createSlice({
 
         // Bloggers
          .addCase(fetchAllBloggers.pending, p)
-         .addCase(fetchAllBloggers.fulfilled, (s, a) => { s.loading = false; s.bloggers = a.payload.bloggers; s.totalBloggers = a.payload.total; })
+         .addCase(fetchAllBloggers.fulfilled, (s, a) => {
+             s.loading       = false;
+             s.bloggers      = a.payload.bloggers;
+             s.totalBloggers = a.payload.total;
+         })
          .addCase(fetchAllBloggers.rejected, r)
 
          .addCase(fetchBloggerById.fulfilled, (s, a) => { s.selectedBlogger = a.payload; })
@@ -279,7 +295,11 @@ const superAdminSlice = createSlice({
          .addCase(updateBloggerBySA.rejected, r)
 
          .addCase(deleteBloggerBySA.pending, p)
-         .addCase(deleteBloggerBySA.fulfilled, (s, a) => { s.loading = false; s.bloggers = s.bloggers.filter(b => b._id !== a.payload); s.actionResult = { type: "bloggerDeleted" }; })
+         .addCase(deleteBloggerBySA.fulfilled, (s, a) => {
+             s.loading   = false;
+             s.bloggers  = s.bloggers.filter(b => b._id !== a.payload);
+             s.actionResult = { type: "bloggerDeleted", message: "Blogger silindi" };
+         })
          .addCase(deleteBloggerBySA.rejected, r)
 
          .addCase(updateBloggerCommission.pending, p)
@@ -316,8 +336,8 @@ const superAdminSlice = createSlice({
 
          .addCase(deleteUserBySA.pending, p)
          .addCase(deleteUserBySA.fulfilled, (s, a) => {
-             s.loading = false;
-             s.users = s.users.filter(u => u._id !== a.payload);
+             s.loading    = false;
+             s.users      = s.users.filter(u => u._id !== a.payload);
              s.totalUsers = Math.max(0, s.totalUsers - 1);
              s.actionResult = { type: "userDeleted", message: "İstifadəçi silindi" };
          })
@@ -335,7 +355,10 @@ const superAdminSlice = createSlice({
 
         // SuperAdmins
          .addCase(fetchAllSuperAdmins.pending, p)
-         .addCase(fetchAllSuperAdmins.fulfilled, (s, a) => { s.loading = false; s.superAdmins = a.payload.superAdmins || []; })
+         .addCase(fetchAllSuperAdmins.fulfilled, (s, a) => {
+             s.loading      = false;
+             s.superAdmins  = a.payload.superAdmins || [];
+         })
          .addCase(fetchAllSuperAdmins.rejected, r);
     },
 });
