@@ -605,18 +605,28 @@ const ProductDetail = () => {
 
               {/* İndi al */}
               <button
-                onClick={() => navigate("/payment")}
+                onClick={async () => {
+                  if (!inStock) return;
+                  try {
+                    await addToCart({ productId: product._id, quantity }).unwrap();
+                    navigate("/payment");
+                  } catch {
+                    toast.error("Xəta baş verdi");
+                  }
+                }}
+                disabled={!inStock}
                 style={{
                   width: "100%", height: 48,
                   background: C.white,
                   border: `2px solid ${C.red}`,
-                  borderRadius: 14, cursor: "pointer",
+                  borderRadius: 14, cursor: inStock ? "pointer" : "default",
                   fontSize: 15, fontWeight: 700, color: C.red,
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                   transition: "all 0.18s",
+                  opacity: inStock ? 1 : 0.5,
                 }}
-                onMouseEnter={e => { e.currentTarget.style.background = C.red; e.currentTarget.style.color = "#fff" }}
-                onMouseLeave={e => { e.currentTarget.style.background = C.white; e.currentTarget.style.color = C.red }}
+                onMouseEnter={e => { if(inStock){ e.currentTarget.style.background = C.red; e.currentTarget.style.color = "#fff" } }}
+                onMouseLeave={e => { if(inStock){ e.currentTarget.style.background = C.white; e.currentTarget.style.color = C.red } }}
               >
                 İndi Al
               </button>

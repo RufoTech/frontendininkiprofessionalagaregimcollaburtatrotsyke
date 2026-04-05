@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { useGetProductsQuery, useAddToCartMutation } from "../redux/api/productsApi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Plus, Heart, ShoppingBag, Loader2 } from "lucide-react";
 
@@ -18,8 +18,9 @@ const navBtn = {
   justifyContent: "center",
 };
 
-const ProductCard = ({ product, onAddToCart }) => (
+const ProductCard = ({ product, onAddToCart, onNavigate }) => (
   <div
+    onClick={() => onNavigate(product._id)}
     style={{
       background: "#fff",
       borderRadius: 12,
@@ -122,8 +123,11 @@ const ProductCard = ({ product, onAddToCart }) => (
 
 export default function BestSellers() {
   const rowRef = useRef(null);
+  const navigate = useNavigate();
   const [addToCart] = useAddToCartMutation();
   const { data: productsData, isLoading } = useGetProductsQuery();
+
+  const handleNavigate = (id) => navigate(`/product/${id}`);
 
   const allProducts =
     productsData?.products ||
@@ -150,7 +154,8 @@ export default function BestSellers() {
           <h2 style={{ fontSize: 20, fontWeight: 800, color: "#1a1a1a", margin: 0 }}>
             Ən Çox Satılan Məhsullar
           </h2>
-          <div style={{ display: "flex", gap: 6 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <Link to="/shop" style={{ fontSize: 12, fontWeight: 700, color: "#E8192C", textDecoration: "none" }}>Hamısına bax →</Link>
             <button onClick={() => scroll(-1)} style={navBtn}>‹</button>
             <button onClick={() => scroll(1)} style={navBtn}>›</button>
           </div>
@@ -172,7 +177,7 @@ export default function BestSellers() {
             }}
           >
             {allProducts.map(p => (
-              <ProductCard key={p._id} product={p} onAddToCart={handleAddToCart} />
+              <ProductCard key={p._id} product={p} onAddToCart={handleAddToCart} onNavigate={handleNavigate} />
             ))}
           </div>
         )}

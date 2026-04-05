@@ -97,7 +97,7 @@ const Welcome = () => {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
 
         /* ══ FON — splash Phase1 ilə eyni qırmızı rəng ══ */
@@ -112,7 +112,7 @@ const Welcome = () => {
           align-items: center;
           justify-content: space-between;
           padding: 0 28px;
-          font-family: 'Sora', sans-serif;
+          font-family: 'Inter', sans-serif;
           overflow: hidden;
           position: relative;
         }
@@ -247,7 +247,7 @@ const Welcome = () => {
           border-radius: 99px; border: none;
           background: linear-gradient(135deg, #ff4f5e 0%, #e8182b 100%);
           color: white; font-size: 16px; font-weight: 700;
-          font-family: 'Sora', sans-serif; cursor: pointer;
+          font-family: 'Inter', sans-serif; cursor: pointer;
           letter-spacing: -0.2px;
           box-shadow: 0 10px 32px rgba(232,24,43,0.55);
           transition: transform 0.20s cubic-bezier(0.34,1.4,0.64,1),
@@ -262,7 +262,7 @@ const Welcome = () => {
           border: 1.5px solid rgba(255,255,255,0.28);
           background: rgba(255,255,255,0.08);
           color: white; font-size: 16px; font-weight: 600;
-          font-family: 'Sora', sans-serif; cursor: pointer;
+          font-family: 'Inter', sans-serif; cursor: pointer;
           backdrop-filter: blur(12px);
           transition: transform 0.20s cubic-bezier(0.34,1.4,0.64,1),
                       background 0.18s, border-color 0.18s;

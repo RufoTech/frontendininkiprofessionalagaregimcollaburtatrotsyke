@@ -1,13 +1,30 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import toast from "react-hot-toast";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "/commerce/mehsullar";
 
+const rawBaseQuery = fetchBaseQuery({
+  baseUrl: API_BASE,
+  credentials: "include",
+});
+
+// 401 interceptor — istifadəçiyə aydın bildiriş verir
+const baseQueryWithAuth = async (args, api, extraOptions) => {
+  const result = await rawBaseQuery(args, api, extraOptions);
+  if (result?.error?.status === 401) {
+    // Yalnız bir dəfə toast göstər (eyni anda çoxlu 401 gəlsə)
+    if (!window.__brendex401Shown) {
+      window.__brendex401Shown = true;
+      toast.error("Sessiya bitib, zəhmət olmasa yenidən daxil olun");
+      setTimeout(() => { window.__brendex401Shown = false; }, 3000);
+    }
+  }
+  return result;
+};
+
 export const productApi = createApi({
   reducerPath: "productApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: API_BASE,
-    credentials: "include", // ✅ düzgün yer - fetchBaseQuery içində
-  }),
+  baseQuery: baseQueryWithAuth,
   tagTypes: ["Cart", "Favorites", "Products", "Reviews"],
   endpoints: (builder) => ({
 

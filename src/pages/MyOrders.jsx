@@ -70,13 +70,13 @@ const MyOrders = () => {
                     </div>
                 )}
 
-                {myOrders.length === 0 ? (
+                {!error && myOrders.length === 0 ? (
                     <div className="text-center py-20 bg-white rounded-2xl border border-gray-200">
                         <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                         <p className="text-gray-500 text-lg">Hələ heç bir sifarişiniz yoxdur</p>
                         <p className="text-gray-400 text-sm mt-2">Alış-veriş etdikdən sonra sifarişləriniz burada görünəcək</p>
                     </div>
-                ) : (
+                ) : myOrders.length > 0 ? (
                     <div className="space-y-6">
                         {myOrders.map((order) => (
                             <div
@@ -143,7 +143,7 @@ const MyOrders = () => {
                             </div>
                         ))}
                     </div>
-                )}
+                ) : null}
             </div>
         </div>
     );
