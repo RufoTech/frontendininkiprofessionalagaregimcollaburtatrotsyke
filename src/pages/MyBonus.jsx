@@ -47,12 +47,21 @@ export default function MyBonus() {
 
   const handleCancelRedeem = () => dispatch(cancelRedeem())
 
-  const copyRef = () => {
-    const link = referralData?.referralLink || referralData?.referralCode
-    if (link) { navigator.clipboard.writeText(link); toast.success("Kopyalandı!") }
-  }
+  const referralData = referral?.referral || referral;
 
-  const referralData = referral?.referral || referral
+  const copyRef = async () => {
+    const link = referralData?.referralLink || referralData?.referralCode || "";
+    if (link) {
+      try {
+        await navigator.clipboard.writeText(link);
+        toast.success("Kopyalandı!");
+      } catch (err) {
+        toast.error("Link kopyalanmadı!");
+      }
+    } else {
+      toast.error("Referral linki tapılmadı, səhifəni yeniləyin!");
+    }
+  };
   const balance     = myBonus?.balance ?? 0
   const pending     = myBonus?.pendingRedemption ?? 0
   const txs         = myBonus?.transactions ?? []

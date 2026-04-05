@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Plus, Heart, ShoppingBag, Loader2, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import BonusBanner from "./BonusBanner";
 
 const features = [
   { icon: "🚚", title: "Pulsuz Çatdırılma",  sub: "50 AZN-dən yuxarı"    },
@@ -584,6 +585,8 @@ export default function EcommerceHome() {
 
       {/* ══ MƏHSULLAR + FLASH ══ */}
       <div className="eco-main" style={{ maxWidth: 1120, margin: "0 auto", padding: "32px 20px" }}>
+
+        <BonusBanner />
 
         <ProductRow
           title="Tövsiyə Olunanlar"
