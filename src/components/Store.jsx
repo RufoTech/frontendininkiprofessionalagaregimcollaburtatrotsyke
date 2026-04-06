@@ -41,8 +41,6 @@ const Store = () => {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap');
-
         .store-products-section { max-width: 1280px; margin: 48px auto 0; padding: 0 24px 60px; }
 
         .section-header {

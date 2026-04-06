@@ -369,9 +369,7 @@ export default function EcommerceHome() {
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", background: "#f6f6f8", minHeight: "100vh" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-
-        /* ── Scroll çubuğunu gizlə ── */
+        *, *::before, *::after { box-sizing: border-box; }
         [style*="overflowX"]::-webkit-scrollbar { display: none; }
 
         /* ── Hero ── */

@@ -93,3 +93,31 @@ export const fetchBloggerSales = (params = {}) =>
     params,
     withCredentials: true,
   });
+
+// ─── BLOGER: PRODUCT CRUD ───────────────────────────────────────────
+
+// GET /blogger/products
+export const fetchBloggerProductsApi = () =>
+  axios.get(`${BASE}/blogger/products`, {
+    withCredentials: true,
+  });
+
+// POST /blogger/products
+export const createBloggerProductApi = (formData) =>
+  axios.post(`${BASE}/blogger/products`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+    withCredentials: true,
+  });
+
+// PUT /blogger/products/:id
+export const updateBloggerProductApi = (id, formData) =>
+  axios.put(`${BASE}/blogger/products/${id}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+    withCredentials: true,
+  });
+
+// DELETE /blogger/products/:id
+export const deleteBloggerProductApi = (id) =>
+  axios.delete(`${BASE}/blogger/products/${id}`, {
+    withCredentials: true,
+  });

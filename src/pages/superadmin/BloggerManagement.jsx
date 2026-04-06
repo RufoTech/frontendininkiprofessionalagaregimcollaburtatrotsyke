@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import {
   Users, TrendingUp, DollarSign, Clock, Search,
   Plus, Edit2, Trash2, CreditCard, RefreshCw, CheckCircle, XCircle,
+  Eye, Package, ExternalLink,
 } from "lucide-react";
 import {
   getAllBloggers,
@@ -148,7 +149,9 @@ export default function BloggerManagement() {
   // Modal state
   const [showCreate, setShowCreate] = useState(false);
   const [showEdit,   setShowEdit]   = useState(false);
+  const [showView,   setShowView]   = useState(false);
   const [editTarget, setEditTarget] = useState(null);
+  const [viewTarget, setViewTarget] = useState(null);
 
   // Form state
   const [form, setForm] = useState({
@@ -233,6 +236,15 @@ export default function BloggerManagement() {
     e.preventDefault();
     dispatch(updateBlogger({ id: editTarget._id, formData: editForm }));
   }
+
+  // ── Bax (View) ────────────────────────────────────────────────────────────
+  function openView(b) {
+    setViewTarget(b);
+    setShowView(true);
+    dispatch(getBloggerById(b._id));
+  }
+
+  const { currentBlogger, loading: detailLoading } = useSelector(s => s.blogger);
 
   // ── Faiz dəyişdir ─────────────────────────────────────────────────────────
   async function handleRateChange(blogger) {
@@ -409,6 +421,10 @@ export default function BloggerManagement() {
                       </td>
                       <td style={{ padding: "12px 16px" }}>
                         <div style={{ display: "flex", gap: "6px" }}>
+                          <button title="Bax" onClick={() => openView(b)}
+                            style={{ ...btnPrimary, padding: "6px 10px", background: colors.dark }}>
+                            <Eye size={13} />
+                          </button>
                           <button title="Redaktə" onClick={() => openEdit(b)}
                             style={{ ...btnPrimary, padding: "6px 10px", background: colors.blue }}>
                             <Edit2 size={13} />
@@ -532,6 +548,93 @@ export default function BloggerManagement() {
             </div>
           </form>
         </Modal>
+      )}
+
+      {/* ── Bax Modalı ─────────────────────────────────────────────────── */}
+      {showView && viewTarget && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)",
+          display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
+          <div style={{ background: "#fff", borderRadius: "14px", padding: "28px",
+            width: "100%", maxWidth: "820px", maxHeight: "90vh", overflowY: "auto",
+            boxShadow: "0 8px 40px rgba(0,0,0,0.18)" }}>
+            
+            <div style={{ display: "flex", justifyContent: "space-between",
+              alignItems: "center", marginBottom: "20px", borderBottom: "1px solid #eee", pb: "10px" }}>
+              <h3 style={{ margin: 0, fontSize: "18px", fontWeight: "700", color: colors.dark }}>
+                Bloger Detalları — {viewTarget.firstName} {viewTarget.lastName}
+              </h3>
+              <button onClick={() => { setShowView(false); setViewTarget(null); }} 
+                style={{ background: "none", border: "none", cursor: "pointer", fontSize: "20px", color: "#999" }}>✕</button>
+            </div>
+
+            {detailLoading ? (
+              <div style={{ padding: "40px", textAlign: "center", color: "#aaa" }}>Yüklənir...</div>
+            ) : (
+              <div>
+                {/* Stats Summary */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "10px", mb: "20px" }}>
+                  <div style={{ p: "12px", background: "#f8f9fa", borderRadius: "10px", textAlign: "center" }}>
+                    <div style={{ fontSize: "11px", color: "#888", textTransform: "uppercase" }}>Ümumi Satış</div>
+                    <div style={{ fontSize: "18px", fontWeight: "700" }}>
+                      {(currentBlogger?.blogger?.totalSalesAmount || 0).toFixed(2)} ₼
+                    </div>
+                  </div>
+                  <div style={{ p: "12px", background: "#f0fdf4", borderRadius: "10px", textAlign: "center" }}>
+                    <div style={{ fontSize: "11px", color: colors.green, textTransform: "uppercase" }}>Qazanılan</div>
+                    <div style={{ fontSize: "18px", fontWeight: "700" }}>
+                      {(currentBlogger?.blogger?.totalCommissionEarned || 0).toFixed(2)} ₼
+                    </div>
+                  </div>
+                  <div style={{ p: "12px", background: "#fff7ed", borderRadius: "10px", textAlign: "center" }}>
+                    <div style={{ fontSize: "11px", color: colors.orange, textTransform: "uppercase" }}>Gözləyən</div>
+                    <div style={{ fontSize: "18px", fontWeight: "700" }}>
+                      {(currentBlogger?.blogger?.pendingCommission || 0).toFixed(2)} ₼
+                    </div>
+                  </div>
+                </div>
+
+                <h4 style={{ mb: "10px", fontSize: "15px", fontWeight: "700" }}>Son Satışlar</h4>
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                    <thead>
+                      <tr style={{ background: "#f8f9fa" }}>
+                        {["Tarix", "Məhsullar", "Metod", "Cəm", "Komisya", "Status"].map(h => (
+                          <th key={h} style={{ p: "10px", textAlign: "left", borderBottom: "1px solid #eee" }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {currentBlogger?.recentSales?.length === 0 ? (
+                        <tr><td colSpan={6} style={{ p: "20px", textAlign: "center", color: "#aaa" }}>Satış yoxdur</td></tr>
+                      ) : (
+                        currentBlogger?.recentSales?.map((s) => (
+                          <tr key={s._id} style={{ borderBottom: "1px solid #f0f0f0" }}>
+                            <td style={{ p: "10px" }}>{new Date(s.saleDate).toLocaleDateString("az-AZ")}</td>
+                            <td style={{ p: "10px", maxWidth: "200px" }}>
+                              {s.products?.map((p, idx) => (
+                                <div key={idx} style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  • {p.name} (x{p.quantity})
+                                </div>
+                              ))}
+                            </td>
+                            <td style={{ p: "10px" }}>
+                              <span style={{ fontSize: "10px", fontWeight: "800", color: s.method === "link" ? colors.blue : colors.red }}>
+                                {s.method === "link" ? "LİNK" : "KOD"}
+                              </span>
+                            </td>
+                            <td style={{ p: "10px", fontWeight: "600" }}>{s.orderAmount.toFixed(2)} ₼</td>
+                            <td style={{ p: "10px", fontWeight: "600", color: colors.green }}>{s.commissionAmount.toFixed(2)} ₼</td>
+                            <td style={{ p: "10px" }}><StatusBadge status={s.paymentStatus} /></td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

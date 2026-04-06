@@ -6,7 +6,7 @@ import userSlice from "./features/userSlice";
 import orderReducer from '../slices/orderSlice';
 import commissionReducer from '../slices/commissionSlice';
 import languageReducer from '../slices/languageSlice';
-import notificationReducer from '../slices/notificationSlice';
+import notificationReducer from '../slices/Notificationslice';
 import bloggerReducer from '../slices/bloggerSlice'
 import superAdminReducer from '../slices/superAdminSlice'
 import bonusReducer from '../slices/bonusSlice';

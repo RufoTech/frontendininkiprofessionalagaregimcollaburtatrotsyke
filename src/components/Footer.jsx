@@ -271,9 +271,6 @@ const Footer = () => {
   return (
     <>
       <style>{`
-        /* Google Fonts - Inter srifti */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-
         /* .flink — footer link düymələri üçün ortaq stil */
         .flink{font-size:12.5px;color:#888;text-decoration:none;transition:color 0.15s;font-weight:500;display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;background:none;border:none;cursor:pointer;padding:0;text-align:left}
         /* Hover: mətn qırmızı olur, ox ikonu sağa sürüşür */

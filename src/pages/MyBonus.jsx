@@ -76,7 +76,7 @@ export default function MyBonus() {
 
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: "32px 16px", fontFamily: "'DM Sans',sans-serif" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&display=swap');`}</style>
+      <style>{`.mb-root { --primary:#E8192C; --rose50:#fff5f5; --rose100:#ffe4e6; --dark:#1c1c1e; --mid:#6b7280; font-family:'Inter',sans-serif; }`}</style>
 
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ fontSize: 26, fontWeight: 800, color: "#111", margin: 0, display: "flex", alignItems: "center", gap: 10 }}>

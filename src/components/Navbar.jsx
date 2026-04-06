@@ -24,7 +24,7 @@ import {
   Wrench, ShoppingBag,
 } from "lucide-react"
 
-import { fetchUnreadCount } from "../slices/notificationSlice"
+import { fetchUnreadCount } from "../slices/Notificationslice"
 
 /* ─────────────────────────────────────────────
    LOGO SVG
@@ -375,7 +375,7 @@ function LanguageSwitcher() {
         boxShadow:isOpen ? `0 0 0 3px ${C.rose100}` : "none",
       }}>
         <span style={{ fontSize: 16 }}>{active.flag}</span>
-        <span>{active.short}</span>
+        <span>{active.label}</span>
         <ChevronDown size={11} style={{ transition: "transform .2s", transform: isOpen ? "rotate(180deg)" : "rotate(0)" }} />
       </button>
       {isOpen && (
@@ -848,6 +848,22 @@ const Navbar = () => {
     return () => clearInterval(intervalId);
   }, [isAuthenticated, dispatch]);
 
+  // 🔗 BLOGGER REFERRAL / PROMO DETECTION
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const refCode = params.get("ref") || params.get("promo");
+
+    if (refCode) {
+      const cleanCode = refCode.toUpperCase().trim();
+      // Store in sessionStorage so it persists during the session
+      sessionStorage.setItem("blogger_promo", cleanCode);
+      sessionStorage.setItem("blogger_method", params.get("ref") ? "link" : "code");
+      
+      // Optionally: show a small toast or log
+      console.log("Referral detected:", cleanCode);
+    }
+  }, [location.search]);
+
   useEffect(() => {
     const fn = e => {
       if (catRef.current  && !catRef.current.contains(e.target))  setIsCategoryOpen(false)
@@ -888,8 +904,7 @@ const Navbar = () => {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-        * { box-sizing: border-box; }
+        *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
 
         @keyframes nbSlideDown   { from{transform:translateY(-100%);opacity:0} to{transform:translateY(0);opacity:1} }
         @keyframes nbLogoPop     { 0%{opacity:0;transform:scale(0.6)} 70%{opacity:1;transform:scale(1.07)} 100%{opacity:1;transform:scale(1)} }

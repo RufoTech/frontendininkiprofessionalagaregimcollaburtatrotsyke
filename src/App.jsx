@@ -49,6 +49,8 @@ import Profile from './pages/Profile'
 import BloggerManagement from './pages/superadmin/BloggerManagement'
 import BloggerDashboard from './pages/blogger/BloggerDashboard'
 import BloggerRegister from './pages/blogger/BloggerRegister'
+import BloggerProducts from './pages/blogger/BloggerProducts'
+import AddEditBloggerProduct from './pages/blogger/AddEditBloggerProduct'
 import Terms from './pages/Terms'
 import SuperAdminLogin from './pages/superadmin/SuperAdminLogin'
 import SuperAdminDashboard from './pages/superadmin/SuperAdminDashboard'
@@ -101,6 +103,9 @@ function AppContent() {
         <Route path="/blogger/register" element={<GuestRoute><BloggerRegister /></GuestRoute>} />
         <Route path="/blogger/login"    element={<GuestRoute><BloggerLogin /></GuestRoute>} />
         <Route path="/blogger/dashboard" element={<BloggerDashboard />} />
+        <Route path="/blogger/products" element={<BloggerProducts />} />
+        <Route path="/blogger/add-product" element={<AddEditBloggerProduct />} />
+        <Route path="/blogger/edit-product/:id" element={<AddEditBloggerProduct />} />
 
         {/* SuperAdmin — qeydiyyat, giriş və panel */}
         <Route path="/superadmin/login"     element={<GuestRoute><SuperAdminLogin /></GuestRoute>} />

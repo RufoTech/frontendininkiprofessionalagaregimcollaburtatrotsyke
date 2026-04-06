@@ -183,6 +183,54 @@ export const getBloggerSales = createAsyncThunk(
   }
 );
 
+export const getBloggerProducts = createAsyncThunk(
+  "blogger/getProducts",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await api.fetchBloggerProductsApi();
+      return data.products;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Xəta baş verdi");
+    }
+  }
+);
+
+export const createBloggerProduct = createAsyncThunk(
+  "blogger/productCreate",
+  async (formData, { rejectWithValue }) => {
+    try {
+      const { data } = await api.createBloggerProductApi(formData);
+      return data.product;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Xəta baş verdi");
+    }
+  }
+);
+
+export const updateBloggerProduct = createAsyncThunk(
+  "blogger/productUpdate",
+  async ({ id, formData }, { rejectWithValue }) => {
+    try {
+      const { data } = await api.updateBloggerProductApi(id, formData);
+      return data.product;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Xəta baş verdi");
+    }
+  }
+);
+
+export const deleteBloggerProduct = createAsyncThunk(
+  "blogger/productDelete",
+  async (id, { rejectWithValue }) => {
+    try {
+      await api.deleteBloggerProductApi(id);
+      return id;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Xəta baş verdi");
+    }
+  }
+);
+
 // ════════════════════════════════════════════════════════════════════════════
 //  SLICE
 // ════════════════════════════════════════════════════════════════════════════
@@ -196,6 +244,7 @@ const bloggerSlice = createSlice({
     // Bloger öz hesabı — localStorage-dan yüklənir
     profile:        loadProfile(),   // { blogger: {...}, stats: {...} } | null
     sales:          null,
+    products:       [],
     // UI
     loading:        false,
     error:          null,
@@ -357,12 +406,44 @@ const bloggerSlice = createSlice({
       .addCase(getBloggerProfile.rejected,  setRejected)
 
       // ── getBloggerSales ─────────────────────────────────────────────
-      .addCase(getBloggerSales.pending,   setPending)
       .addCase(getBloggerSales.fulfilled, (state, action) => {
         state.loading = false;
         state.sales   = action.payload;
       })
-      .addCase(getBloggerSales.rejected,  setRejected);
+      .addCase(getBloggerSales.rejected,  setRejected)
+
+      // ── bloggerProducts ─────────────────────────────────────────────
+      .addCase(getBloggerProducts.pending,   setPending)
+      .addCase(getBloggerProducts.fulfilled, (state, action) => {
+        state.loading  = false;
+        state.products = action.payload;
+      })
+      .addCase(getBloggerProducts.rejected,  setRejected)
+
+      .addCase(createBloggerProduct.pending,   setPending)
+      .addCase(createBloggerProduct.fulfilled, (state, action) => {
+        state.loading      = false;
+        state.actionResult = { type: "productCreated", product: action.payload };
+        state.products.unshift(action.payload);
+      })
+      .addCase(createBloggerProduct.rejected,  setRejected)
+
+      .addCase(updateBloggerProduct.pending,   setPending)
+      .addCase(updateBloggerProduct.fulfilled, (state, action) => {
+        state.loading      = false;
+        state.actionResult = { type: "productUpdated", product: action.payload };
+        const idx = state.products.findIndex((p) => p._id === action.payload._id);
+        if (idx !== -1) state.products[idx] = action.payload;
+      })
+      .addCase(updateBloggerProduct.rejected,  setRejected)
+
+      .addCase(deleteBloggerProduct.pending,   setPending)
+      .addCase(deleteBloggerProduct.fulfilled, (state, action) => {
+        state.loading      = false;
+        state.actionResult = { type: "productDeleted" };
+        state.products = state.products.filter((p) => p._id !== action.payload);
+      })
+      .addCase(deleteBloggerProduct.rejected,  setRejected);
   },
 });
 

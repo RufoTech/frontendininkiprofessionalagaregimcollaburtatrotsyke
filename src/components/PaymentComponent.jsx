@@ -148,17 +148,37 @@ const PaymentComponent = () => {
   const { data: cartData, isLoading: cartLoading } = useGetCartQuery();
 
   const [currency, setCurrency] = useState("azn");
+  const [promoCode, setPromoCode] = useState("");
+  const [promoMethod, setPromoMethod] = useState("code");
   const orderCreatedRef = useRef(false);
 
   const totalAmount = cartData?.cart?.reduce((t, i) => t + i.product.price * i.quantity, 0) ?? 0;
 
   useEffect(() => {
+    // Check for stored referral/promo from Navbar detection
+    const savedPromo = sessionStorage.getItem("blogger_promo");
+    const savedMethod = sessionStorage.getItem("blogger_method");
+    if (savedPromo) {
+      setPromoCode(savedPromo);
+      if (savedMethod) setPromoMethod(savedMethod);
+    }
+  }, []);
+
+  useEffect(() => {
     if (clientSecret && !orderCreatedRef.current) {
       orderCreatedRef.current = true;
       const piId = clientSecret.split("_secret_")[0];
-      setTimeout(() => dispatch(createOrder({ stripePaymentIntentId: piId, currency })), 0);
+      setTimeout(() => dispatch(createOrder({ 
+        stripePaymentIntentId: piId, 
+        currency,
+        promoCode,
+        promoMethod
+      })), 0);
+      // Clear after successful use
+      sessionStorage.removeItem("blogger_promo");
+      sessionStorage.removeItem("blogger_method");
     }
-  }, [clientSecret, currency, dispatch]);
+  }, [clientSecret, currency, dispatch, promoCode, promoMethod]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -172,9 +192,10 @@ const PaymentComponent = () => {
 
   return (
     <div style={{ minHeight: "100vh", background: "#f8f9fa", padding: "32px 16px", fontFamily: "'DM Sans',sans-serif" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');`}</style>
+      <style>{`
+        /* Custom scrollbar for summary */
+      `}</style>
       <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-
         <div style={{ textAlign: "center", marginBottom: 36 }}>
           <h1 style={{ fontSize: 28, fontWeight: 800, color: "#111", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, margin: 0 }}>
             <Lock size={24} /> Təhlükəsiz Ödəniş
@@ -263,6 +284,41 @@ const PaymentComponent = () => {
                     ))}
                   </div>
                   <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: 14 }}>
+                    {/* Blogger Promo UI */}
+                    <div style={{ marginBottom: 16 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: "#555" }}>Promo Kod</span>
+                        {promoCode && promoMethod === "link" && (
+                          <span style={{ fontSize: 10, background: "#fef2f2", color: "#E8192C", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>REF LİNK</span>
+                        )}
+                      </div>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <input
+                          type="text"
+                          placeholder="Məs: AYDAN10"
+                          value={promoCode}
+                          onChange={(e) => {
+                            setPromoCode(e.target.value.toUpperCase());
+                            setPromoMethod("code");
+                          }}
+                          style={{
+                            flex: 1, padding: "8px 12px", border: "1.5px solid #eee",
+                            borderRadius: 10, fontSize: 13, fontFamily: "'Inter', sans-serif",
+                            textTransform: "uppercase", outline: "none"
+                          }}
+                          disabled={promoMethod === "link"}
+                        />
+                        {promoCode && (
+                          <button 
+                            onClick={() => { setPromoCode(""); setPromoMethod("code"); sessionStorage.removeItem("blogger_promo"); }}
+                            style={{ border: "none", background: "none", color: "#888", cursor: "pointer", fontSize: 11, fontWeight: 600 }}
+                          >
+                            Sil
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "#888", marginBottom: 6 }}>
                       <span>Məhsullar</span><span>{totalAmount.toFixed(2)} ₼</span>
                     </div>

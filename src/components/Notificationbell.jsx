@@ -11,7 +11,7 @@ import {
   markAllNotificationsRead,
   deleteNotification,
   deleteAllNotifications,
-} from "../slices/notificationSlice"
+} from "../slices/Notificationslice"
 
 /* ── Rəng sabitleri ───────────────────────────────────────────── */
 const C = {
@@ -127,8 +127,7 @@ export default function NotificationsPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
-        * { box-sizing:border-box; }
+        .nb-shake { animation: nbShakeAnim 0.6s ease; }
 
         .np-root {
           min-height:100vh;

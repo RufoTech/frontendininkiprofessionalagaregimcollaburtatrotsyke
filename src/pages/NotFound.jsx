@@ -61,8 +61,6 @@ const NotFound = () => {
             fontFamily: "'Bebas Neue', 'Impact', sans-serif",
         }}>
             <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;600&display=swap');
-
                 @keyframes fadeUp {
                     from { opacity: 0; transform: translateY(40px); }
                     to { opacity: 1; transform: translateY(0); }

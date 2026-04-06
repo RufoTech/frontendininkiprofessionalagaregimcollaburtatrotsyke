@@ -29,7 +29,6 @@ const BloggerLogin = () => {
       fontFamily: "'Inter', sans-serif", padding: "24px",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
         .bl-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12);
           border-radius:24px; padding:48px 40px; width:100%; max-width:420px;
           backdrop-filter:blur(16px); }

@@ -53,7 +53,6 @@ const Login = () => {
     return (
       <>
         <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
           .ap-root { min-height:100vh; background:#F5F5F5; display:flex; align-items:center; justify-content:center; padding:20px; font-family:'Inter',sans-serif; }
           .ap-card { background:#fff; border-radius:24px; padding:36px 32px; max-width:480px; width:100%; box-shadow:0 4px 24px rgba(0,0,0,0.08); }
           .ap-icon { width:60px; height:60px; background:#fff0f1; border-radius:18px; display:flex; align-items:center; justify-content:center; margin-bottom:16px; }
@@ -128,8 +127,6 @@ const Login = () => {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
         * { box-sizing: border-box; }
 
         .login-page {

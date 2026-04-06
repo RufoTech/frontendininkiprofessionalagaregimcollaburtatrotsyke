@@ -53,8 +53,6 @@ const Product = ({ category, subcategory }) => {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap');
-
         .section-header {
           display: flex;
           align-items: center;

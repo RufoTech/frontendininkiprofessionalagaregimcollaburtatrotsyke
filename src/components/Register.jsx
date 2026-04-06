@@ -121,7 +121,6 @@ const Register = () => {
     return (
       <>
         <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
           .link-page {
             min-height: 100vh; display: flex; align-items: center;
             justify-content: center; background: #fff;
@@ -220,7 +219,6 @@ const Register = () => {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         .reg-root { min-height: 100vh; display: flex; font-family: 'Inter', sans-serif; background: #fff; }
         .reg-left { flex: 0 0 520px; display: flex; flex-direction: column; justify-content: center; padding: 48px 52px; position: relative; z-index: 2; background: #fff; overflow-y: auto; }
         .reg-logo { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 32px; text-decoration: none; }

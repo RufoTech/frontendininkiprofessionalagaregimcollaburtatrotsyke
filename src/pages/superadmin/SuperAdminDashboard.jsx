@@ -267,7 +267,7 @@ export default function SuperAdminDashboard() {
   /* ─────────────────────── RENDER ──────────────────────────────── */
   return (
     <div style={{ minHeight: "100vh", background: "#f8f9fa", fontFamily: "'Inter',sans-serif" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');`}</style>
+      <style>{`.sa-root { --primary:#E8192C; --zinc950:#09090b; --zinc900:#18181b; --zinc800:#27272a; --zinc400:#a1a1aa; font-family:'Inter',sans-serif; }`}</style>
 
       {/* ── TOP NAV ── */}
       <header style={{

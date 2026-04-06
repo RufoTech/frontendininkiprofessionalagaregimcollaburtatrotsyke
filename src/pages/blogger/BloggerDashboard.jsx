@@ -211,10 +211,16 @@ export default function BloggerDashboard() {
             Komissiya paneli — {blogger.commissionRate}% faiz
           </p>
         </div>
-        <button onClick={handleLogout}
-          style={{ ...btnBase, background: colors.red, color: "#fff" }}>
-          <LogOut size={15} /> Çıxış
-        </button>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button onClick={() => navigate("/blogger/products")}
+            style={{ ...btnBase, background: colors.dark, color: "#fff" }}>
+            <Package size={15} /> Məhsullarım
+          </button>
+          <button onClick={handleLogout}
+            style={{ ...btnBase, background: colors.red, color: "#fff" }}>
+            <LogOut size={15} /> Çıxış
+          </button>
+        </div>
       </div>
 
       {/* Stat kartları */}
@@ -326,19 +332,19 @@ export default function BloggerDashboard() {
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "14px" }}>
               <thead>
                 <tr style={{ background: "#f8f9fa" }}>
-                  {["Tarix", "Sifariş", "Satış Məbləği", "Faiz", "Komissiya", "Status"].map((h) => (
-                    <th key={h} style={{ padding: "12px 14px", textAlign: "left",
-                      fontWeight: "700", color: "#555", borderBottom: "1px solid #eee",
-                      whiteSpace: "nowrap" }}>{h}</th>
+                  {["Tarix", "Sifariş", "Məhsullar", "Metod", "Satış", "Komissiya", "Status"].map((h) => (
+                    <th key={h} style={{ padding: "12px 14px", textAlign: h === "Status" ? "center" : "left",
+                      fontWeight: "700", fontSize: "12px", color: "#555", borderBottom: "1px solid #eee",
+                      textTransform: "uppercase", letterSpacing: "0.5px", whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {saleList.length === 0 ? (
                   <tr>
-                    <td colSpan={6} style={{ padding: "28px", textAlign: "center", color: "#aaa" }}>
+                    <td colSpan={7} style={{ padding: "40px", textAlign: "center", color: "#aaa" }}>
                       <Package size={32} style={{ display: "block", margin: "0 auto 8px", opacity: 0.3 }} />
-                      Satış tapılmadı
+                      Hələ satışınız yoxdur.
                     </td>
                   </tr>
                 ) : (
@@ -346,27 +352,46 @@ export default function BloggerDashboard() {
                     <tr key={s._id} style={{ borderBottom: "1px solid #f0f0f0" }}
                       onMouseEnter={(e) => e.currentTarget.style.background = "#fafafa"}
                       onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
-                      <td style={{ padding: "11px 14px", color: "#555" }}>
+                      <td style={{ padding: "12px 14px", color: "#555", fontSize: "13px" }}>
                         {new Date(s.saleDate).toLocaleDateString("az-AZ")}
                       </td>
-                      <td style={{ padding: "11px 14px" }}>
-                        <code style={{ fontSize: "12px", background: "#f5f5f5",
-                          padding: "2px 6px", borderRadius: "4px" }}>
-                          {s.order?._id?.slice(-8) || "—"}
+                      <td style={{ padding: "12px 14px" }}>
+                        <code style={{ fontSize: "11px", background: "#f0f0f0", color: "#111",
+                          padding: "2px 6px", borderRadius: "4px", fontWeight: "600" }}>
+                          #{s.order?._id?.slice(-8) || "—"}
                         </code>
                       </td>
-                      <td style={{ padding: "11px 14px", fontWeight: "600" }}>
-                        {(s.orderAmount || 0).toFixed(2)} ₼
+                      <td style={{ padding: "12px 14px", maxWidth: "220px" }}>
+                        <div style={{ fontSize: "13px", color: colors.dark, fontWeight: "500" }}>
+                          {s.products && s.products.length > 0 ? (
+                            s.products.map((p, idx) => (
+                              <div key={idx} style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} title={`${p.name} (x${p.quantity})`}>
+                                • {p.name} <span style={{ color: "#888", fontSize: "11px" }}>x{p.quantity}</span>
+                              </div>
+                            ))
+                          ) : (
+                            <span style={{ color: "#aaa" }}>Məlumat yoxdur</span>
+                          )}
+                        </div>
                       </td>
-                      <td style={{ padding: "11px 14px" }}>
-                        <span style={{ color: colors.purple, fontWeight: "700" }}>
-                          {s.commissionRate}%
+                      <td style={{ padding: "12px 14px" }}>
+                        <span style={{ 
+                          fontSize: "11px", fontWeight: "700", padding: "2px 8px", borderRadius: "6px",
+                          background: s.method === "link" ? "#e0f2fe" : "#fef2f2",
+                          color: s.method === "link" ? "#0369a1" : "#E8192C",
+                          textTransform: "uppercase"
+                        }}>
+                          {s.method === "link" ? "LİNK" : "KOD"}
                         </span>
                       </td>
-                      <td style={{ padding: "11px 14px", color: colors.green, fontWeight: "600" }}>
-                        {(s.commissionAmount || 0).toFixed(2)} ₼
+                      <td style={{ padding: "12px 14px", fontWeight: "700", color: colors.dark }}>
+                        {(s.orderAmount || 0).toFixed(2)} ₼
                       </td>
-                      <td style={{ padding: "11px 14px" }}>
+                      <td style={{ padding: "12px 14px", color: colors.green, fontWeight: "700" }}>
+                        {(s.commissionAmount || 0).toFixed(2)} ₼
+                        <div style={{ fontSize: "10px", color: "#aaa", fontWeight: "400" }}>{s.commissionRate}%</div>
+                      </td>
+                      <td style={{ padding: "12px 14px", textAlign: "center" }}>
                         <StatusBadge status={s.paymentStatus} />
                       </td>
                     </tr>

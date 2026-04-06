@@ -119,7 +119,9 @@ const SebetCart = () => {
   if (error || !items.length) {
     return (
       <div style={{ minHeight: "100vh", background: "#f8f8f8", fontFamily: "'Inter',sans-serif" }}>
-        <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');`}</style>
+        <style>{`
+  /* Boş səbət stilləri */
+`}</style>
 
         {/* Header */}
         <div style={{ background: "#fff", padding: "16px 20px", display: "flex", alignItems: "center", gap: 12, borderBottom: "1px solid #f0f0f0", position: "sticky", top: 0, zIndex: 10 }}>
@@ -175,7 +177,6 @@ const SebetCart = () => {
   return (
     <div style={{ minHeight: "100vh", background: "#f8f8f8", fontFamily: "'Inter',sans-serif" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         @keyframes spin{to{transform:rotate(360deg)}}
 
         .cart-item { background:#fff; border-radius:16px; padding:14px; display:flex; align-items:center; gap:12px; box-shadow:0 2px 10px rgba(0,0,0,.05); margin-bottom:10px; }

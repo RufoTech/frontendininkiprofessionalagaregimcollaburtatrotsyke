@@ -9,11 +9,11 @@ const BASE_URL = "/commerce/mehsullar";
 // ===================== SİFARİŞ YARAT =====================
 export const createOrder = createAsyncThunk(
     "order/createOrder",
-    async ({ stripePaymentIntentId, currency }, thunkAPI) => {
+    async ({ stripePaymentIntentId, currency, promoCode, promoMethod }, thunkAPI) => {
         try {
             const response = await axios.post(
                 `${BASE_URL}/orders/create`,
-                { stripePaymentIntentId, currency },
+                { stripePaymentIntentId, currency, promoCode, promoMethod },
                 { withCredentials: true }
             );
             return response.data;

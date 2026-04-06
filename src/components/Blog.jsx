@@ -255,11 +255,13 @@ const Blog = () => {
           Tailwind-lə ifadə edilə bilməyən media query-lər və
           pseudo-class-lar burada yazılır. */}
       <style>{`
-        /* Google Fonts — Nunito şrifti */
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
-
-        /* Şrifti bütün bloq komponentinə tətbiq et */
-        .blog-root { font-family: 'Nunito', sans-serif; }
+        .blog-root {
+          min-height: 100vh;
+          background: #fdfdfd;
+          font-family: 'Nunito', sans-serif;
+          color: #111827;
+          overflow-x: hidden;
+        }
 
         /* HERO FON:
            linear-gradient → üç rəng arası çəhrayı keçid.
