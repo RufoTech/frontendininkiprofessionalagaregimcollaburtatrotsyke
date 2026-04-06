@@ -19,8 +19,11 @@ const navBtn = {
 };
 
 // Real product card (uses API data)
-const RealProductCard = ({ product, onAddToCart }) => (
-  <div
+const RealProductCard = ({ product, onAddToCart }) => {
+  const navigate = useNavigate();
+  return (
+    <div
+      onClick={() => navigate(`/product/${product._id}`)}
     style={{
       background: "#fff",
       borderRadius: 12,
@@ -32,6 +35,7 @@ const RealProductCard = ({ product, onAddToCart }) => (
       transition: "transform 0.2s, box-shadow 0.2s",
       cursor: "pointer",
       overflow: "hidden",
+      fontFamily: "'Inter', sans-serif",
     }}
     onMouseEnter={e => {
       e.currentTarget.style.transform = "translateY(-3px)";
@@ -59,7 +63,7 @@ const RealProductCard = ({ product, onAddToCart }) => (
       <Heart size={14} color="#ccc" />
     </button>
 
-    <Link to={`/product/${product._id}`}>
+    <div>
       <div style={{
         width: "100%", aspectRatio: "1/1", background: "#f8f8f8",
         display: "flex", alignItems: "center", justifyContent: "center",
@@ -75,10 +79,10 @@ const RealProductCard = ({ product, onAddToCart }) => (
           <ShoppingBag size={40} color="#ccc" />
         )}
       </div>
-    </Link>
+    </div>
 
     <div style={{ padding: "10px 12px 12px" }}>
-      <Link to={`/product/${product._id}`} style={{ textDecoration: "none" }}>
+      <div style={{ textDecoration: "none" }}>
         <div style={{
           fontSize: 12, fontWeight: 600, color: "#222",
           marginBottom: 4, lineHeight: 1.3,
@@ -87,7 +91,7 @@ const RealProductCard = ({ product, onAddToCart }) => (
         }}>
           {product.name}
         </div>
-      </Link>
+      </div>
 
       {product.originalPrice && product.originalPrice > product.price && (
         <div style={{ fontSize: 10, color: "#aaa", textDecoration: "line-through" }}>
@@ -100,7 +104,7 @@ const RealProductCard = ({ product, onAddToCart }) => (
           {product.price} ₼
         </span>
         <button
-          onClick={() => onAddToCart(product._id)}
+          onClick={(e) => { e.stopPropagation(); onAddToCart(product._id) }}
           style={{
             width: 26, height: 26,
             background: "#e53935", border: "none", borderRadius: "50%",
@@ -115,10 +119,12 @@ const RealProductCard = ({ product, onAddToCart }) => (
       </div>
     </div>
   </div>
-);
+  );
+};
 
 function RealProductRow({ title }) {
   const rowRef = useRef(null);
+  const navigate = useNavigate();
   const [addToCart] = useAddToCartMutation();
   const { data: productsData, isLoading } = useGetProductsQuery();
 
@@ -143,7 +149,7 @@ function RealProductRow({ title }) {
   return (
     <div style={{ marginBottom: 28 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 800, color: "#1a1a1a", margin: 0 }}>{title}</h2>
+        <h2 style={{ fontSize: 18, fontWeight: 800, color: "#1a1a1a", margin: 0, fontFamily: "'Inter', sans-serif" }}>{title}</h2>
         <div style={{ display: "flex", gap: 6 }}>
           <button onClick={() => scroll(-1)} style={navBtn}>‹</button>
           <button onClick={() => scroll(1)} style={navBtn}>›</button>
@@ -163,7 +169,6 @@ function RealProductRow({ title }) {
             overflowX: "auto",
             paddingBottom: 8,
             scrollbarWidth: "none",
-            // Mobil: scroll snap
             scrollSnapType: "x mandatory",
             WebkitOverflowScrolling: "touch",
           }}
@@ -198,7 +203,7 @@ export default function EcommerceHome() {
       <style>{`
         /* ── MOBİL EcommerceHome ── */
         .eco-home-wrap {
-          font-family: 'Segoe UI', sans-serif;
+          font-family: 'Inter', sans-serif;
           background: #f5f5f5;
           min-height: 100vh;
         }

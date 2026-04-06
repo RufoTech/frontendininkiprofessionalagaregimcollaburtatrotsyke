@@ -26,10 +26,10 @@ const BloggerLogin = () => {
     <div style={{
       minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
       background: "linear-gradient(135deg,#0a1a0a 0%,#1a3a1a 50%,#0a1a0a 100%)",
-      fontFamily: "'Sora',sans-serif", padding: "24px",
+      fontFamily: "'Inter', sans-serif", padding: "24px",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
         .bl-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12);
           border-radius:24px; padding:48px 40px; width:100%; max-width:420px;
           backdrop-filter:blur(16px); }
@@ -44,14 +44,14 @@ const BloggerLogin = () => {
         .bl-icon  { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.3); width:16px; height:16px; pointer-events:none; }
         .bl-input { width:100%; padding:13px 13px 13px 42px; background:rgba(255,255,255,0.07);
           border:1.5px solid rgba(255,255,255,0.12); border-radius:12px; color:#fff;
-          font-size:max(16px,14px); font-family:'Sora',sans-serif; outline:none;
+          font-size:max(16px,14px); font-family:'Inter',sans-serif; outline:none;
           transition:border-color 0.2s, background 0.2s; box-sizing:border-box; }
         .bl-input::placeholder { color:rgba(255,255,255,0.25); }
         .bl-input:focus { border-color:rgba(22,163,74,0.7); background:rgba(255,255,255,0.10); }
         .bl-eye { position:absolute; right:12px; top:50%; transform:translateY(-50%);
           background:none; border:none; cursor:pointer; color:rgba(255,255,255,0.35); display:flex; padding:4px; }
         .bl-btn { width:100%; padding:14px; background:#16a34a; color:#fff; border:none; border-radius:12px;
-          font-family:'Sora',sans-serif; font-size:15px; font-weight:700; cursor:pointer;
+          font-family:'Inter',sans-serif; font-size:15px; font-weight:700; cursor:pointer;
           display:flex; align-items:center; justify-content:center; gap:8px; margin-top:8px;
           transition:background 0.2s, transform 0.15s; box-shadow:0 6px 20px rgba(22,163,74,0.4); }
         .bl-btn:hover:not(:disabled) { background:#15803d; transform:translateY(-1px); }
@@ -69,7 +69,7 @@ const BloggerLogin = () => {
           <div className="bl-logo-box"><PenTool size={26} color="#fff" /></div>
         </div>
         <h1 className="bl-title">Blogger Paneli</h1>
-        <p className="bl-sub">Brendex Blogger hesabınıza daxil olun</p>
+        <p className="bl-sub">BRENDEX Blogger hesabınıza daxil olun</p>
 
         <form onSubmit={handleSubmit}>
           <div className="bl-field">
@@ -97,7 +97,7 @@ const BloggerLogin = () => {
         <p className="bl-footer">
           Hesabınız yoxdur? <Link to="/blogger/register">Qeydiyyat</Link>
         </p>
-        <p className="bl-badge"><PenTool size={13} /> Brendex Blogger Platforması</p>
+        <p className="bl-badge"><PenTool size={13} /> BRENDEX Blogger Platforması</p>
       </div>
     </div>
   )

@@ -64,7 +64,7 @@ const C = {
   shadowSm:    "0 1px 3px rgba(0,0,0,0.07)",
 }
 
-const font = "'Sora','Segoe UI',system-ui,sans-serif"
+const font = "'Inter','Segoe UI',system-ui,sans-serif"
 
 /* ── Helpers ── */
 const Divider = () => (
@@ -877,9 +877,9 @@ const ProductDetail = () => {
 
       {/* ── Responsive styles ── */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
 
         .pd-main-grid {
           display: flex;

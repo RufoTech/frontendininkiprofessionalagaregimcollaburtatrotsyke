@@ -62,8 +62,8 @@ const SidebarBCartIcon = ({ size = 32 }) => (
 const BrendexLogoFull = ({ iconSize = 36 }) => (
   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
     <BCartIcon size={iconSize} />
-    <span style={{ fontFamily: "'Sora','Segoe UI',sans-serif", fontWeight: 900, fontSize: Math.round(iconSize * 0.92), letterSpacing: "-0.03em", lineHeight: 1, display: "flex", alignItems: "center" }}>
-      <span style={{ color: "#E8192C" }}>REND</span>
+    <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 900, fontSize: Math.round(iconSize * 0.92), letterSpacing: "-0.03em", lineHeight: 1, display: "flex", alignItems: "center" }}>
+      <span style={{ color: "#E8192C" }}>BREND</span>
       <span style={{ color: "#1a1a1a" }}>EX</span>
     </span>
   </div>
@@ -72,8 +72,8 @@ const BrendexLogoFull = ({ iconSize = 36 }) => (
 const MobileLogoFull = () => (
   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
     <BCartIcon size={32} />
-    <span style={{ fontFamily: "'Sora','Segoe UI',sans-serif", fontWeight: 900, fontSize: 17, letterSpacing: "-0.02em", lineHeight: 1, display: "flex", alignItems: "center" }}>
-      <span style={{ color: "#E8192C" }}>REND</span>
+    <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 900, fontSize: 17, letterSpacing: "-0.02em", lineHeight: 1, display: "flex", alignItems: "center" }}>
+      <span style={{ color: "#E8192C" }}>BREND</span>
       <span style={{ color: "#1a1a1a" }}>EX</span>
     </span>
   </div>
@@ -83,8 +83,8 @@ const SidebarLogo = () => (
   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
     <SidebarBCartIcon size={32} />
     <div>
-      <span style={{ color: "white", fontWeight: 900, fontSize: 15, fontFamily: "'Sora',sans-serif", letterSpacing: "-0.02em", display: "block", lineHeight: 1.1 }}>RENDEX</span>
-      <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", fontFamily: "'Sora',sans-serif", display: "block" }}>Online Store</span>
+      <span style={{ color: "white", fontWeight: 900, fontSize: 15, fontFamily: "'Inter',sans-serif", letterSpacing: "-0.02em", display: "block", lineHeight: 1.1 }}>BRENDEX</span>
+      <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", fontFamily: "'Inter',sans-serif", display: "block" }}>Online Store</span>
     </div>
   </div>
 )
@@ -328,10 +328,10 @@ const LOCAL_PRODUCTS = [
 ]
 
 const languages = [
-  { code:"az", label:"Azərbaycan", flag:"🇦🇿", short:"AZ"  },
-  { code:"en", label:"English",    flag:"🇺🇸", short:"EN"  },
-  { code:"ru", label:"Русский",    flag:"🇷🇺", short:"RU"  },
-  { code:"tr", label:"Türkçe",     flag:"🇹🇷", short:"TR"  },
+  { code: "az", label: "Azərbaycan", flag: "🇦🇿", short: "AZ" },
+  { code: "en", label: "English",    flag: "🇬🇧", short: "EN" },
+  { code: "ru", label: "Русский",    flag: "🇷🇺", short: "RU" },
+  { code: "tr", label: "Türkçe",     flag: "🇹🇷", short: "TR" },
 ]
 
 const C = {
@@ -369,44 +369,48 @@ function LanguageSwitcher() {
         border:`1.5px solid ${isOpen ? C.rose200 : "#e5e7eb"}`,
         background:isOpen ? C.rose50 : "#fff",
         cursor:"pointer", display:"flex", alignItems:"center", gap:6,
-        transition:"all .18s", fontFamily:"'Sora',sans-serif",
+        transition:"all .18s", fontFamily:"'Inter',sans-serif",
         fontSize:12, fontWeight:700,
         color:isOpen ? C.primary : C.mid,
         boxShadow:isOpen ? `0 0 0 3px ${C.rose100}` : "none",
       }}>
-        <span style={{ fontSize:16 }}>{active.flag}</span>
+        <span style={{ fontSize: 16 }}>{active.flag}</span>
         <span>{active.short}</span>
-        <ChevronDown size={11} style={{ transition:"transform .2s", transform:isOpen ? "rotate(180deg)" : "rotate(0)" }} />
+        <ChevronDown size={11} style={{ transition: "transform .2s", transform: isOpen ? "rotate(180deg)" : "rotate(0)" }} />
       </button>
       {isOpen && (
         <ul style={{
-          position:"absolute", top:"calc(100% + 8px)", right:0,
-          background:"#fff", border:"1.5px solid #f3f4f6",
-          borderRadius:16, listStyle:"none", margin:0,
-          padding:"6px", minWidth:140,
-          boxShadow:"0 12px 40px rgba(0,0,0,0.10)", zIndex:1000,
-          animation:"nbLangDrop .18s ease",
+          position: "absolute", top: "calc(100% + 8px)", right: 0,
+          background: "#fff", border: "1.5px solid #f3f4f6",
+          borderRadius: 16, listStyle: "none", margin: 0,
+          padding: "6px", minWidth: 140,
+          boxShadow: "0 12px 40px rgba(0,0,0,0.10)", zIndex: 1000,
+          animation: "nbLangDrop .18s ease",
         }}>
           {languages.map((lang) => {
             const isAct = currentLang === lang.code
             return (
               <li key={lang.code}
-                onClick={() => { dispatch(setLanguage(lang.code)); setIsOpen(false) }}
+                onClick={() => {
+                  i18n.changeLanguage(lang.code);
+                  dispatch(setLanguage(lang.code));
+                  setIsOpen(false);
+                }}
                 style={{
-                  display:"flex", alignItems:"center", gap:9,
-                  padding:"8px 12px", cursor:"pointer", borderRadius:10,
-                  fontFamily:"'Sora',sans-serif", fontSize:13,
-                  fontWeight:isAct ? 700 : 500,
-                  color:isAct ? C.primary : C.dark,
-                  background:isAct ? C.rose50 : "transparent",
-                  transition:"background .12s",
+                  display: "flex", alignItems: "center", gap: 9,
+                  padding: "8px 12px", cursor: "pointer", borderRadius: 10,
+                  fontFamily: "'Inter', sans-serif", fontSize: 13,
+                  fontWeight: isAct ? 700 : 500,
+                  color: isAct ? C.primary : C.dark,
+                  background: isAct ? C.rose50 : "transparent",
+                  transition: "background .12s",
                 }}
                 onMouseEnter={e => { if (!isAct) e.currentTarget.style.background = "#f9fafb" }}
                 onMouseLeave={e => { if (!isAct) e.currentTarget.style.background = "transparent" }}
               >
-                <span style={{ fontSize:18 }}>{lang.flag}</span>
-                <span>{lang.short}</span>
-                {isAct && <span style={{ marginLeft:"auto", width:6, height:6, borderRadius:"50%", background:C.primary }} />}
+                <span style={{ fontSize: 18 }}>{lang.flag}</span>
+                <span>{lang.label}</span>
+                {isAct && <span style={{ marginLeft: "auto", width: 6, height: 6, borderRadius: "50%", background: C.primary }} />}
               </li>
             )
           })}
@@ -482,17 +486,17 @@ function ProductCard({ product, onClose }) {
         }
       </div>
       <div style={{ padding:"11px 13px 13px" }}>
-        <p style={{ margin:0, fontSize:12, fontWeight:600, color:C.dark, lineHeight:1.45, overflow:"hidden", textOverflow:"ellipsis", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", fontFamily:"'Sora',sans-serif" }}>{product.name}</p>
+        <p style={{ margin:0, fontSize:12, fontWeight:600, color:C.dark, lineHeight:1.45, overflow:"hidden", textOverflow:"ellipsis", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", fontFamily:"'Inter',sans-serif" }}>{product.name}</p>
         {product.ratings > 0 && (
           <div style={{ display:"flex", alignItems:"center", gap:2, marginTop:6 }}>
             {[1,2,3,4,5].map(s => <Star key={s} size={10} fill={s <= Math.round(product.ratings) ? "#f59e0b" : "none"} color={s <= Math.round(product.ratings) ? "#f59e0b" : "#e5e7eb"} />)}
-            <span style={{ fontSize:10, color:C.light, marginLeft:3, fontFamily:"'Sora',sans-serif" }}>({product.numOfReviews})</span>
+            <span style={{ fontSize:10, color:C.light, marginLeft:3, fontFamily:"'Inter',sans-serif" }}>({product.numOfReviews})</span>
           </div>
         )}
-        <span style={{ display:"block", marginTop:7, fontSize:14, fontWeight:800, color:C.primary, fontFamily:"'Sora',sans-serif" }}>
+        <span style={{ display:"block", marginTop:7, fontSize:14, fontWeight:800, color:C.primary, fontFamily:"'Inter',sans-serif" }}>
           {product.price?.toLocaleString("az-AZ", { minimumFractionDigits:2 })} {t("common.currency")}
         </span>
-        <p style={{ margin:"3px 0 0", fontSize:10, color:C.light, fontFamily:"'Sora',sans-serif" }}>{product.seller}</p>
+        <p style={{ margin:"3px 0 0", fontSize:10, color:C.light, fontFamily:"'Inter',sans-serif" }}>{product.seller}</p>
       </div>
     </div>
   )
@@ -553,13 +557,13 @@ function CategoryProductPanel({ cat, onClose, onCategoryNavigate }) {
         .cpr{-webkit-appearance:none;width:100%;height:4px;border:none;outline:none;border-radius:99px;cursor:pointer;background:linear-gradient(90deg,${C.primary} 0%,${C.primary} var(--p),#f3f4f6 var(--p),#f3f4f6 100%);}
         .cpr::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,${C.primarySoft},${C.primary});cursor:pointer;border:3px solid #fff;box-shadow:0 2px 8px rgba(232,25,44,0.35);transition:transform .15s;}
         .cpr::-webkit-slider-thumb:hover{transform:scale(1.15)}
-        .cpch{display:flex;align-items:center;gap:3px;padding:5px 10px;border-radius:99px;cursor:pointer;font-size:11px;font-weight:700;transition:all .15s;font-family:'Sora',sans-serif}
-        .cat-panel{position:relative;margin-left:auto;width:min(920px,97vw);height:100%;background:#fff;display:flex;flex-direction:column;animation:cpSl 0.3s cubic-bezier(0.4,0,0.2,1);box-shadow:-16px 0 60px rgba(0,0,0,0.10);font-family:'Sora',sans-serif;border-radius:24px 0 0 24px;}
+        .cpch{display:flex;align-items:center;gap:3px;padding:5px 10px;border-radius:99px;cursor:pointer;font-size:11px;font-weight:700;transition:all .15s;font-family:'Inter',sans-serif}
+        .cat-panel{position:relative;margin-left:auto;width:min(920px,97vw);height:100%;background:#fff;display:flex;flex-direction:column;animation:cpSl 0.3s cubic-bezier(0.4,0,0.2,1);box-shadow:-16px 0 60px rgba(0,0,0,0.10);font-family:'Inter',sans-serif;border-radius:24px 0 0 24px;}
         @media(max-width:768px){.cat-panel{margin-left:0;margin-top:auto;width:100%;height:94vh;border-radius:24px 24px 0 0;animation:cpSlMob 0.3s cubic-bezier(0.34,1.10,0.64,1);box-shadow:0 -12px 60px rgba(0,0,0,0.12);}}
         .cat-filters-row{display:flex;flex-wrap:wrap;gap:16px;padding:14px 18px;border-bottom:1px solid #f3f4f6;background:${C.rose50};flex-shrink:0}
         .cat-prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:14px;}
         @media(max-width:640px){.cat-prod-grid{grid-template-columns:repeat(2,1fr)!important;gap:10px!important}}
-        .sub-tab{padding:6px 14px;border-radius:99px;border:1.5px solid #e5e7eb;background:#fff;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Sora',sans-serif;white-space:nowrap;display:flex;align-items:center;gap:5px;}
+        .sub-tab{padding:6px 14px;border-radius:99px;border:1.5px solid #e5e7eb;background:#fff;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif;white-space:nowrap;display:flex;align-items:center;gap:5px;}
         .sub-tab:hover{border-color:${C.rose200};color:${C.primary};background:${C.rose50}}
         .sub-tab.active{border-color:${C.primary};background:${C.primary};color:#fff}
         .sub-tabs-row{display:flex;gap:7px;overflow-x:auto;padding:10px 18px 6px;flex-shrink:0}
@@ -583,7 +587,7 @@ function CategoryProductPanel({ cat, onClose, onCategoryNavigate }) {
           </div>
           <div style={{ display:"flex", alignItems:"center", gap:7, flexShrink:0 }}>
             <div style={{ position:"relative" }}>
-              <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ appearance:"none", padding:"7px 30px 7px 12px", borderRadius:12, border:`1.5px solid #e5e7eb`, background:"#fff", fontSize:12, fontWeight:600, color:C.mid, cursor:"pointer", fontFamily:"'Sora',sans-serif", outline:"none" }}>
+              <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ appearance:"none", padding:"7px 30px 7px 12px", borderRadius:12, border:`1.5px solid #e5e7eb`, background:"#fff", fontSize:12, fontWeight:600, color:C.mid, cursor:"pointer", fontFamily:"'Inter',sans-serif", outline:"none" }}>
                 {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
               <ArrowUpDown size={11} color={C.light} style={{ position:"absolute", right:9, top:"50%", transform:"translateY(-50%)", pointerEvents:"none" }} />
@@ -652,7 +656,7 @@ function CategoryProductPanel({ cat, onClose, onCategoryNavigate }) {
           {displayed.length === 0 ? (
             <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", height:260, gap:12 }}>
               <span style={{ fontSize:40 }}>🔍</span>
-              <p style={{ color:C.mid, fontSize:14, fontFamily:"'Sora',sans-serif" }}>Nəticə tapılmadı</p>
+              <p style={{ color:C.mid, fontSize:14, fontFamily:"'Inter',sans-serif" }}>Nəticə tapılmadı</p>
               <button onClick={() => { setPriceRange(maxPrice); setMinRating(0); setActiveSub(null) }} style={{ padding:"10px 22px", borderRadius:12, border:"none", background:`linear-gradient(135deg,${C.primarySoft},${C.primary})`, color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer" }}>
                 Sıfırla
               </button>
@@ -718,8 +722,8 @@ function CategoryDropdown({ onCategorySelect }) {
                 <Icon size={15} color={cat.color} />
               </div>
               <div style={{ minWidth:0, flex:1 }}>
-                <div style={{ fontSize:12, fontWeight:700, color:isHov ? cat.color : C.dark, fontFamily:"'Sora',sans-serif", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{cat.label}</div>
-                <div style={{ fontSize:9, color:C.mid, fontFamily:"'Sora',sans-serif", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{cat.subcategories?.length} alt kateqoriya</div>
+                <div style={{ fontSize:12, fontWeight:700, color:isHov ? cat.color : C.dark, fontFamily:"'Inter',sans-serif", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{cat.label}</div>
+                <div style={{ fontSize:9, color:C.mid, fontFamily:"'Inter',sans-serif", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{cat.subcategories?.length} alt kateqoriya</div>
               </div>
               <ChevronRight size={11} color={isHov ? cat.color : C.light} />
             </div>
@@ -736,8 +740,8 @@ function CategoryDropdown({ onCategorySelect }) {
                 {<hoveredCat.icon size={16} color={hoveredCat.color} />}
               </div>
               <div>
-                <p style={{ margin:0, fontSize:13, fontWeight:800, color:C.dark, fontFamily:"'Sora',sans-serif" }}>{hoveredCat.label}</p>
-                <p style={{ margin:0, fontSize:10, color:C.mid, fontFamily:"'Sora',sans-serif" }}>{hoveredCat.sub}</p>
+                <p style={{ margin:0, fontSize:13, fontWeight:800, color:C.dark, fontFamily:"'Inter',sans-serif" }}>{hoveredCat.label}</p>
+                <p style={{ margin:0, fontSize:10, color:C.mid, fontFamily:"'Inter',sans-serif" }}>{hoveredCat.sub}</p>
               </div>
             </div>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7 }}>
@@ -753,13 +757,13 @@ function CategoryDropdown({ onCategorySelect }) {
                     <div style={{ width:28, height:28, borderRadius:8, background:hoveredCat.bg, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                       <SubIcon size={13} color={hoveredCat.color} />
                     </div>
-                    <span style={{ fontSize:11, fontWeight:600, color:C.dark, fontFamily:"'Sora',sans-serif", lineHeight:1.3 }}>{sub.label}</span>
+                    <span style={{ fontSize:11, fontWeight:600, color:C.dark, fontFamily:"'Inter',sans-serif", lineHeight:1.3 }}>{sub.label}</span>
                   </div>
                 )
               })}
             </div>
             <button onClick={() => onCategorySelect(hoveredCat)}
-              style={{ marginTop:14, width:"100%", padding:"10px", borderRadius:12, border:`1.5px solid ${hoveredCat.color}33`, background:hoveredCat.bg, color:hoveredCat.color, fontSize:12, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6, fontFamily:"'Sora',sans-serif", transition:"all .15s" }}
+              style={{ marginTop:14, width:"100%", padding:"10px", borderRadius:12, border:`1.5px solid ${hoveredCat.color}33`, background:hoveredCat.bg, color:hoveredCat.color, fontSize:12, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6, fontFamily:"'Inter',sans-serif", transition:"all .15s" }}
               onMouseEnter={e => e.currentTarget.style.background=hoveredCat.color+"22"}
               onMouseLeave={e => e.currentTarget.style.background=hoveredCat.bg}
             >
@@ -822,16 +826,27 @@ const Navbar = () => {
   useEffect(() => {
     if (!isAuthenticated) return;
 
-    syncUnreadCount()
+    syncUnreadCount();
 
     const intervalId = setInterval(() => {
       if (document.visibilityState === "visible") {
-        syncUnreadCount()
+        dispatch(fetchUnreadCount())
+          .unwrap()
+          .then((payload) => {
+            if (payload?.error?.status === 401) {
+              clearInterval(intervalId);
+            }
+          })
+          .catch((err) => {
+            if (err?.status === 401) {
+              clearInterval(intervalId);
+            }
+          });
       }
-    }, 60000)
+    }, 60000);
 
     return () => clearInterval(intervalId);
-  }, [isAuthenticated, syncUnreadCount]);
+  }, [isAuthenticated, dispatch]);
 
   useEffect(() => {
     const fn = e => {
@@ -867,13 +882,13 @@ const Navbar = () => {
   const dropLink = {
     display:"block", padding:"8px 12px", borderRadius:10,
     fontSize:13, color:C.dark, textDecoration:"none",
-    fontFamily:"'Sora',sans-serif", background:"transparent", transition:"background .12s",
+    fontFamily:"'Inter',sans-serif", background:"transparent", transition:"background .12s",
   }
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; }
 
         @keyframes nbSlideDown   { from{transform:translateY(-100%);opacity:0} to{transform:translateY(0);opacity:1} }
@@ -908,7 +923,7 @@ const Navbar = () => {
         .nb-logo-link { transition: transform 0.2s ease; display:inline-flex; align-items:center; text-decoration:none; }
         .nb-logo-link:hover { transform: translateY(-1px); }
 
-        .bnl { position:relative;font-size:14px;font-weight:600;color:#374151;text-decoration:none;padding:6px 2px;transition:color 0.2s;font-family:'Sora',sans-serif;background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:5px;letter-spacing:-0.01em; }
+        .bnl { position:relative;font-size:14px;font-weight:600;color:#374151;text-decoration:none;padding:6px 2px;transition:color 0.2s;font-family:'Inter',sans-serif;background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:5px;letter-spacing:-0.01em; }
         .bnl::after { content:'';position:absolute;bottom:-4px;left:0;width:0;height:2.5px;background:linear-gradient(90deg,${C.primarySoft},${C.primary});border-radius:2px;transition:width 0.28s cubic-bezier(0.34,1.56,0.64,1); }
         .bnl:hover::after,.bnl.on::after { width:100% }
         .bnl:hover,.bnl.on { color:${C.primary} }
@@ -918,20 +933,20 @@ const Navbar = () => {
 
         .bbd { position:absolute;top:2px;right:2px;min-width:16px;height:16px;background:linear-gradient(135deg,${C.primarySoft},${C.primary});color:#fff;font-size:8px;font-weight:800;border-radius:99px;display:flex;align-items:center;justify-content:center;padding:0 3px;border:2px solid #fff;animation:nbBd 0.3s cubic-bezier(0.34,1.56,0.64,1); }
 
-        .bmt { display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:3px;padding:5px 2px;border:none;background:transparent;cursor:pointer;color:#9ca3af;transition:color 0.2s;font-family:'Sora',sans-serif;font-size:9.5px;font-weight:600;text-decoration:none;-webkit-tap-highlight-color:transparent;white-space:nowrap;min-width:0; }
+        .bmt { display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:3px;padding:5px 2px;border:none;background:transparent;cursor:pointer;color:#9ca3af;transition:color 0.2s;font-family:'Inter',sans-serif;font-size:9.5px;font-weight:600;text-decoration:none;-webkit-tap-highlight-color:transparent;white-space:nowrap;min-width:0; }
         .bmt.on { color:${C.primary}; }
         .bmt.on svg { filter:drop-shadow(0 2px 6px rgba(232,25,44,0.38)); }
 
-        .bsi { display:flex;align-items:center;gap:12px;padding:11px 14px;color:#374151;font-size:14px;font-weight:600;text-decoration:none;border-radius:14px;margin:2px 8px;transition:all .15s;cursor:pointer;border:none;background:transparent;width:calc(100% - 16px);font-family:'Sora',sans-serif; }
+        .bsi { display:flex;align-items:center;gap:12px;padding:11px 14px;color:#374151;font-size:14px;font-weight:600;text-decoration:none;border-radius:14px;margin:2px 8px;transition:all .15s;cursor:pointer;border:none;background:transparent;width:calc(100% - 16px);font-family:'Inter',sans-serif; }
         .bsi:hover { background:${C.rose50};color:${C.primary}; }
         .bsi.red { color:${C.primary}; }
 
         /* Mobil sidebar kateqoriya accordion */
-        .mob-cat-item { display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:12px;margin:1px 8px;cursor:pointer;border:none;background:transparent;width:calc(100% - 16px);font-family:'Sora',sans-serif;transition:all .15s; }
+        .mob-cat-item { display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:12px;margin:1px 8px;cursor:pointer;border:none;background:transparent;width:calc(100% - 16px);font-family:'Inter',sans-serif;transition:all .15s; }
         .mob-cat-item:hover { background:${C.rose50}; }
         .mob-cat-item.open { background:${C.rose50}; }
         .mob-sub-grid { display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:6px 10px 10px 18px;animation:subSlide 0.2s ease; }
-        .mob-sub-btn { display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:10px;border:1.5px solid #f3f4f6;background:#fafafa;cursor:pointer;font-family:'Sora',sans-serif;font-size:11px;font-weight:600;color:${C.dark};transition:all .15s;text-align:left; }
+        .mob-sub-btn { display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:10px;border:1.5px solid #f3f4f6;background:#fafafa;cursor:pointer;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:${C.dark};transition:all .15s;text-align:left; }
         .mob-sub-btn:hover { border-color:var(--cat-color);background:var(--cat-bg);color:var(--cat-color); }
         .mob-sub-btn:active { transform:scale(0.97); }
 
@@ -966,17 +981,17 @@ const Navbar = () => {
             <form onSubmit={handleSearch} style={{ display:"flex", alignItems:"center", padding:"4px 18px" }}>
               <Search size={18} color={C.primary} style={{ flexShrink:0 }} />
               <input autoFocus type="text" placeholder={t("search.placeholder")} value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                style={{ flex:1, border:"none", outline:"none", padding:"14px 13px", fontSize:15, fontFamily:"'Sora',sans-serif", color:C.dark, background:"transparent" }} />
+                style={{ flex:1, border:"none", outline:"none", padding:"14px 13px", fontSize:15, fontFamily:"'Inter',sans-serif", color:C.dark, background:"transparent" }} />
               <button type="button" onClick={() => setShowSearch(false)} style={{ border:"none", background:"none", cursor:"pointer", color:C.light, padding:8 }}>
                 <X size={18} />
               </button>
             </form>
             <div style={{ padding:"0 20px 22px", borderTop:`1px solid #f3f4f6` }}>
-              <p style={{ fontSize:10, fontWeight:700, color:C.light, letterSpacing:1.5, margin:"14px 0 10px", textTransform:"uppercase", fontFamily:"'Sora',sans-serif" }}>Populyar axtarışlar</p>
+              <p style={{ fontSize:10, fontWeight:700, color:C.light, letterSpacing:1.5, margin:"14px 0 10px", textTransform:"uppercase", fontFamily:"'Inter',sans-serif" }}>Populyar axtarışlar</p>
               <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
                 {["iPhone","Nike","Samsung","Laptop","Geyim"].map(q => (
                   <button key={q} onClick={() => { setSearchQuery(q); navigate(`/search-results?query=${q}`); setShowSearch(false) }}
-                    style={{ padding:"7px 16px", borderRadius:99, border:`1.5px solid #e5e7eb`, background:"#fafafa", color:C.mid, fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"'Sora',sans-serif", transition:"all .15s" }}
+                    style={{ padding:"7px 16px", borderRadius:99, border:`1.5px solid #e5e7eb`, background:"#fafafa", color:C.mid, fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"'Inter',sans-serif", transition:"all .15s" }}
                     onMouseEnter={e => { e.currentTarget.style.borderColor=C.rose200; e.currentTarget.style.color=C.primary; e.currentTarget.style.background=C.rose50 }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor="#e5e7eb"; e.currentTarget.style.color=C.mid; e.currentTarget.style.background="#fafafa" }}
                   >{q}</button>
@@ -1067,13 +1082,13 @@ const Navbar = () => {
                   {isUserMenuOpen && (
                     <div style={{ position:"absolute", right:0, top:"calc(100% + 8px)", background:"#fff", borderRadius:18, boxShadow:"0 16px 52px rgba(0,0,0,0.11)", border:"1.5px solid #f3f4f6", minWidth:230, padding:"10px 7px", zIndex:100, animation:"nbUserDrop 0.18s ease" }}>
                       <div style={{ padding:"8px 12px 11px" }}>
-                        <p style={{ fontSize:13, fontWeight:700, color:"#111", margin:0, fontFamily:"'Sora',sans-serif" }}>{bloggerProfile.blogger.firstName} {bloggerProfile.blogger.lastName}</p>
-                        <p style={{ fontSize:11, color:"#888", margin:"2px 0 0", fontFamily:"'Sora',sans-serif" }}>{bloggerProfile.blogger.email}</p>
-                        <p style={{ fontSize:10, color:"#E8192C", margin:"4px 0 0", fontFamily:"'Sora',sans-serif", fontWeight:700 }}>Blogger · {bloggerProfile.blogger.commissionRate}%</p>
+                        <p style={{ fontSize:13, fontWeight:700, color:"#111", margin:0, fontFamily:"'Inter',sans-serif" }}>{bloggerProfile.blogger.firstName} {bloggerProfile.blogger.lastName}</p>
+                        <p style={{ fontSize:11, color:"#888", margin:"2px 0 0", fontFamily:"'Inter',sans-serif" }}>{bloggerProfile.blogger.email}</p>
+                        <p style={{ fontSize:10, color:"#E8192C", margin:"4px 0 0", fontFamily:"'Inter',sans-serif", fontWeight:700 }}>Blogger · {bloggerProfile.blogger.commissionRate}%</p>
                       </div>
                       <div style={{ borderTop:"1px solid #f3f4f6", paddingTop:5 }}>
                         <Link to="/blogger/dashboard" onClick={() => setIsUserMenuOpen(false)} style={dropLink} onMouseEnter={e => e.currentTarget.style.background="#f9fafb"} onMouseLeave={e => e.currentTarget.style.background="transparent"}>📊 Blogger Paneli</Link>
-                        <button onClick={() => { handleBloggerLogout(); setIsUserMenuOpen(false) }} style={{ display:"block", width:"100%", textAlign:"left", padding:"8px 12px", borderRadius:10, fontSize:13, color:"#E8192C", background:"none", border:"none", cursor:"pointer", fontFamily:"'Sora',sans-serif", transition:"background .12s" }} onMouseEnter={e => e.currentTarget.style.background="#fff8f8"} onMouseLeave={e => e.currentTarget.style.background="transparent"}>Çıxış</button>
+                        <button onClick={() => { handleBloggerLogout(); setIsUserMenuOpen(false) }} style={{ display:"block", width:"100%", textAlign:"left", padding:"8px 12px", borderRadius:10, fontSize:13, color:"#E8192C", background:"none", border:"none", cursor:"pointer", fontFamily:"'Inter',sans-serif", transition:"background .12s" }} onMouseEnter={e => e.currentTarget.style.background="#fff8f8"} onMouseLeave={e => e.currentTarget.style.background="transparent"}>Çıxış</button>
                       </div>
                     </div>
                   )}
@@ -1088,8 +1103,8 @@ const Navbar = () => {
                   {isUserMenuOpen && (
                     <div style={{ position:"absolute", right:0, top:"calc(100% + 8px)", background:"#fff", borderRadius:18, boxShadow:"0 16px 52px rgba(0,0,0,0.11)", border:"1.5px solid #f3f4f6", minWidth:230, padding:"10px 7px", zIndex:100, animation:"nbUserDrop 0.18s ease" }}>
                       <div style={{ padding:"8px 12px 11px" }}>
-                        <p style={{ fontSize:13, fontWeight:700, color:C.dark, margin:0, fontFamily:"'Sora',sans-serif" }}>{user?.user?.name}</p>
-                        <p style={{ fontSize:11, color:C.mid, margin:"2px 0 0", fontFamily:"'Sora',sans-serif" }}>{user?.user?.email}</p>
+                        <p style={{ fontSize:13, fontWeight:700, color:C.dark, margin:0, fontFamily:"'Inter',sans-serif" }}>{user?.user?.name}</p>
+                        <p style={{ fontSize:11, color:C.mid, margin:"2px 0 0", fontFamily:"'Inter',sans-serif" }}>{user?.user?.email}</p>
                       </div>
                       <div style={{ borderTop:"1px solid #f3f4f6", paddingTop:5 }}>
                         {isAdmin && (
@@ -1102,7 +1117,7 @@ const Navbar = () => {
                         )}
                         <Link to="/my-orders" onClick={() => setIsUserMenuOpen(false)} style={dropLink} onMouseEnter={e => e.currentTarget.style.background="#f9fafb"} onMouseLeave={e => e.currentTarget.style.background="transparent"}>📦 {t("navbar.myOrders")}</Link>
                         <Link to="/my-bonus" onClick={() => setIsUserMenuOpen(false)} style={dropLink} onMouseEnter={e => e.currentTarget.style.background="#f9fafb"} onMouseLeave={e => e.currentTarget.style.background="transparent"}>⭐ Bonus Hesabım</Link>
-                        <button onClick={handleLogout} style={{ display:"block", width:"100%", textAlign:"left", padding:"8px 12px", borderRadius:10, fontSize:13, color:C.primary, background:"none", border:"none", cursor:"pointer", fontFamily:"'Sora',sans-serif", transition:"background .12s" }} onMouseEnter={e => e.currentTarget.style.background=C.rose50} onMouseLeave={e => e.currentTarget.style.background="transparent"}>{t("navbar.logout")}</button>
+                        <button onClick={handleLogout} style={{ display:"block", width:"100%", textAlign:"left", padding:"8px 12px", borderRadius:10, fontSize:13, color:C.primary, background:"none", border:"none", cursor:"pointer", fontFamily:"'Inter',sans-serif", transition:"background .12s" }} onMouseEnter={e => e.currentTarget.style.background=C.rose50} onMouseLeave={e => e.currentTarget.style.background="transparent"}>{t("navbar.logout")}</button>
                       </div>
                     </div>
                   )}
@@ -1145,8 +1160,8 @@ const Navbar = () => {
                 {bloggerProfile.blogger.firstName?.charAt(0).toUpperCase()}
               </div>
               <div>
-                <p style={{ margin:0, fontSize:14, fontWeight:700, color:C.dark, fontFamily:"'Sora',sans-serif" }}>{bloggerProfile.blogger.firstName} {bloggerProfile.blogger.lastName}</p>
-                <p style={{ margin:"2px 0 0", fontSize:11, color:"#E8192C", fontFamily:"'Sora',sans-serif", fontWeight:700 }}>Blogger · {bloggerProfile.blogger.commissionRate}%</p>
+                <p style={{ margin:0, fontSize:14, fontWeight:700, color:C.dark, fontFamily:"'Inter',sans-serif" }}>{bloggerProfile.blogger.firstName} {bloggerProfile.blogger.lastName}</p>
+                <p style={{ margin:"2px 0 0", fontSize:11, color:"#E8192C", fontFamily:"'Inter',sans-serif", fontWeight:700 }}>Blogger · {bloggerProfile.blogger.commissionRate}%</p>
               </div>
             </div>
           ) : isAuthenticated && user ? (
@@ -1155,12 +1170,12 @@ const Navbar = () => {
                 ? <img src={user.user.avatar.url} alt="" style={{ width:44, height:44, borderRadius:"50%", objectFit:"cover", border:`2px solid ${C.rose200}` }} />
                 : <div style={{ width:44, height:44, borderRadius:"50%", background:`linear-gradient(135deg,${C.primarySoft},${C.primary})`, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:17, fontWeight:800, boxShadow:`0 4px 14px rgba(232,25,44,0.28)` }}>{user?.user?.name?.charAt(0).toUpperCase()}</div>}
               <div>
-                <p style={{ margin:0, fontSize:14, fontWeight:700, color:C.dark, fontFamily:"'Sora',sans-serif" }}>{user?.user?.name}</p>
-                <p style={{ margin:"2px 0 0", fontSize:11, color:C.mid, fontFamily:"'Sora',sans-serif" }}>{user?.user?.email}</p>
+                <p style={{ margin:0, fontSize:14, fontWeight:700, color:C.dark, fontFamily:"'Inter',sans-serif" }}>{user?.user?.name}</p>
+                <p style={{ margin:"2px 0 0", fontSize:11, color:C.mid, fontFamily:"'Inter',sans-serif" }}>{user?.user?.email}</p>
               </div>
             </div>
           ) : (
-            <Link to="/login" onClick={() => setIsMenuOpen(false)} style={{ display:"flex", alignItems:"center", gap:9, textDecoration:"none", padding:"12px 16px", borderRadius:14, background:`linear-gradient(135deg,${C.primarySoft},${C.primary})`, color:"#fff", fontSize:14, fontWeight:700, fontFamily:"'Sora',sans-serif", boxShadow:`0 4px 14px rgba(232,25,44,0.28)` }}>
+            <Link to="/login" onClick={() => setIsMenuOpen(false)} style={{ display:"flex", alignItems:"center", gap:9, textDecoration:"none", padding:"12px 16px", borderRadius:14, background:`linear-gradient(135deg,${C.primarySoft},${C.primary})`, color:"#fff", fontSize:14, fontWeight:700, fontFamily:"'Inter',sans-serif", boxShadow:`0 4px 14px rgba(232,25,44,0.28)` }}>
               <User size={15} /> {t("navbar.loginRegister")}
             </Link>
           )}
@@ -1168,14 +1183,14 @@ const Navbar = () => {
 
         {/* Dil seçimi */}
         <div style={{ padding:"12px 16px", borderBottom:"1px solid #f3f4f6", flexShrink:0 }}>
-          <p style={{ fontSize:10, fontWeight:700, color:C.light, letterSpacing:1.2, textTransform:"uppercase", margin:"0 0 9px", fontFamily:"'Sora',sans-serif" }}>{t("language.select")}</p>
+          <p style={{ fontSize:10, fontWeight:700, color:C.light, letterSpacing:1.2, textTransform:"uppercase", margin:"0 0 9px", fontFamily:"'Inter',sans-serif" }}>{t("language.select")}</p>
           <LanguageSwitcher />
         </div>
 
         {/* Axtarış */}
         <div style={{ padding:"12px 12px 6px", flexShrink:0 }}>
           <button onClick={() => { setShowSearch(true); setIsMenuOpen(false) }}
-            style={{ width:"100%", display:"flex", alignItems:"center", gap:10, padding:"11px 14px", borderRadius:13, background:"#f9fafb", border:"1.5px solid #f3f4f6", cursor:"pointer", fontFamily:"'Sora',sans-serif", fontSize:13, color:C.light, fontWeight:500, transition:"all .15s" }}
+            style={{ width:"100%", display:"flex", alignItems:"center", gap:10, padding:"11px 14px", borderRadius:13, background:"#f9fafb", border:"1.5px solid #f3f4f6", cursor:"pointer", fontFamily:"'Inter',sans-serif", fontSize:13, color:C.light, fontWeight:500, transition:"all .15s" }}
             onMouseEnter={e => { e.currentTarget.style.borderColor=C.rose200; e.currentTarget.style.color=C.primary; e.currentTarget.style.background=C.rose50 }}
             onMouseLeave={e => { e.currentTarget.style.borderColor="#f3f4f6"; e.currentTarget.style.color=C.light; e.currentTarget.style.background="#f9fafb" }}
           >
@@ -1190,7 +1205,7 @@ const Navbar = () => {
           {/* ── 15 kateqoriya accordion ── */}
           <div>
             <div style={{ padding:"6px 14px 4px 16px" }}>
-              <p style={{ fontSize:9, fontWeight:800, color:C.light, letterSpacing:1.4, textTransform:"uppercase", margin:0, fontFamily:"'Sora',sans-serif" }}>Kateqoriyalar</p>
+              <p style={{ fontSize:9, fontWeight:800, color:C.light, letterSpacing:1.4, textTransform:"uppercase", margin:0, fontFamily:"'Inter',sans-serif" }}>Kateqoriyalar</p>
             </div>
             {MAIN_CATEGORIES.map(cat => {
               const Icon   = cat.icon
@@ -1208,8 +1223,8 @@ const Navbar = () => {
                         <Icon size={14} color={cat.color} />
                       </div>
                       <div style={{ minWidth:0 }}>
-                        <div style={{ fontSize:13, fontWeight:700, color:isOpen ? cat.color : C.dark, fontFamily:"'Sora',sans-serif", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", transition:"color .15s" }}>{cat.label}</div>
-                        <div style={{ fontSize:9, color:C.mid, fontFamily:"'Sora',sans-serif" }}>{cat.subcategories.length} alt kateqoriya</div>
+                        <div style={{ fontSize:13, fontWeight:700, color:isOpen ? cat.color : C.dark, fontFamily:"'Inter',sans-serif", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", transition:"color .15s" }}>{cat.label}</div>
+                        <div style={{ fontSize:9, color:C.mid, fontFamily:"'Inter',sans-serif" }}>{cat.subcategories.length} alt kateqoriya</div>
                       </div>
                     </div>
                     <div style={{ flexShrink:0, transition:"transform .2s", transform:isOpen ? "rotate(180deg)" : "rotate(0)" }}>
@@ -1298,12 +1313,12 @@ const Navbar = () => {
             >
               <ShoppingCart size={21} color="#fff" />
               {cartCount > 0 && (
-                <span style={{ position:"absolute", top:-5, right:-5, minWidth:16, height:16, background:"#fff", color:C.primary, fontSize:8, fontWeight:800, lineHeight:1, borderRadius:99, display:"flex", alignItems:"center", justifyContent:"center", padding:"0 3px", border:`1.5px solid ${C.rose100}`, fontFamily:"'Sora',sans-serif" }}>
+                <span style={{ position:"absolute", top:-5, right:-5, minWidth:16, height:16, background:"#fff", color:C.primary, fontSize:8, fontWeight:800, lineHeight:1, borderRadius:99, display:"flex", alignItems:"center", justifyContent:"center", padding:"0 3px", border:`1.5px solid ${C.rose100}`, fontFamily:"'Inter',sans-serif" }}>
                   {cartCount > 9 ? "9+" : cartCount}
                 </span>
               )}
             </div>
-            <span className="nb-cart-lbl" style={{ fontSize:9, fontWeight:700, color:C.primary, marginTop:4, fontFamily:"'Sora',sans-serif", lineHeight:1 }}>{t("navbar.cart")}</span>
+            <span className="nb-cart-lbl" style={{ fontSize:9, fontWeight:700, color:C.primary, marginTop:4, fontFamily:"'Inter',sans-serif", lineHeight:1 }}>{t("navbar.cart")}</span>
           </Link>
           <Link to="/favori" className={`bmt ${isAct("/favori") ? "on" : ""}`} style={{ position:"relative" }}>
             <div style={{ position:"relative" }}>

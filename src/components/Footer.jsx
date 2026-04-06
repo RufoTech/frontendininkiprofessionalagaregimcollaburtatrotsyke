@@ -73,7 +73,7 @@ const Modal = ({ title, icon: Icon, content, onClose }) => (
           <div style={{ width: 36, height: 36, borderRadius: 10, background: "#E8192C", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <Icon size={17} color="white" />
           </div>
-          <h3 style={{ margin: 0, fontSize: 15, fontWeight: 800, color: "#1a1a1a", fontFamily: "'Sora',sans-serif" }}>{title}</h3>
+          <h3 style={{ margin: 0, fontSize: 15, fontWeight: 800, color: "#1a1a1a", fontFamily: "'Inter',sans-serif" }}>{title}</h3>
         </div>
         {/* X (bağlama) düyməsi */}
         <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 9, border: "1.5px solid #f0f0f0", background: "#f9f9f9", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -87,11 +87,11 @@ const Modal = ({ title, icon: Icon, content, onClose }) => (
         {content.map((section, i) => (
           <div key={i} style={{ marginBottom: 22 }}>
             {/* Bölmə başlığı — qırmızı, böyük hərflərlə */}
-            <h4 style={{ fontSize: 12, fontWeight: 800, color: "#E8192C", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 7, fontFamily: "'Sora',sans-serif" }}>
+            <h4 style={{ fontSize: 12, fontWeight: 800, color: "#E8192C", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 7, fontFamily: "'Inter',sans-serif" }}>
               {section.title}
             </h4>
             {/* Bölmə mətni */}
-            <p style={{ fontSize: 13, color: "#555", lineHeight: 1.8, margin: 0, fontFamily: "'Sora',sans-serif" }}>
+            <p style={{ fontSize: 13, color: "#555", lineHeight: 1.8, margin: 0, fontFamily: "'Inter',sans-serif" }}>
               {section.text}
             </p>
           </div>
@@ -111,9 +111,9 @@ const CONTRACTS = {
     title: "Mağaza Hüquqları",
     icon: Store,
     content: [
-      { title: "1. Mağaza Açma Hüququ", text: "Brendex platformasında mağaza açmaq üçün satıcı vergi nömrəsi, VÖN nömrəsi və mağaza ünvanı təqdim etməlidir. Qeydiyyat prosesi tamamlandıqdan sonra mağazanıza unikal URL linki verilir." },
-      { title: "2. Məhsul Yerləşdirmə", text: "Satıcılar yalnız qanuni məhsullar yerləşdirə bilər. Qadağan olunmuş, saxta, və ya zərərli məhsulların yerləşdirilməsi hesabın bağlanması ilə nəticələnəcəkdir. Bütün məhsullar Brendex moderasiya prosesinə tabedir." },
-      { title: "3. Komissiya və Ödənişlər", text: "Brendex hər uğurlu sifariş üçün 5-10% komissiya alır. Ödənişlər hər ayın 1-i və 15-inde satıcının bank hesabına köçürülür. Minimum ödəniş məbləği 50 AZN-dir." },
+      { title: "1. Mağaza Açma Hüququ", text: "BRENDEX platformasında mağaza açmaq üçün satıcı vergi nömrəsi, VÖN nömrəsi və mağaza ünvanı təqdim etməlidir. Qeydiyyat prosesi tamamlandıqdan sonra mağazanıza unikal URL linki verilir." },
+      { title: "2. Məhsul Yerləşdirmə", text: "Satıcılar yalnız qanuni məhsullar yerləşdirə bilər. Qadağan olunmuş, saxta, və ya zərərli məhsulların yerləşdirilməsi hesabın bağlanması ilə nəticələnəcəkdir. Bütün məhsullar BRENDEX moderasiya prosesinə tabedir." },
+      { title: "3. Komissiya və Ödənişlər", text: "BRENDEX hər uğurlu sifariş üçün 5-10% komissiya alır. Ödənişlər hər ayın 1-i və 15-inde satıcının bank hesabına köçürülür. Minimum ödəniş məbləği 50 AZN-dir." },
       { title: "4. Sifariş İdarəetmə", text: "Satıcı sifariş daxil olduqdan 24 saat ərzində sifarişi qəbul etməli və 3 iş günü ərzində göndərməlidir. Gecikmiş sifarişlər penalti ilə nəticələnə bilər." },
       { title: "5. İadə Siyasəti", text: "Müştərinin iadə sorğusuna satıcı 48 saat ərzində cavab verməlidir. Məhsul qüsurlu olarsa, geri qaytarma xərcləri satıcı tərəfindən ödənilir." },
       { title: "6. Hesab Bloklanması", text: "Şikayət nisbəti 5%-dən yuxarı olan mağazalar xəbərdarlıq alarlar. Şikayət nisbəti 10%-i keçərsə hesab müvəqqəti, 15%-i keçərsə daimi bağlanır." },
@@ -123,12 +123,12 @@ const CONTRACTS = {
     title: "Müştəri Müqaviləsi",
     icon: Users,
     content: [
-      { title: "1. Hesab Yaratma", text: "Brendex-də alış-veriş etmək üçün etibarlı e-poçt ünvanı ilə qeydiyyatdan keçməlisiniz. Hesabınızın təhlükəsizliyi sizin məsuliyyətinizdədir. Şübhəli fəaliyyət aşkar etdikdə dərhal bildirin." },
+      { title: "1. Hesab Yaratma", text: "BRENDEX-də alış-veriş etmək üçün etibarlı e-poçt ünvanı ilə qeydiyyatdan keçməlisiniz. Hesabınızın təhlükəsizliyi sizin məsuliyyətinizdədir. Şübhəli fəaliyyət aşkar etdikdə dərhal bildirin." },
       { title: "2. Sifariş və Ödəniş", text: "Sifarişinizi tamamladıqdan sonra ödəniş SSL şifrələməsi ilə qorunur. Kart məlumatlarınız serverimizdə saxlanılmır. Stripe ödəniş sistemi vasitəsilə təhlükəsiz əməliyyat həyata keçirilir." },
       { title: "3. Çatdırılma", text: "Çatdırılma müddəti satıcıya görə dəyişir (1-7 iş günü). Sifariş statusunu 'Sifarişlərim' bölməsindən izləyə bilərsiniz. Çatdırılma problemi yarandıqda müştəri xidmətinə müraciət edin." },
       { title: "4. İadə və Geri Ödəmə", text: "Qüsurlu məhsullar 14 gün ərzində iadə edilə bilər. Geri ödəmə 5-10 iş günü ərzində həyata keçirilir. İadə prosesi üçün foto sübutu tələb oluna bilər." },
       { title: "5. Gizlilik", text: "Şəxsi məlumatlarınız üçüncü şəxslərə satılmır. Yalnız sifarişin yerinə yetirilməsi üçün lazımi məlumatlar satıcı ilə paylaşılır. Kart nömrəsi, şifrə kimi həssas məlumatlar heç vaxt açıqlanmır." },
-      { title: "6. Mübahisə Həlli", text: "Satıcı ilə mübahisə yarandıqda Brendex vasitəçi kimi çıxış edir. Brendex müştərinin haqlı olduğunu müəyyən edərsə, geri ödəmə avtomatik həyata keçirilir." },
+      { title: "6. Mübahisə Həlli", text: "Satıcı ilə mübahisə yarandıqda BRENDEX vasitəçi kimi çıxış edir. BRENDEX müştərinin haqlı olduğunu müəyyən edərsə, geri ödəmə avtomatik həyata keçirilir." },
     ],
   },
   gizlilik: {
@@ -145,10 +145,10 @@ const CONTRACTS = {
     title: "İstifadə Şərtləri",
     icon: FileText,
     content: [
-      { title: "1. Qəbul Edilən İstifadə", text: "Brendex-i yalnız qanuni məqsədlər üçün istifadə edə bilərsiniz. Saxtakarlıq, spam, virusların yayılması, başqasının hesabına icazəsiz giriş qadağandır." },
-      { title: "2. İntellektual Mülkiyyət", text: "Brendex loqosu, dizaynı və məzmunu müəlliflik hüququ ilə qorunur. İcazəsiz kopyalama, dağıtma və kommersiya istifadəsi qadağandır." },
-      { title: "3. Məsuliyyətin Məhdudlaşdırılması", text: "Brendex üçüncü tərəf satıcıların məhsulları üçün məsuliyyət daşımır. Məhsul keyfiyyəti birbaşa satıcının məsuliyyətidir." },
-      { title: "4. Şərtlərin Dəyişdirilməsi", text: "Brendex bu şərtləri 30 günlük xəbərdarlıqla dəyişdirə bilər. Dəyişiklikdən sonra platformadan istifadə yeni şərtləri qəbul etmək deməkdir." },
+      { title: "1. Qəbul Edilən İstifadə", text: "BRENDEX-i yalnız qanuni məqsədlər üçün istifadə edə bilərsiniz. Saxtakarlıq, spam, virusların yayılması, başqasının hesabına icazəsiz giriş qadağandır." },
+      { title: "2. İntellektual Mülkiyyət", text: "BRENDEX loqosu, dizaynı və məzmunu müəlliflik hüququ ilə qorunur. İcazəsiz kopyalama, dağıtma və kommersiya istifadəsi qadağandır." },
+      { title: "3. Məsuliyyətin Məhdudlaşdırılması", text: "BRENDEX üçüncü tərəf satıcıların məhsulları üçün məsuliyyət daşımır. Məhsul keyfiyyəti birbaşa satıcının məsuliyyətidir." },
+      { title: "4. Şərtlərin Dəyişdirilməsi", text: "BRENDEX bu şərtləri 30 günlük xəbərdarlıqla dəyişdirə bilər. Dəyişiklikdən sonra platformadan istifadə yeni şərtləri qəbul etmək deməkdir." },
     ],
   },
   faq: {
@@ -188,7 +188,7 @@ const CONTRACTS = {
     content: [
       { title: "E-poçt", text: "Ümumi sorğular: info@brendex.az\nMüştəri xidməti: support@brendex.az\nSatıcı dəstəyi: seller@brendex.az\nCavab müddəti: 24 saat ərzində." },
       { title: "Telefon", text: "+994 12 345 67 89 — İş saatları: Həftəiçi 09:00-18:00\n+994 50 123 45 67 — WhatsApp dəstəyi (24/7)" },
-      { title: "Ünvan", text: "Brendex MMC\nAzərbaycan, Bakı şəhəri,\nNizami küçəsi 65, AZ1000" },
+      { title: "Ünvan", text: "BRENDEX MMC\nAzərbaycan, Bakı şəhəri,\nNizami küçəsi 65, AZ1000" },
       { title: "Sosial Media", text: "Facebook, Instagram, Twitter hesablarımızda @brendex.az adı ilə bizi tapın. Birbaşa mesaj göndərərək sürətli dəstək ala bilərsiniz." },
     ],
   },
@@ -271,11 +271,11 @@ const Footer = () => {
   return (
     <>
       <style>{`
-        /* Google Fonts — Sora şrifti */
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&display=swap');
+        /* Google Fonts - Inter srifti */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
         /* .flink — footer link düymələri üçün ortaq stil */
-        .flink{font-size:12.5px;color:#888;text-decoration:none;transition:color 0.15s;font-weight:500;display:flex;align-items:center;gap:6px;font-family:'Sora',sans-serif;background:none;border:none;cursor:pointer;padding:0;text-align:left}
+        .flink{font-size:12.5px;color:#888;text-decoration:none;transition:color 0.15s;font-weight:500;display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;background:none;border:none;cursor:pointer;padding:0;text-align:left}
         /* Hover: mətn qırmızı olur, ox ikonu sağa sürüşür */
         .flink:hover{color:#E8192C}
         .flink:hover .fchev{opacity:1;transform:translateX(3px)}
@@ -302,7 +302,7 @@ const Footer = () => {
           padding: 14px 0;
           border-bottom: 1px solid #f0f0f0;
           cursor: pointer;
-          font-family: 'Sora', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-weight: 700;
           font-size: 13px;
           color: #1a1a1a;
@@ -343,7 +343,7 @@ const Footer = () => {
         />
       )}
 
-      <footer style={{ background: "#fff", borderTop: "1px solid #f0f0f0", fontFamily: "'Sora',sans-serif" }}>
+      <footer style={{ background: "#fff", borderTop: "1px solid #f0f0f0", fontFamily: "'Inter',sans-serif" }}>
 
         {/* ── ÜST QIRMIZI ŞERİT ── */}
         {/* Logo + naviqasiya linklərini ehtiva edir */}
@@ -472,7 +472,7 @@ const Footer = () => {
               <input
                 type="email" value={email} onChange={e => setEmail(e.target.value)}
                 placeholder="E-poçtunuzu daxil edin"
-                style={{ flex: 1, padding: "10px 12px", border: "none", outline: "none", fontSize: 12, color: "#1a1a1a", background: "white", fontFamily: "'Sora',sans-serif" }}
+                style={{ flex: 1, padding: "10px 12px", border: "none", outline: "none", fontSize: 12, color: "#1a1a1a", background: "white", fontFamily: "'Inter',sans-serif" }}
               />
               {/* Email boş deyilsə abunəlik uğurlu bildirişi göstərir */}
               <button
@@ -502,7 +502,7 @@ const Footer = () => {
               <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                 {legalLinks.map(({ label, key }) => (
                   <Link key={key} to="/terms"
-                    style={{ background: "none", border: "none", cursor: "pointer", textAlign: "left", fontSize: 11, color: "#E8192C", fontWeight: 600, padding: "2px 0", fontFamily: "'Sora',sans-serif", textDecoration: "underline" }}>
+                    style={{ background: "none", border: "none", cursor: "pointer", textAlign: "left", fontSize: 11, color: "#E8192C", fontWeight: 600, padding: "2px 0", fontFamily: "'Inter',sans-serif", textDecoration: "underline" }}>
                     → {label}
                   </Link>
                 ))}
@@ -549,7 +549,7 @@ const Footer = () => {
               <input
                 type="email" value={email} onChange={e => setEmail(e.target.value)}
                 placeholder="E-poçtunuzu daxil edin"
-                style={{ flex: 1, padding: "11px 13px", border: "none", outline: "none", fontSize: 13, color: "#1a1a1a", background: "white", fontFamily: "'Sora',sans-serif" }}
+                style={{ flex: 1, padding: "11px 13px", border: "none", outline: "none", fontSize: 13, color: "#1a1a1a", background: "white", fontFamily: "'Inter',sans-serif" }}
               />
               <button
                 onClick={() => {
@@ -632,12 +632,12 @@ const Footer = () => {
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px 24px" }}>
           <div style={{ paddingTop: 24, borderTop: "1px solid #f0f0f0", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
-              <p style={{ fontSize: 11, color: "#bbb", margin: 0 }}>© 2025 Brendex. Bütün hüquqlar qorunur.</p>
+              <p style={{ fontSize: 11, color: "#bbb", margin: 0 }}>© 2025 BRENDEX. Bütün hüquqlar qorunur.</p>
               {/* Bütün hüquqi + xidmət linklərini bir sırada göstərir */}
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                 {[...legalLinks, ...serviceLinks].map(({ label, key }) => (
                   <button key={key} onClick={() => setActiveModal(key)}
-                    style={{ fontSize: 11, color: "#ccc", background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "'Sora',sans-serif", transition: "color 0.15s" }}
+                    style={{ fontSize: 11, color: "#ccc", background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "'Inter',sans-serif", transition: "color 0.15s" }}
                     onMouseEnter={e => e.currentTarget.style.color = "#E8192C"}
                     onMouseLeave={e => e.currentTarget.style.color = "#ccc"}>
                     {label}
@@ -660,7 +660,7 @@ const Footer = () => {
         {/* ── ALT BAR — MOBİL ── */}
         {/* Müəllif hüququ + ödəniş ikonları (mobil versiyası) */}
         <div className="footer-mobile" style={{ padding: "12px 16px 20px", borderTop: "1px solid #f0f0f0", marginTop: 4 }}>
-          <p style={{ fontSize: 11, color: "#bbb", margin: "0 0 10px" }}>© 2025 Brendex. Bütün hüquqlar qorunur.</p>
+          <p style={{ fontSize: 11, color: "#bbb", margin: "0 0 10px" }}>© 2025 BRENDEX. Bütün hüquqlar qorunur.</p>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <span style={{ fontSize: 10, fontWeight: 700, color: "#bbb", textTransform: "uppercase", letterSpacing: "0.06em" }}>Ödəniş:</span>
             {payments.map(({ label, bg }) => (

@@ -9,32 +9,32 @@ const Introduction = () => {
 
   const slides = [
     {
-      badge: "SALE! UP TO 50% OFF!",
-      title: "Summer Sale",
-      subtitle: "Collections",
-      buttonText: "SHOP NOW",
+      badge: "ENDİRİM! 50%-DƏK!",
+      title: "Yay",
+      subtitle: "Kolleksiyası",
+      buttonText: "İNDİ AL",
       image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&auto=format&fit=crop",
       bgColor: "#faf7f0"
     },
     {
-      badge: "NEW ARRIVALS",
-      title: "Winter",
-      subtitle: "Collection 2024",
-      buttonText: "DISCOVER NOW",
+      badge: "YENİ GƏLƏNLƏR",
+      title: "Qış",
+      subtitle: "Kolleksiyası 2024",
+      buttonText: "KƏŞF ET",
       image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&auto=format&fit=crop",
       bgColor: "#f5f5f5"
     },
     {
-      badge: "TRENDING NOW",
-      title: "Spring",
-      subtitle: "Fashion",
-      buttonText: "VIEW MORE",
+      badge: "TREND",
+      title: "Bahar",
+      subtitle: "Dəbi",
+      buttonText: "DAHA ÇOX",
       image: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&auto=format&fit=crop",
       bgColor: "#fff5f5"
     }
   ];
 
-  const categories = ['All Products', 'Phones', 'Cameras', 'Laptops'];
+  const categories = ['Bütün Məhsullar', 'Telefonlar', 'Kameralar', 'Laptoplar'];
 
   const goToSlide = (index) => {
     setCurrentSlide(index);
@@ -51,7 +51,7 @@ const Introduction = () => {
     <>
       <section
         className="relative w-full overflow-hidden transition-colors duration-700"
-        style={{ backgroundColor: slides[currentSlide].bgColor }}
+        style={{ backgroundColor: slides[currentSlide].bgColor, fontFamily: "'Inter', sans-serif" }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative">
@@ -135,10 +135,10 @@ const Introduction = () => {
       </section>
 
       {/* ------------ WHAT'S NEW ------------ */}
-      <div className="w-full py-10 sm:py-16 bg-white">
+      <div className="w-full py-10 sm:py-16 bg-white" style={{ fontFamily: "'Inter', sans-serif" }}>
         <div className="max-w-7xl mx-auto px-4 flex flex-col items-center gap-5 sm:gap-8">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black tracking-tight text-center">
-            What's New
+            Yeni Gələnlər
           </h2>
 
           {/* Mobil: yatay scroll — tab-lar kəsilmir */}

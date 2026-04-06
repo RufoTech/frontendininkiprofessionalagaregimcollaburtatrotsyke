@@ -53,8 +53,8 @@ const Login = () => {
     return (
       <>
         <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
-          .ap-root { min-height:100vh; background:#F5F5F5; display:flex; align-items:center; justify-content:center; padding:20px; font-family:'Sora',sans-serif; }
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+          .ap-root { min-height:100vh; background:#F5F5F5; display:flex; align-items:center; justify-content:center; padding:20px; font-family:'Inter',sans-serif; }
           .ap-card { background:#fff; border-radius:24px; padding:36px 32px; max-width:480px; width:100%; box-shadow:0 4px 24px rgba(0,0,0,0.08); }
           .ap-icon { width:60px; height:60px; background:#fff0f1; border-radius:18px; display:flex; align-items:center; justify-content:center; margin-bottom:16px; }
           .ap-title { font-size:20px; font-weight:700; color:#1A1A1A; margin:0 0 4px; }
@@ -69,9 +69,9 @@ const Login = () => {
           .ap-btn { background:#fafafa; border:1.5px solid #eee; border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; transition:all .2s; }
           .ap-btn:hover { border-color:#E8192C; background:#fff8f8; }
           .ap-btn-icon { width:34px; height:34px; background:#fff0f1; border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-          .ap-primary { width:100%; height:46px; background:#E8192C; color:#fff; border:none; border-radius:12px; font-family:'Sora',sans-serif; font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:8px; transition:background .2s; text-decoration:none; }
+          .ap-primary { width:100%; height:46px; background:#E8192C; color:#fff; border:none; border-radius:12px; font-family:'Inter',sans-serif; font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:8px; transition:background .2s; text-decoration:none; }
           .ap-primary:hover { background:#c8111f; }
-          .ap-secondary { width:100%; height:44px; background:transparent; color:#555; border:1.5px solid #eee; border-radius:12px; font-family:'Sora',sans-serif; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all .2s; }
+          .ap-secondary { width:100%; height:44px; background:transparent; color:#555; border:1.5px solid #eee; border-radius:12px; font-family:'Inter',sans-serif; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all .2s; }
           .ap-secondary:hover { border-color:#E8192C; color:#E8192C; }
         `}</style>
         <div className="ap-root">
@@ -128,7 +128,7 @@ const Login = () => {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
         * { box-sizing: border-box; }
 
@@ -140,7 +140,7 @@ const Login = () => {
           align-items: center;
           justify-content: center;
           padding: 24px 20px;
-          font-family: 'Sora', sans-serif;
+          font-family: 'Inter', sans-serif;
         }
 
         .login-wrap { width: 100%; max-width: 400px; }
@@ -190,7 +190,7 @@ const Login = () => {
         }
         .login-phone-input {
           flex: 1; border: none; background: transparent; outline: none;
-          font-family: 'Sora', sans-serif; font-size: 14px; color: #1A1A1A;
+          font-family: 'Inter', sans-serif; font-size: 14px; color: #1A1A1A;
           padding: 0 14px; height: 50px;
         }
         .login-phone-input::placeholder { color: #C4C4C4; }
@@ -199,7 +199,7 @@ const Login = () => {
         .login-input {
           width: 100%; height: 50px; padding: 0 46px 0 16px;
           border: 1.5px solid #E8E8E8; border-radius: 14px;
-          background: #FAFAFA; font-family: 'Sora', sans-serif;
+          background: #FAFAFA; font-family: 'Inter', sans-serif;
           font-size: 14px; color: #1A1A1A; outline: none; transition: .2s;
         }
         .login-input::placeholder { color: #C4C4C4; }
@@ -220,7 +220,7 @@ const Login = () => {
           width: 100%; height: 52px;
           background: linear-gradient(135deg, #E8192C 0%, #C0001A 100%);
           color: #fff; border: none; border-radius: 14px;
-          font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700;
+          font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700;
           cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
           box-shadow: 0 6px 20px rgba(232,25,44,0.35);
           transition: all .2s; margin-bottom: 20px;
@@ -237,7 +237,7 @@ const Login = () => {
         .social-btn {
           width: 100%; height: 48px;
           background: #fff; border: 1.5px solid #E8E8E8; border-radius: 14px;
-          font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600; color: #1A1A1A;
+          font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #1A1A1A;
           cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
           margin-bottom: 10px; transition: all .2s;
         }
@@ -256,7 +256,7 @@ const Login = () => {
         .role-chip {
           padding: 6px 14px; border-radius: 50px;
           border: 1.5px solid #E8E8E8; background: #fff;
-          font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 600;
+          font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
           color: #888; cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 5px;
         }
         .role-chip.active { border-color: #E8192C; color: #E8192C; background: #fff8f8; }
@@ -276,7 +276,7 @@ const Login = () => {
           </div>
 
           <h1 className="login-title">Xoş gəlmisiniz!</h1>
-          <p className="login-sub">Brendex hesabınıza daxil olun</p>
+          <p className="login-sub">BRENDEX hesabınıza daxil olun</p>
 
           {/* Role chips */}
           <div className="login-role-row">
@@ -394,6 +394,9 @@ const Login = () => {
               ? <>Blogger hesabın yoxdur? <Link to="/blogger/register">Qeydiyyat</Link></>
               : <>Hesabın yoxdur? <Link to="/register">Qeydiyyatdan keç</Link></>
             }
+            <div style={{ marginTop: 12, fontSize: 12 }}>
+              Daxil olmaqla <Link to="/terms" style={{ fontWeight: 600 }}>Şərtlər və Qaydalar</Link>ımızı qəbul edirsiniz.
+            </div>
           </div>
         </div>
       </div>

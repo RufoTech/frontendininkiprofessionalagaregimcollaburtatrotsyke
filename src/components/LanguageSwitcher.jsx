@@ -114,7 +114,7 @@ export default function LanguageSwitcher() {
                   gap: 10,
                   padding: '8px 14px',
                   cursor: 'pointer',
-                  fontFamily: "'Sora', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   fontSize: 13,
                   fontWeight: isActive ? 700 : 500,
                   color: isActive ? '#E8192C' : '#333',
@@ -143,7 +143,7 @@ export default function LanguageSwitcher() {
                   background: isActive ? '#fde8ea' : '#f4f4f4',
                   borderRadius: 6,
                   padding: '2px 6px',
-                  fontFamily: "'Sora', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                 }}>
                   {lang.code.toUpperCase()}
                 </span>

@@ -105,7 +105,7 @@ const SebetCart = () => {
   /* ─── Yüklənir ─── */
   if (isLoading) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8f8f8", fontFamily: "'Sora',sans-serif" }}>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8f8f8", fontFamily: "'Inter',sans-serif" }}>
         <div style={{ textAlign: "center" }}>
           <Loader2 size={36} color="#E8192C" style={{ animation: "spin 1s linear infinite", marginBottom: 12 }} />
           <p style={{ color: "#aaa", fontSize: 14 }}>Səbətiniz yüklənir...</p>
@@ -118,8 +118,8 @@ const SebetCart = () => {
   /* ─── BOŞ SƏBƏT ─── */
   if (error || !items.length) {
     return (
-      <div style={{ minHeight: "100vh", background: "#f8f8f8", fontFamily: "'Sora',sans-serif" }}>
-        <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap');`}</style>
+      <div style={{ minHeight: "100vh", background: "#f8f8f8", fontFamily: "'Inter',sans-serif" }}>
+        <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');`}</style>
 
         {/* Header */}
         <div style={{ background: "#fff", padding: "16px 20px", display: "flex", alignItems: "center", gap: 12, borderBottom: "1px solid #f0f0f0", position: "sticky", top: 0, zIndex: 10 }}>
@@ -173,15 +173,15 @@ const SebetCart = () => {
 
   /* ─── DOLU SƏBƏT ─── */
   return (
-    <div style={{ minHeight: "100vh", background: "#f8f8f8", fontFamily: "'Sora',sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#f8f8f8", fontFamily: "'Inter',sans-serif" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         @keyframes spin{to{transform:rotate(360deg)}}
 
         .cart-item { background:#fff; border-radius:16px; padding:14px; display:flex; align-items:center; gap:12px; box-shadow:0 2px 10px rgba(0,0,0,.05); margin-bottom:10px; }
         .cart-qty-btn { width:30px; height:30px; border-radius:50%; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .18s; flex-shrink:0; }
         .cart-qty-btn:active { transform:scale(.9); }
-        .checkout-btn { width:100%; background:#E8192C; color:#fff; border:none; borderRadius:40px; padding:16px; font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; font-family:'Sora',sans-serif; box-shadow:0 8px 24px rgba(232,25,44,.4); transition:all .2s; }
+        .checkout-btn { width:100%; background:#E8192C; color:#fff; border:none; borderRadius:40px; padding:16px; font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; font-family:'Inter',sans-serif; box-shadow:0 8px 24px rgba(232,25,44,.4); transition:all .2s; }
         .checkout-btn:hover { transform:translateY(-2px); box-shadow:0 12px 32px rgba(232,25,44,.5); }
         .checkout-btn:active { transform:scale(.97); }
 

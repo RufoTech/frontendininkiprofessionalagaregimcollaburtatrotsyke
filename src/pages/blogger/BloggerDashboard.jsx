@@ -149,7 +149,7 @@ export default function BloggerDashboard() {
   if (!profile) {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center",
-        minHeight: "100vh", fontFamily: "'Segoe UI', sans-serif", color: "#aaa" }}>
+        minHeight: "100vh", fontFamily: "'Inter', sans-serif", color: "#aaa" }}>
         {loading ? "Yüklənir..." : "Giriş edilməyib"}
       </div>
     );
@@ -198,8 +198,7 @@ export default function BloggerDashboard() {
   const totalPages = sales?.pages  || 1;
 
   return (
-    <div style={{ padding: "24px", fontFamily: "'Segoe UI', sans-serif",
-      background: "#f5f6fa", minHeight: "100vh" }}>
+    <div style={{ padding: "30px", background: "#f8f9fa", minHeight: "100vh", fontFamily: "'Inter', sans-serif" }}>
 
       {/* Başlıq */}
       <div style={{ display: "flex", justifyContent: "space-between",

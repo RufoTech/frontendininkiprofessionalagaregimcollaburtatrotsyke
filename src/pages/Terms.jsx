@@ -2,7 +2,7 @@ const Terms = () => (
   <div style={{
     minHeight: "100vh", background: "#fafafa",
     display: "flex", justifyContent: "center", padding: "60px 24px",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', sans-serif",
   }}>
     <div style={{ maxWidth: 720, width: "100%" }}>
       <h1 style={{ fontSize: 28, fontWeight: 800, color: "#111", marginBottom: 8 }}>
@@ -15,7 +15,7 @@ const Terms = () => (
       {[
         {
           title: "1. Ümumi müddəalar",
-          body: "Brendex platformasından istifadə etməklə siz bu şərtləri qəbul etmiş sayılırsınız. Xidmətdən istifadə etməzdən əvvəl bu sənədi diqqətlə oxuyun.",
+          body: "BRENDEX platformasından istifadə etməklə siz bu şərtləri qəbul etmiş sayılırsınız. Xidmətdən istifadə etməzdən əvvəl bu sənədi diqqətlə oxuyun.",
         },
         {
           title: "2. Hesab məsuliyyəti",
@@ -23,7 +23,7 @@ const Terms = () => (
         },
         {
           title: "3. Məxfilik",
-          body: "Şəxsi məlumatlarınız Brendex Məxfilik Siyasətinə uyğun olaraq işlənilir. Məlumatlarınız üçüncü tərəflərlə yalnız qanuni əsaslarla paylaşıla bilər.",
+          body: "Şəxsi məlumatlarınız BRENDEX Məxfilik Siyasətinə uyğun olaraq işlənilir. Məlumatlarınız üçüncü tərəflərlə yalnız qanuni əsaslarla paylaşıla bilər.",
         },
         {
           title: "4. Ödəniş və sifarişlər",
@@ -31,7 +31,7 @@ const Terms = () => (
         },
         {
           title: "5. Dəyişikliklər",
-          body: "Brendex bu şərtləri istənilən vaxt yeniləmək hüququnu özündə saxlayır. Dəyişikliklər platforma vasitəsilə elan ediləcəkdir.",
+          body: "BRENDEX bu şərtləri istənilən vaxt yeniləmək hüququnu özündə saxlayır. Dəyişikliklər platforma vasitəsilə elan ediləcəkdir.",
         },
       ].map(({ title, body }) => (
         <section key={title} style={{ marginBottom: 32 }}>
@@ -41,7 +41,7 @@ const Terms = () => (
       ))}
 
       <p style={{ fontSize: 13, color: "#aaa", marginTop: 48, borderTop: "1px solid #eee", paddingTop: 24 }}>
-        © {new Date().getFullYear()} Brendex. Bütün hüquqlar qorunur.
+        © {new Date().getFullYear()} BRENDEX. Bütün hüquqlar qorunur.
       </p>
     </div>
   </div>

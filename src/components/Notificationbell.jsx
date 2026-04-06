@@ -127,13 +127,13 @@ export default function NotificationsPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
         * { box-sizing:border-box; }
 
         .np-root {
           min-height:100vh;
           background:#f8f9fa;
-          font-family:'Sora',sans-serif;
+          font-family:'Inter',sans-serif;
           padding-bottom:60px;
         }
 
@@ -179,7 +179,7 @@ export default function NotificationsPage() {
           font-size:12px;font-weight:700;
           color:${C.primary};background:none;
           border:1.5px solid ${C.rose100};
-          cursor:pointer;font-family:'Sora',sans-serif;
+          cursor:pointer;font-family:'Inter',sans-serif;
           padding:7px 14px;border-radius:10px;
           transition:all .15s;
         }
@@ -188,7 +188,7 @@ export default function NotificationsPage() {
           font-size:12px;font-weight:700;
           color:#ef4444;background:none;
           border:1.5px solid #fecaca;
-          cursor:pointer;font-family:'Sora',sans-serif;
+          cursor:pointer;font-family:'Inter',sans-serif;
           padding:7px 14px;border-radius:10px;
           transition:all .15s;
         }
@@ -209,7 +209,7 @@ export default function NotificationsPage() {
           font-size:13px;font-weight:600;
           color:${C.mid};background:none;border:none;
           cursor:pointer;border-bottom:2.5px solid transparent;
-          transition:all .15s;font-family:'Sora',sans-serif;
+          transition:all .15s;font-family:'Inter',sans-serif;
           display:flex;align-items:center;gap:6px;
           white-space:nowrap;
         }
@@ -390,7 +390,7 @@ export default function NotificationsPage() {
           display:flex;align-items:center;justify-content:space-between;
           padding:11px 14px;border-radius:12px;
           background:#f9fafb;margin-bottom:8px;
-          font-family:'Sora',sans-serif;
+          font-family:'Inter',sans-serif;
         }
         .np-info-label {
           font-size:11px;font-weight:700;color:${C.light};
@@ -419,7 +419,7 @@ export default function NotificationsPage() {
           border:none;
           background:linear-gradient(135deg,${C.primarySoft},${C.primary});
           color:#fff;font-size:13px;font-weight:700;
-          cursor:pointer;font-family:'Sora',sans-serif;
+          cursor:pointer;font-family:'Inter',sans-serif;
           transition:all .15s;
           box-shadow:0 4px 14px rgba(232,25,44,0.25);
         }
@@ -432,7 +432,7 @@ export default function NotificationsPage() {
           border:1.5px solid #fecaca;
           background:none;color:#ef4444;
           font-size:12px;font-weight:700;
-          cursor:pointer;font-family:'Sora',sans-serif;
+          cursor:pointer;font-family:'Inter',sans-serif;
           transition:all .15s;
         }
         .np-btn-outline-del:hover { background:#fee2e2; }
@@ -474,12 +474,12 @@ export default function NotificationsPage() {
         }
         .np-confirm-title {
           font-size:16px;font-weight:900;color:${C.dark};
-          margin:0 0 8px;font-family:'Sora',sans-serif;
+          margin:0 0 8px;font-family:'Inter',sans-serif;
         }
         .np-confirm-txt {
           font-size:13px;color:${C.mid};
           margin:0 0 20px;line-height:1.5;
-          font-family:'Sora',sans-serif;
+          font-family:'Inter',sans-serif;
         }
         .np-confirm-btns {
           display:flex;gap:10px;
@@ -488,7 +488,7 @@ export default function NotificationsPage() {
           flex:1;padding:11px;border-radius:12px;
           border:1.5px solid #e5e7eb;background:#fff;
           color:${C.mid};font-size:13px;font-weight:700;
-          cursor:pointer;font-family:'Sora',sans-serif;
+          cursor:pointer;font-family:'Inter',sans-serif;
           transition:background .12s;
         }
         .np-confirm-cancel:hover { background:#f9fafb; }
@@ -496,7 +496,7 @@ export default function NotificationsPage() {
           flex:1;padding:11px;border-radius:12px;
           border:none;background:#ef4444;
           color:#fff;font-size:13px;font-weight:700;
-          cursor:pointer;font-family:'Sora',sans-serif;
+          cursor:pointer;font-family:'Inter',sans-serif;
           transition:all .15s;
         }
         .np-confirm-del:hover { background:#dc2626; }
@@ -594,10 +594,10 @@ export default function NotificationsPage() {
                       {/* Qiymət varsa göstər */}
                       {n.data?.newPrice && n.data?.oldPrice && (
                         <div style={{ display:"flex", alignItems:"center", gap:4, marginBottom:4 }}>
-                          <span style={{ fontSize:13, fontWeight:800, color:C.primary, fontFamily:"'Sora',sans-serif" }}>
+                          <span style={{ fontSize:13, fontWeight:800, color:C.primary, fontFamily:"'Inter',sans-serif" }}>
                             {n.data.newPrice} AZN
                           </span>
-                          <span style={{ fontSize:11, color:C.light, textDecoration:"line-through", fontFamily:"'Sora',sans-serif" }}>
+                          <span style={{ fontSize:11, color:C.light, textDecoration:"line-through", fontFamily:"'Inter',sans-serif" }}>
                             {n.data.oldPrice} AZN
                           </span>
                         </div>
@@ -693,7 +693,7 @@ export default function NotificationsPage() {
                             background:st.bg, color:st.color,
                             padding:"3px 12px", borderRadius:99,
                             fontSize:12, fontWeight:700,
-                            fontFamily:"'Sora',sans-serif",
+                            fontFamily:"'Inter',sans-serif",
                           }}
                         >
                           {st.label}
@@ -730,7 +730,7 @@ export default function NotificationsPage() {
                           style={{
                             fontWeight:800, fontSize:14,
                             color: n.data.stock === 0 ? "#ef4444" : "#854d0e",
-                            fontFamily:"'Sora',sans-serif",
+                            fontFamily:"'Inter',sans-serif",
                           }}
                         >
                           {n.data.stock === 0 ? "Bitib" : `${n.data.stock} ədəd`}
@@ -757,7 +757,7 @@ export default function NotificationsPage() {
                         color:      n.isRead ? "#065f46" : C.primary,
                         padding:"3px 12px", borderRadius:99,
                         fontSize:12, fontWeight:700,
-                        fontFamily:"'Sora',sans-serif",
+                        fontFamily:"'Inter',sans-serif",
                       }}>
                         {n.isRead ? "✓ Oxunub" : "● Oxunmamış"}
                       </span>

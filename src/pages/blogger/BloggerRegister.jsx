@@ -38,8 +38,8 @@ export default function BloggerRegister() {
     if (form.password !== form.confirm) {
       return toast.error('Şifrələr uyğun gəlmir')
     }
-    if (form.password.length < 6) {
-      return toast.error('Şifrə ən az 6 simvol olmalıdır')
+    if (form.password.length < 8) {
+      return toast.error('Şifrə ən az 8 simvol olmalıdır')
     }
 
     try {
@@ -62,11 +62,11 @@ export default function BloggerRegister() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
         .breg-root {
           min-height: 100vh; display: flex;
-          font-family: 'DM Sans', sans-serif; background: #fff;
+          font-family: 'Inter', sans-serif; background: #fff;
         }
         .breg-left {
           flex: 0 0 540px; display: flex; flex-direction: column;
@@ -82,16 +82,16 @@ export default function BloggerRegister() {
         .breg-logo-icon {
           width: 40px; height: 40px; background: #E8192C; border-radius: 11px;
           display: flex; align-items: center; justify-content: center;
-          font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; color: #fff;
+          font-family: 'Inter', serif; font-weight: 800; font-size: 22px; color: #fff;
           box-shadow: 0 4px 14px rgba(232,25,44,0.3);
         }
         .breg-logo-name {
-          font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; color: #111;
+          font-family: 'Inter', serif; font-weight: 800; font-size: 22px; color: #111;
         }
         .breg-logo-name span { color: #E8192C; }
 
         .breg-heading {
-          font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800;
+          font-family: 'Inter', serif; font-size: 24px; font-weight: 800;
           color: #111; margin-bottom: 6px;
         }
         .breg-sub { font-size: 14px; color: #888; margin-bottom: 26px; }
@@ -134,7 +134,7 @@ export default function BloggerRegister() {
         .breg-btn {
           width: 100%; padding: 14px; background: #E8192C; color: #fff;
           border: none; border-radius: 13px;
-          font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+          font-family: 'Inter', serif; font-size: 15px; font-weight: 700;
           cursor: pointer; display: flex; align-items: center; justify-content: center;
           gap: 10px; margin-top: 6px; box-shadow: 0 4px 16px rgba(232,25,44,0.22);
           transition: 0.2s; min-height: 50px;
@@ -159,7 +159,7 @@ export default function BloggerRegister() {
           padding: 80px; color: #fff;
         }
         .breg-right-title {
-          font-family: 'Syne', sans-serif; font-size: 40px; font-weight: 800;
+          font-family: 'Inter', serif; font-size: 40px; font-weight: 800;
           line-height: 1.15; margin-bottom: 24px;
         }
         .breg-feature {
@@ -173,7 +173,7 @@ export default function BloggerRegister() {
         <div className="breg-left">
           <Link to="/" className="breg-logo">
             <div className="breg-logo-icon">B</div>
-            <span className="breg-logo-name">Brend<span>ex</span></span>
+            <span className="breg-logo-name">BREND<span>EX</span></span>
           </Link>
 
           <h2 className="breg-heading">Blogger Qeydiyyatı 🚀</h2>
@@ -203,11 +203,11 @@ export default function BloggerRegister() {
 
               {/* Soyad */}
               <div className="breg-field">
-                <label className="breg-label">Soyad</label>
+                <label className="breg-label">Soyad *</label>
                 <div className="breg-input-wrap">
                   <User size={16} className="breg-input-icon" />
                   <input className="breg-input" name="lastName" value={form.lastName}
-                    onChange={handleChange} placeholder="Soyadınız" />
+                    onChange={handleChange} placeholder="Soyadınız" required />
                 </div>
               </div>
 
@@ -284,6 +284,9 @@ export default function BloggerRegister() {
             <Link to="/login" style={{ color: '#E8192C', fontWeight: '700', textDecoration: 'none' }}>
               Daxil olun
             </Link>
+            <div style={{ marginTop: 12, fontSize: 11 }}>
+              Qeydiyyatdan keçməklə <Link to="/terms" style={{ fontWeight: 600, color: '#888' }}>Şərtlər və Qaydalar</Link>ımızı qəbul edirsiniz.
+            </div>
           </div>
         </div>
 

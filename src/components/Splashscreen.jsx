@@ -109,7 +109,7 @@ function Phase2({ onDone }) {
                 <circle cx={c.cx} cy={c.cy} r={c.r} fill="#E8192C"/>
                 <circle cx={c.cx} cy={c.cy} r={c.r * 0.45} fill="white"/>
                 <text x={c.cx} y={c.cy - c.r - 4} textAnchor="middle"
-                  fontSize="7" fontWeight="700" fill="#E8192C" fontFamily="Sora,sans-serif">
+                  fontSize="7" fontWeight="700" fill="#E8192C" fontFamily="Inter,sans-serif">
                   {c.label}
                 </text>
               </g>
@@ -186,7 +186,7 @@ const SLIDES = [
         <line x1="26" y1="36" x2="46" y2="36" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
         <line x1="26" y1="39" x2="38" y2="39" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
         <circle cx="52" cy="22" r="8" fill="#E8192C"/>
-        <text x="52" y="26" textAnchor="middle" fontSize="9" fontWeight="800" fill="white" fontFamily="Sora,sans-serif">∞</text>
+        <text x="52" y="26" textAnchor="middle" fontSize="9" fontWeight="800" fill="white" fontFamily="Inter,sans-serif">∞</text>
       </svg>
     ),
     title: "Minlərlə məhsul",
@@ -323,14 +323,14 @@ const SplashScreen = ({ onFinish }) => {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap');
         * { box-sizing: border-box; }
 
         .ob-phase {
           position: fixed; inset: 0; z-index: 9999;
           display: flex; flex-direction: column;
           align-items: center; justify-content: center;
-          font-family: 'Sora', sans-serif;
+          font-family: 'Inter', sans-serif;
           overflow: hidden;
         }
         .ob-enter { animation: ob-fade-in 0.4s ease both; }
@@ -486,14 +486,14 @@ const SplashScreen = ({ onFinish }) => {
         }
         .ob-p3-skip {
           border: none; background: transparent; cursor: pointer;
-          font-family: 'Sora',sans-serif; font-size: 14px;
+          font-family: 'Inter',sans-serif; font-size: 14px;
           font-weight: 600; color: #9ca3af;
           padding: 14px 20px; border-radius: 14px; transition: color 0.15s;
         }
         .ob-p3-skip:hover { color: #6b7280; }
         .ob-p3-next {
           border: none; cursor: pointer;
-          font-family: 'Sora',sans-serif; font-size: 15px;
+          font-family: 'Inter',sans-serif; font-size: 15px;
           font-weight: 700; color: white;
           padding: 14px 28px; border-radius: 16px;
           display: flex; align-items: center; gap: 8px;
@@ -503,7 +503,7 @@ const SplashScreen = ({ onFinish }) => {
         .ob-p3-next:active { transform: scale(0.96); }
         .ob-p3-start {
           border: none; cursor: pointer;
-          font-family: 'Sora',sans-serif; font-size: 16px;
+          font-family: 'Inter',sans-serif; font-size: 16px;
           font-weight: 700; color: white;
           padding: 16px 0; border-radius: 18px;
           display: flex; align-items: center; justify-content: center; gap: 10px;

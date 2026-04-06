@@ -29,7 +29,7 @@ export default function Profile() {
   const C = { primary: '#E8192C', soft: '#fff5f5', mid: '#6b7280', dark: '#1c1c1e' };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f6f6f8', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '48px 16px', fontFamily: "'Sora', sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: '#f6f6f8', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '48px 16px', fontFamily: "'Inter', sans-serif" }}>
       <div style={{ background: '#fff', borderRadius: 20, boxShadow: '0 4px 32px rgba(0,0,0,0.08)', width: '100%', maxWidth: 480, overflow: 'hidden' }}>
 
         {/* Header */}

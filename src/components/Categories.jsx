@@ -100,7 +100,7 @@ function ProductCard({ product, onAddToCart, favoriteIds }) {
         transition: "all 0.3s cubic-bezier(0.34,1.56,0.64,1)",
         cursor: "pointer",
         border: hovered ? "1.5px solid #fde8ea" : "1.5px solid transparent",
-        fontFamily: "'Nunito', sans-serif",
+        fontFamily: "'Inter', sans-serif",
       }}
     >
       {/* Endirim badge */}
@@ -227,7 +227,7 @@ function ProductRow({ title, items, viewAll, isLoading, onAddToCart, favoriteIds
   const scroll = (dir) => rowRef.current?.scrollBy({ left: dir * 210, behavior: "smooth" });
 
   return (
-    <div style={{ marginBottom: 40, fontFamily: "'Nunito', sans-serif" }}>
+    <div style={{ marginBottom: 40, fontFamily: "'Inter', sans-serif" }}>
       <div style={{
         display: "flex", alignItems: "center",
         justifyContent: "space-between",
@@ -367,9 +367,9 @@ export default function EcommerceHome() {
   const s = slides[slide];
 
   return (
-    <div style={{ fontFamily: "'Nunito', sans-serif", background: "#f6f6f8", minHeight: "100vh" }}>
+    <div style={{ fontFamily: "'Inter', sans-serif", background: "#f6f6f8", minHeight: "100vh" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
         /* ── Scroll çubuğunu gizlə ── */
         [style*="overflowX"]::-webkit-scrollbar { display: none; }

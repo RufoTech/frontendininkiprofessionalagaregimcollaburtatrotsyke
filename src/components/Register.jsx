@@ -69,7 +69,12 @@ const Register = () => {
     if (formData.password !== formData.confirmPassword) { toast.error("Şifrələr eyni deyil"); return }
     if (formData.password.length < 8) { toast.error("Şifrə ən azı 8 simvol olmalıdır"); return }
     try {
-      const payload = { name: formData.name, email: formData.email, password: formData.confirmPassword, role: formData.role }
+      const payload = { 
+        name: formData.name, 
+        email: formData.email, 
+        password: formData.password, // Changed from confirmPassword to password for clarity
+        role: formData.role 
+      }
       if (formData.role === 'admin') {
         payload.storeName    = formData.storeName
         payload.storeAddress = formData.storeAddress
@@ -116,11 +121,11 @@ const Register = () => {
     return (
       <>
         <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
           .link-page {
             min-height: 100vh; display: flex; align-items: center;
             justify-content: center; background: #fff;
-            font-family: 'DM Sans', sans-serif; padding: 20px;
+            font-family: 'Inter', sans-serif; padding: 20px;
           }
           .link-card {
             background: #fff; border-radius: 24px; padding: 48px 40px;
@@ -133,7 +138,7 @@ const Register = () => {
             display: flex; align-items: center; justify-content: center;
             margin: 0 auto 24px;
           }
-          .link-title { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; color: #111; margin: 0 0 8px; }
+          .link-title { font-family: 'Inter', sans-serif; font-size: 26px; font-weight: 800; color: #111; margin: 0 0 8px; }
           .link-sub { font-size: 14px; color: #888; margin: 0 0 32px; }
           .link-box {
             background: #fafafa; border: 1.5px solid #eee; border-radius: 14px;
@@ -149,7 +154,7 @@ const Register = () => {
           .link-copy-btn:hover { background: #c8111f; }
           .link-open-btn {
             width: 100%; padding: 13px; background: #E8192C; color: #fff;
-            border: none; border-radius: 12px; font-family: 'Syne', sans-serif;
+            border: none; border-radius: 12px; font-family: 'Inter', sans-serif;
             font-size: 15px; font-weight: 700; cursor: pointer;
             display: flex; align-items: center; justify-content: center; gap: 8px;
             margin-bottom: 12px; transition: background 0.2s, transform 0.15s;
@@ -158,7 +163,7 @@ const Register = () => {
           .link-open-btn:hover { background: #c8111f; transform: translateY(-1px); }
           .link-login-btn {
             width: 100%; padding: 13px; background: transparent; color: #888;
-            border: 1.5px solid #eee; border-radius: 12px; font-family: 'Syne', sans-serif;
+            border: 1.5px solid #eee; border-radius: 12px; font-family: 'Inter', sans-serif;
             font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
           }
           .link-login-btn:hover { border-color: #E8192C; color: #E8192C; }
@@ -215,32 +220,32 @@ const Register = () => {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
-        .reg-root { min-height: 100vh; display: flex; font-family: 'DM Sans', sans-serif; background: #fff; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        .reg-root { min-height: 100vh; display: flex; font-family: 'Inter', sans-serif; background: #fff; }
         .reg-left { flex: 0 0 520px; display: flex; flex-direction: column; justify-content: center; padding: 48px 52px; position: relative; z-index: 2; background: #fff; overflow-y: auto; }
         .reg-logo { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 32px; text-decoration: none; }
-        .reg-logo-icon { width: 40px; height: 40px; background: #E8192C; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; color: #fff; box-shadow: 0 4px 14px rgba(232,25,44,0.35); }
-        .reg-logo-name { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; color: #111; letter-spacing: -0.5px; }
+        .reg-logo-icon { width: 40px; height: 40px; background: #E8192C; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: 'Inter', sans-serif; font-weight: 800; font-size: 22px; color: #fff; box-shadow: 0 4px 14px rgba(232,25,44,0.35); }
+        .reg-logo-name { font-family: 'Inter', sans-serif; font-weight: 800; font-size: 22px; color: #111; letter-spacing: -0.5px; }
         .reg-logo-name span { color: #E8192C; }
-        .reg-heading { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; color: #111; line-height: 1.2; margin: 0 0 6px; }
+        .reg-heading { font-family: 'Inter', sans-serif; font-size: 26px; font-weight: 800; color: #111; line-height: 1.2; margin: 0 0 6px; }
         .reg-sub { font-size: 13px; color: #888; margin: 0 0 24px; }
         .role-toggle { display: flex; background: #f4f4f4; border-radius: 12px; padding: 4px; margin-bottom: 24px; gap: 4px; }
-        .role-btn { flex: 1; padding: 10px 12px; border: none; border-radius: 9px; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; background: transparent; color: #888; transition: all 0.22s ease; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .role-btn { flex: 1; padding: 10px 12px; border: none; border-radius: 9px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; background: transparent; color: #888; transition: all 0.22s ease; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .role-btn.active { background: #fff; color: #E8192C; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
         .role-btn:hover:not(.active) { color: #555; }
         .reg-form { display: flex; flex-direction: column; gap: 15px; }
         .reg-label { display: block; font-size: 12px; font-weight: 500; color: #444; margin-bottom: 5px; }
         .reg-input-wrap { position: relative; }
         .reg-input-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: #bbb; width: 15px; height: 15px; pointer-events: none; }
-        .reg-input { width: 100%; padding: 11px 13px 11px 40px; border: 1.5px solid #eee; border-radius: 11px; background: #fafafa; font-size: max(16px, 13.5px); font-family: 'DM Sans', sans-serif; color: #111; outline: none; transition: border-color 0.2s, background 0.2s, box-shadow 0.2s; box-sizing: border-box; }
+        .reg-input { width: 100%; padding: 11px 13px 11px 40px; border: 1.5px solid #eee; border-radius: 11px; background: #fafafa; font-size: max(16px, 13.5px); font-family: 'Inter', sans-serif; color: #111; outline: none; transition: border-color 0.2s, background 0.2s, box-shadow 0.2s; box-sizing: border-box; }
         .reg-input:focus { border-color: #E8192C; background: #fff; box-shadow: 0 0 0 3px rgba(232,25,44,0.07); }
         .reg-input::placeholder { color: #ccc; }
         .reg-eye-btn { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #bbb; display: flex; padding: 0; transition: color 0.2s; }
         .reg-eye-btn:hover { color: #E8192C; }
         .seller-section { border: 1.5px dashed #f0c0c5; border-radius: 14px; padding: 18px; background: #fff8f8; display: flex; flex-direction: column; gap: 14px; animation: fadeIn 0.3s ease; }
-        .seller-section-title { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; color: #E8192C; text-transform: uppercase; letter-spacing: 1.5px; margin: 0; display: flex; align-items: center; gap: 6px; }
+        .seller-section-title { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; color: #E8192C; text-transform: uppercase; letter-spacing: 1.5px; margin: 0; display: flex; align-items: center; gap: 6px; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
-        .reg-btn { width: 100%; padding: 13px; background: #E8192C; color: #fff; border: none; border-radius: 12px; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; transition: background 0.2s, transform 0.15s, box-shadow 0.2s; box-shadow: 0 4px 16px rgba(232,25,44,0.25); }
+        .reg-btn { width: 100%; padding: 13px; background: #E8192C; color: #fff; border: none; border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; transition: background 0.2s, transform 0.15s, box-shadow 0.2s; box-shadow: 0 4px 16px rgba(232,25,44,0.25); }
         .reg-btn:hover:not(:disabled) { background: #c8111f; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(232,25,44,0.35); }
         .reg-btn:disabled { opacity: 0.65; cursor: not-allowed; }
         .reg-login-link { text-align: center; margin-top: 20px; font-size: 13px; color: #888; }
@@ -254,7 +259,7 @@ const Register = () => {
         .reg-right-circle2 { position: absolute; width: 260px; height: 260px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.06); bottom: 40px; left: -60px; }
         .reg-right-content { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: 64px; color: #fff; }
         .reg-right-tagline { font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 20px; }
-        .reg-right-title { font-family: 'Syne', sans-serif; font-size: 38px; font-weight: 800; line-height: 1.15; margin: 0 0 32px; color: #fff; }
+        .reg-right-title { font-family: 'Inter', sans-serif; font-size: 38px; font-weight: 800; line-height: 1.15; margin: 0 0 32px; color: #fff; }
         .reg-features { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 16px; }
         .reg-feature-item { display: flex; align-items: center; gap: 14px; font-size: 15px; color: rgba(255,255,255,0.85); }
         .reg-feature-dot { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -266,7 +271,7 @@ const Register = () => {
         <div className="reg-left">
           <Link to="/" className="reg-logo">
             <div className="reg-logo-icon">B</div>
-            <span className="reg-logo-name">Brend<span>ex</span></span>
+            <span className="reg-logo-name">BREND<span>EX</span></span>
           </Link>
 
           <h2 className="reg-heading">Yeni Hesab Yaradın 🚀</h2>
@@ -446,6 +451,9 @@ const Register = () => {
           <div className="reg-login-link">
             Artıq hesabınız var?{" "}
             <Link to="/login">Giriş edin</Link>
+            <div style={{ marginTop: 12, fontSize: 11 }}>
+              Qeydiyyatdan keçməklə <Link to="/terms" style={{ fontWeight: 600 }}>Şərtlər və Qaydalar</Link>ımızı qəbul edirsiniz.
+            </div>
           </div>
         </div>
 

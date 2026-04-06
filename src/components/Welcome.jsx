@@ -361,7 +361,7 @@ const Welcome = () => {
 
           {/* Brand adı */}
           <div className={`wl-brand ${step >= 2 ? "show" : ""}`}>
-            <div className="wl-brand-name">Brendex</div>
+            <div className="wl-brand-name">BRENDEX</div>
           </div>
 
           {/* Animated underline */}
@@ -369,7 +369,7 @@ const Welcome = () => {
 
           {/* Subtitle */}
           <p className={`wl-sub ${step >= 4 ? "show" : ""}`}>
-            Keyfiyyətli Alış-veriş
+            Premium Alış-veriş Təcrübəsi
           </p>
         </div>
 
