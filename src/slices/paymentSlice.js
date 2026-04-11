@@ -2,27 +2,20 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// ===================== PAYMENT INTENT YARAT =====================
-// Backend: POST /commerce/mehsullar/products/create-payment-intent
-// Backend cavabı: { success: true, clientSecret: '...' }
-export const createPaymentIntent = createAsyncThunk(
-    'payment/createPaymentIntent',
-    async ({ amount, currency }, thunkAPI) => {
+// ===================== PAYMENT SESSION YARAT =====================
+// Backend: POST /commerce/mehsullar/products/create-payment-intent (endpoint adı əvvəlki kimi qalır, amma funksionallıq fərqlidir)
+export const createPaymentSession = createAsyncThunk(
+    'payment/createPaymentSession',
+    async ({ amount, currency, cardNumber, expiry, cvv }, thunkAPI) => {
         try {
             const response = await axios.post(
                 '/commerce/mehsullar/products/create-payment-intent',
-                { amount, currency },
-                { withCredentials: true } // Cookie-dəki token backend-ə göndərilir (isAuthenticatedUser üçün)
+                { amount, currency, cardNumber, expiry, cvv },
+                { withCredentials: true }
             );
-            // Backend: { success: true, clientSecret: '...' }
             return response.data;
         } catch (error) {
-            // Xəta mesajı backend-dən gəlirsə onu göstər, gəlmirsə ümumi mesaj
-            const message =
-                error.response?.data?.message ||
-                error.response?.data?.error ||
-                error.message ||
-                'Ödəniş xətası baş verdi';
+            const message = error.response?.data?.message || 'Ödəniş xətası baş verdi';
             return thunkAPI.rejectWithValue(message);
         }
     }
@@ -32,29 +25,36 @@ const paymentSlice = createSlice({
     name: 'payment',
     initialState: {
         loading:      false,
-        clientSecret: null,
+        paymentId:    null,
+        redirectUrl:  null,
+        provider:     null,
         error:        null,
     },
     reducers: {
         resetPaymentState: (state) => {
             state.loading      = false;
-            state.clientSecret = null;
+            state.paymentId    = null;
+            state.redirectUrl  = null;
+            state.provider     = null;
             state.error        = null;
         },
     },
     extraReducers: (builder) => {
         builder
-            .addCase(createPaymentIntent.pending, (state) => {
+            .addCase(createPaymentSession.pending, (state) => {
                 state.loading      = true;
                 state.error        = null;
-                state.clientSecret = null;
+                state.paymentId    = null;
+                state.redirectUrl  = null;
+                state.provider     = null;
             })
-            .addCase(createPaymentIntent.fulfilled, (state, action) => {
+            .addCase(createPaymentSession.fulfilled, (state, action) => {
                 state.loading      = false;
-                // Backend { success: true, clientSecret } qaytarır
-                state.clientSecret = action.payload.clientSecret;
+                state.paymentId    = action.payload.paymentId;
+                state.provider     = action.payload.provider;
+                state.redirectUrl  = action.payload.redirectUrl;
             })
-            .addCase(createPaymentIntent.rejected, (state, action) => {
+            .addCase(createPaymentSession.rejected, (state, action) => {
                 state.loading = false;
                 state.error   = action.payload;
             });

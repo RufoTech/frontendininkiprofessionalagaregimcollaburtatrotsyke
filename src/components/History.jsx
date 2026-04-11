@@ -9,7 +9,7 @@ const History = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12">
         {/* Məzmun hissəsi */}
         <div className="space-y-4 sm:space-y-6">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-gray-900 to-red-600 bg-clip-text text-transparent">
             Our History
           </h2>
 
@@ -24,7 +24,7 @@ const History = () => {
           {/* Mobil: tam genişlik düyməsi */}
           <button
             type="button"
-            className="w-full sm:w-auto inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 active:scale-95"
+            className="w-full sm:w-auto inline-block bg-gradient-to-r from-red-600 to-rose-700 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:from-red-700 hover:to-rose-800 transition-all duration-300 transform hover:scale-105 active:scale-95"
           >
             START NOW
           </button>
@@ -32,7 +32,7 @@ const History = () => {
 
         {/* Şəkil hissəsi */}
         <div className="flex items-center justify-center relative mt-4 md:mt-0">
-          <div className="absolute -inset-4 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-xl blur-lg opacity-50"></div>
+          <div className="absolute -inset-4 bg-gradient-to-r from-red-100 to-rose-100 rounded-xl blur-lg opacity-50"></div>
           <img
             src="https://res.cloudinary.com/dwdvr0oxa/image/upload/v1740241625/1_xxbets.jpg"
             alt="Tarihçemizi anlatan görsel"

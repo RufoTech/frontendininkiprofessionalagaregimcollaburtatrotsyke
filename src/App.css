@@ -1,6 +1,194 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@300;400;500;700&family=Syne:wght@400;600;700;800&family=Nunito:wght@400;500;600;700;800;900&family=Bebas+Neue&family=Montserrat:wght@300;400;600&display=swap');
+@import "tailwindcss";
 
 :root {
   font-family: 'Inter', sans-serif;
+  color: #18212f;
+  background:
+    radial-gradient(circle at top left, rgba(232, 25, 44, 0.1), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(22, 163, 74, 0.08), transparent 22%),
+    linear-gradient(180deg, #fffaf8 0%, #f6f7fb 48%, #eef2f7 100%);
+  --app-text: #18212f;
+  --app-muted: #5f6b7c;
+  --app-border: rgba(24, 33, 47, 0.08);
+  --app-card: rgba(255, 255, 255, 0.82);
+  --app-primary: #e8192c;
+  --app-accent: #0f9d58;
+  --app-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  color: var(--app-text);
+  background: transparent;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+a,
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease, border-color 180ms ease;
+}
+
+img {
+  max-width: 100%;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  position: relative;
+  min-height: 100vh;
+}
+
+.app-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 10% 15%, rgba(255, 255, 255, 0.8), transparent 22%),
+    radial-gradient(circle at 90% 12%, rgba(232, 25, 44, 0.08), transparent 18%);
+  z-index: -1;
+}
+
+.route-shell {
+  width: min(1280px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 56px;
+}
+
+.route-shell--wide {
+  width: min(1380px, calc(100% - 24px));
+}
+
+.route-shell--full {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.page-section {
+  position: relative;
+  padding: 28px;
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.72));
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 22px 50px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+.page-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(232, 25, 44, 0.05), transparent 28%, rgba(15, 157, 88, 0.04) 100%);
+}
+
+.section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.section-heading h2,
+.section-heading h3,
+.section-heading p {
+  margin: 0;
+}
+
+.section-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(232, 25, 44, 0.08);
+  color: var(--app-primary);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.floating-orb {
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+  filter: blur(6px);
+  opacity: 0.55;
+}
+
+.floating-orb--rose {
+  background: radial-gradient(circle, rgba(232, 25, 44, 0.18), transparent 68%);
+}
+
+.floating-orb--mint {
+  background: radial-gradient(circle, rgba(15, 157, 88, 0.18), transparent 68%);
+}
+
+.auth-spotlight {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 18% 16%, rgba(232, 25, 44, 0.14), transparent 20%),
+    radial-gradient(circle at 78% 24%, rgba(14, 165, 233, 0.12), transparent 18%),
+    radial-gradient(circle at 50% 100%, rgba(15, 157, 88, 0.08), transparent 22%);
+}
+
+@media (max-width: 900px) {
+  .route-shell,
+  .route-shell--wide {
+    width: min(100% - 20px, 1280px);
+    padding: 18px 0 44px;
+  }
+
+  .page-section {
+    padding: 20px;
+    border-radius: 24px;
+  }
+
+  .section-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .route-shell,
+  .route-shell--wide {
+    width: calc(100% - 14px);
+    padding: 12px 0 30px;
+  }
+
+  .page-section {
+    padding: 16px;
+    border-radius: 20px;
+  }
 }

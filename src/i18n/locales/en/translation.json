@@ -750,5 +750,56 @@
     "gifts_trending": "Trending Products",
     "gifts_books": "Books",
     "allSubcategories": "All"
+  },
+  "storesList": {
+    "title": "All Stores",
+    "foundCount": "stores found",
+    "sortedByRating": "sorted by rating",
+    "sortBy": "Sort by:",
+    "sortRating": "Rating",
+    "sortName": "Name",
+    "noRating": "No reviews",
+    "labelGood": "Good",
+    "labelAvg": "Average",
+    "labelWeak": "Poor",
+    "viewStore": "View Store →",
+    "products": "products",
+    "noStores": "No stores found",
+    "loading": "Loading..."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "desc": "The page you are looking for does not exist or has been moved.",
+    "backHome": "Return to Home"
+  },
+  "adminOrders": {
+    "title": "Store Orders",
+    "refresh": "Refresh",
+    "noOrders": "No orders with this status",
+    "pending": "Pending",
+    "processing": "Processing",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "completed": "Completed",
+    "orderCompleted": "Order completed",
+    "changeStatus": "Change Status",
+    "updating": "Updating...",
+    "deliveredNote": "Order will be finalized — cannot be undone",
+    "currentStatus": "Current",
+    "products": "items"
+  },
+  "myOrders": {
+    "title": "My Orders",
+    "noOrders": "You have no orders yet",
+    "noOrdersDesc": "Your orders will appear here after you make a purchase",
+    "ordersFound": "orders found",
+    "ordersWillAppear": "Your orders will appear here",
+    "completed": "Order completed",
+    "downloadReceipt": "Download Receipt",
+    "pending": "Pending",
+    "processing": "Processing",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "total": "Total"
   }
 }

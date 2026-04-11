@@ -1,28 +1,29 @@
 import { useState } from "react";
-import { useLocation, Link, useNavigate } from "react-router-dom"; // useNavigate əlavə edildi
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import { useSearchProductsQuery } from "../redux/api/productsApi";
+import { useTranslation } from "react-i18next";
 import StarRatings from "react-star-ratings";
-import { Search, Home, ShoppingBag, ShoppingCart, AlertCircle, FilterX } from "lucide-react";
+import { ArrowRight, Home, Search, SearchX, ShoppingBag } from "lucide-react";
 
-// 1. Skeleton Komponenti (Yüklənmə zamanı görünüş)
 const ProductSkeleton = () => (
-  <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm animate-pulse flex flex-col md:flex-row items-center gap-6">
-    <div className="w-full md:w-32 h-32 bg-gray-200 rounded-lg shrink-0"></div>
-    <div className="flex-1 w-full space-y-3">
-      <div className="h-6 bg-gray-200 rounded w-3/4"></div>
-      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-      <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+  <div style={{ borderRadius: 24, background: "rgba(255,255,255,0.9)", border: "1px solid rgba(148,163,184,0.14)", padding: 18, display: "grid", gridTemplateColumns: "120px minmax(0,1fr) 160px", gap: 16, alignItems: "center" }}>
+    <div style={{ height: 120, borderRadius: 18, background: "#e5e7eb" }} />
+    <div style={{ display: "grid", gap: 10 }}>
+      <div style={{ height: 22, borderRadius: 8, background: "#e5e7eb", width: "70%" }} />
+      <div style={{ height: 16, borderRadius: 8, background: "#e5e7eb", width: "40%" }} />
+      <div style={{ height: 16, borderRadius: 8, background: "#e5e7eb", width: "85%" }} />
     </div>
-    <div className="w-full md:w-40 flex flex-col gap-3">
-      <div className="h-8 bg-gray-200 rounded"></div>
-      <div className="h-10 bg-gray-200 rounded"></div>
+    <div style={{ display: "grid", gap: 10 }}>
+      <div style={{ height: 28, borderRadius: 10, background: "#e5e7eb" }} />
+      <div style={{ height: 42, borderRadius: 12, background: "#e5e7eb" }} />
     </div>
   </div>
 );
 
 const SearchResults = () => {
+  const { t } = useTranslation();
   const location = useLocation();
-  const navigate = useNavigate(); // React Router üçün düzgün yönləndirmə
+  const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
   const query = searchParams.get("query") || "";
   const { data: results, isLoading, isError, error } = useSearchProductsQuery(
@@ -31,203 +32,217 @@ const SearchResults = () => {
   );
   const [searchInput, setSearchInput] = useState(query);
   const products = results?.products || [];
-  const defaultImageUrl = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Crect width='300' height='300' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' fill='%239ca3af'%3EŞəkil yoxdur%3C/text%3E%3C/svg%3E";
+  const defaultImageUrl = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Crect width='300' height='300' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' fill='%239ca3af'%3ESekil yoxdur%3C/text%3E%3C/svg%3E";
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    // window.location.href əvəzinə navigate istifadə etmək daha yaxşıdır (SPA üçün)
     navigate(`/search-results?query=${encodeURIComponent(searchInput)}`);
   };
 
-  // Loading Ekranı
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6 max-w-6xl space-y-4 mt-10">
+      <div style={{ display: "grid", gap: 14 }}>
         {[...Array(4)].map((_, i) => <ProductSkeleton key={i} />)}
       </div>
     );
   }
 
-  // Xəta Ekranı — 401 xətalarını authApi idarə edir
   if (isError && error?.status !== 304) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center p-6">
-        <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
-        <h2 className="text-2xl font-bold text-gray-900">Xəta baş verdi</h2>
-        <p className="text-gray-500 mt-2">Məlumatları yükləyərkən problem yarandı. Zəhmət olmasa yenidən cəhd edin.</p>
-      </div>
+      <section className="page-section" style={{ textAlign: "center" }}>
+        <SearchX size={56} color="#e8192c" style={{ marginBottom: 14 }} />
+        <h2 style={{ fontSize: 28, fontWeight: 900, margin: 0 }}>{t("searchResults.errorTitle")}</h2>
+        <p style={{ color: "#64748b", marginTop: 10 }}>{t("searchResults.errorDesc")}</p>
+      </section>
     );
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen pb-20">
-      {/* Header Bölməsi */}
-      <div className="bg-white shadow-sm border-b border-gray-100 mb-8">
-        <div className="container mx-auto px-4 py-6 max-w-6xl">
-          
-          {/* Breadcrumb */}
-          <div className="flex items-center text-sm text-gray-500 mb-6">
-            <Link to="/" className="hover:text-blue-600 flex items-center gap-1 transition-colors">
-              <Home className="w-4 h-4" /> Ana Səhifə
-            </Link>
-            <span className="mx-2 text-gray-300">/</span>
-            <Link to="/shop" className="hover:text-blue-600 flex items-center gap-1 transition-colors">
-              <ShoppingBag className="w-4 h-4" /> Mağaza
-            </Link>
-            <span className="mx-2 text-gray-300">/</span>
-            <span className="text-gray-800 font-medium">Axtarış</span>
-          </div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <section
+        className="page-section"
+        style={{
+          padding: 0,
+          overflow: "hidden",
+          background: "linear-gradient(135deg, #22080c 0%, #7f1520 46%, #ef4444 100%)",
+          color: "#fff",
+        }}
+      >
+        <div className="floating-orb floating-orb--rose" style={{ width: 240, height: 240, top: -70, right: -30 }} />
+        <div className="floating-orb floating-orb--mint" style={{ width: 220, height: 220, bottom: -80, left: -30 }} />
 
-          {/* Axtarış Formu */}
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-6">
-              "{query}" üçün axtarış nəticələri
-            </h1>
-            
-            <form onSubmit={handleSearchSubmit} className="relative shadow-lg rounded-xl">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400" />
+        <div style={{ position: "relative", zIndex: 1, padding: "34px 30px" }}>
+          <nav style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "rgba(255,255,255,0.74)", flexWrap: "wrap", marginBottom: 20 }}>
+            <Link to="/" style={{ color: "#fff", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <Home size={14} /> {t("searchResults.breadcrumbHome")}
+            </Link>
+            <span>/</span>
+            <Link to="/shop" style={{ color: "#fff", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <ShoppingBag size={14} /> {t("searchResults.breadcrumbShop")}
+            </Link>
+            <span>/</span>
+            <span>{t("searchResults.breadcrumbSearch")}</span>
+          </nav>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 22, alignItems: "end" }}>
+            <div>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 14px", borderRadius: 999, background: "rgba(255,255,255,0.12)", fontSize: 12, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                Search results
+              </span>
+              <h1 style={{ margin: "14px 0 8px", fontSize: "clamp(2rem, 4vw, 3.8rem)", lineHeight: 0.96, fontWeight: 900, letterSpacing: "-0.05em" }}>
+                "{query}" {t("searchResults.title")}
+              </h1>
+              <p style={{ margin: 0, color: "rgba(255,255,255,0.8)", lineHeight: 1.7 }}>
+                {results ? `${results.total || results.totalProducts || 0} ${t("searchResults.totalFound")}` : ""}
+              </p>
+            </div>
+
+            <form onSubmit={handleSearchSubmit} style={{ position: "relative" }}>
+              <div style={{ position: "absolute", inset: "0 auto 0 16px", display: "flex", alignItems: "center", color: "#94a3b8" }}>
+                <Search size={18} />
               </div>
               <input
                 type="text"
-                placeholder="Məhsul axtar..."
+                placeholder={t("searchResults.placeholder")}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full pl-11 pr-4 py-4 border-0 rounded-xl ring-1 ring-gray-200 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all text-gray-700 placeholder-gray-400"
+                style={{
+                  width: "100%",
+                  height: 56,
+                  borderRadius: 18,
+                  border: "1px solid rgba(255,255,255,0.16)",
+                  background: "rgba(255,255,255,0.96)",
+                  padding: "0 130px 0 48px",
+                  outline: "none",
+                  color: "#0f172a",
+                }}
               />
-              <button 
-                type="submit" 
-                className="absolute right-2 top-2 bottom-2 bg-blue-600 text-white px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              <button
+                type="submit"
+                style={{
+                  position: "absolute",
+                  right: 6,
+                  top: 6,
+                  bottom: 6,
+                  padding: "0 18px",
+                  borderRadius: 14,
+                  border: "none",
+                  background: "linear-gradient(135deg,#e8192c,#be123c)",
+                  color: "#fff",
+                  fontWeight: 800,
+                  cursor: "pointer",
+                }}
               >
-                Axtar
+                {t("searchResults.searchBtn")}
               </button>
             </form>
-
-            {results && (
-               <p className="text-gray-500 mt-4 font-medium">
-                 {results.total || results.totalProducts || 0} məhsul tapıldı
-               </p>
-            )}
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="container mx-auto px-4 max-w-6xl">
-        
-        {/* Nəticə Tapılmadıqda */}
-        {(!results || products.length === 0) ? (
-          <div className="bg-white rounded-2xl p-12 text-center shadow-sm border border-gray-100">
-            <div className="bg-gray-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
-              <FilterX className="w-12 h-12 text-gray-400" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Heç bir nəticə tapılmadı</h2>
-            <p className="text-gray-500 max-w-md mx-auto">
-              Axtarış sözünü dəyişdirərək və ya daha ümumi sözlər istifadə edərək yenidən cəhd edin.
-            </p>
-            <Link to="/shop" className="inline-block mt-8 px-8 py-3 bg-gray-900 text-white rounded-xl font-medium hover:bg-gray-800 transition-all">
-              Bütün Məhsullara Bax
-            </Link>
+      {(!results || products.length === 0) ? (
+        <section className="page-section" style={{ textAlign: "center" }}>
+          <div style={{ width: 94, height: 94, borderRadius: 28, background: "rgba(232,25,44,0.08)", color: "#e8192c", display: "grid", placeItems: "center", margin: "0 auto 20px" }}>
+            <SearchX size={42} />
           </div>
-        ) : (
-          /* Məhsul Siyahısı */
-          <div className="space-y-4">
+          <h2 style={{ fontSize: 30, fontWeight: 900, margin: 0 }}>{t("searchResults.noResults")}</h2>
+          <p style={{ color: "#64748b", maxWidth: 540, margin: "12px auto 0", lineHeight: 1.75 }}>{t("searchResults.noResultsDesc")}</p>
+          <Link
+            to="/shop"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              marginTop: 22,
+              padding: "14px 18px",
+              borderRadius: 16,
+              background: "linear-gradient(135deg,#e8192c,#be123c)",
+              color: "#fff",
+              textDecoration: "none",
+              fontWeight: 800,
+            }}
+          >
+            {t("searchResults.viewAll")} <ArrowRight size={16} />
+          </Link>
+        </section>
+      ) : (
+        <section className="page-section">
+          <div className="section-heading" style={{ position: "relative", zIndex: 1 }}>
+            <div>
+              <span className="section-kicker">Matched products</span>
+              <h2 style={{ fontSize: 30, fontWeight: 900, letterSpacing: "-0.04em", marginTop: 12 }}>Tapılan məhsullar</h2>
+            </div>
+          </div>
+
+          <div style={{ position: "relative", zIndex: 1, display: "grid", gap: 14 }}>
             {products.map((product) => {
               const imageUrl = product?.images?.[0]?.url || defaultImageUrl;
               const inStock = product.stock > 0;
 
               return (
-                <div 
-                  key={product._id} 
-                  className="group bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-100 transition-all duration-300"
+                <article
+                  key={product._id}
+                  style={{
+                    borderRadius: 24,
+                    background: "rgba(255,255,255,0.9)",
+                    border: "1px solid rgba(148,163,184,0.14)",
+                    boxShadow: "0 18px 38px rgba(15,23,42,0.06)",
+                    padding: 18,
+                    display: "grid",
+                    gridTemplateColumns: "minmax(140px, 180px) minmax(0, 1fr) minmax(160px, 190px)",
+                    gap: 18,
+                    alignItems: "center",
+                  }}
                 >
-                  <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
-                    
-                    {/* Şəkil */}
-                    <div className="relative w-full md:w-48 aspect-[4/3] md:aspect-square shrink-0 overflow-hidden rounded-xl bg-gray-100">
-                      <img
-                        src={imageUrl}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      {!inStock && (
-                        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center">
-                          <span className="bg-gray-900 text-white text-xs font-bold px-3 py-1 rounded-full">Bitib</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Məlumatlar */}
-                    <div className="flex-1 text-center md:text-left w-full">
-                      <Link 
-                        to={`/product/${product._id}`}
-                        className="text-lg md:text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors line-clamp-2 mb-2"
-                      >
-                        {product.name}
-                      </Link>
-                      
-                      <div className="flex items-center justify-center md:justify-start gap-2 mb-3">
-                        <div className="flex text-yellow-400 text-sm">
-                            <StarRatings
-                              rating={product.ratings || 0}
-                              starRatedColor="#FBBF24"
-                              numberOfStars={5}
-                              starDimension="16px"
-                              starSpacing="1px"
-                            />
-                        </div>
-                        <span className="text-xs text-gray-500 font-medium bg-gray-100 px-2 py-0.5 rounded-md">
-                          {product.numOfReviews} rəy
-                        </span>
-                      </div>
-
-                      <p className="text-gray-500 text-sm line-clamp-2 mb-4 hidden md:block">
-                        {product.description || "Məhsul haqqında ətraflı məlumat üçün keçid edin."}
-                      </p>
-
-                      {/* Mobil Stok Statusu */}
-                      <div className="md:hidden mb-3">
-                         <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-md ${
-                            inStock ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-                          }`}>
-                            <div className={`w-1.5 h-1.5 rounded-full ${inStock ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                            {inStock ? 'Stokda var' : 'Stokda yoxdur'}
-                          </span>
-                      </div>
-                    </div>
-
-                    {/* Sağ Tərəf: Qiymət və Düymə */}
-                    <div className="w-full md:w-auto flex flex-col gap-4 md:items-end md:justify-between md:h-full md:border-l md:pl-6 md:border-gray-100">
-                      <div className="text-center md:text-right">
-                        <span className="block text-2xl font-extrabold text-blue-600">
-                          {product.price} ₼
-                        </span>
-                        <span className="text-xs text-gray-400 line-through mr-2">
-                           {/* Əgər endirim varsa köhnə qiyməti bura yaza bilərsiniz */}
-                        </span>
-                         {/* Desktop Stok Statusu */}
-                        <span className={`hidden md:inline-flex items-center gap-1 text-xs font-medium mt-1 ${
-                          inStock ? 'text-green-600' : 'text-red-500'
-                        }`}>
-                          {inStock ? '● Stokda var' : '● Stokda yoxdur'}
-                        </span>
-                      </div>
-
-                      <button 
-                        disabled={!inStock}
-                        className="w-full md:w-auto whitespace-nowrap bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-3 px-6 rounded-xl font-semibold shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2"
-                      >
-                        <ShoppingCart className="w-5 h-5" />
-                        {inStock ? 'Səbətə At' : 'Mövcud Deyil'}
-                      </button>
-                    </div>
-
+                  <div style={{ borderRadius: 18, overflow: "hidden", background: "#f1f5f9", minHeight: 140 }}>
+                    <img src={imageUrl} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   </div>
-                </div>
+
+                  <div>
+                    <Link to={`/product/${product._id}`} style={{ textDecoration: "none", color: "#0f172a", fontSize: 22, fontWeight: 900, lineHeight: 1.3 }}>
+                      {product.name}
+                    </Link>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
+                      <StarRatings rating={product.ratings || 0} starRatedColor="#FBBF24" numberOfStars={5} starDimension="16px" starSpacing="1px" />
+                      <span style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>{product.numOfReviews} {t("searchResults.reviews")}</span>
+                    </div>
+                    <p style={{ color: "#64748b", lineHeight: 1.7, marginTop: 12 }}>
+                      {product.description || t("searchResults.noDescription")}
+                    </p>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: 14, alignItems: "flex-end" }}>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ color: "#e8192c", fontSize: 28, fontWeight: 900 }}>{product.price} ₼</div>
+                      <div style={{ color: inStock ? "#15803d" : "#dc2626", fontSize: 12, fontWeight: 800 }}>
+                        {inStock ? t("searchResults.inStock") : t("searchResults.outOfStock")}
+                      </div>
+                    </div>
+                    <Link
+                      to={`/product/${product._id}`}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 8,
+                        width: "100%",
+                        minHeight: 48,
+                        borderRadius: 16,
+                        background: inStock ? "linear-gradient(135deg,#e8192c,#be123c)" : "#cbd5e1",
+                        color: "#fff",
+                        textDecoration: "none",
+                        fontWeight: 800,
+                      }}
+                    >
+                      {inStock ? t("searchResults.addToCart") : t("searchResults.unavailable")}
+                    </Link>
+                  </div>
+                </article>
               );
             })}
           </div>
-        )}
-      </div>
+        </section>
+      )}
     </div>
   );
 };

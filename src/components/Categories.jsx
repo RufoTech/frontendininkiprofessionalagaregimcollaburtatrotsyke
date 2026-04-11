@@ -33,8 +33,8 @@ const slides = [
     bold:   "ENDİRİM!",
     sub:    "Yeni gələn smartfonlar və aksessuarlar",
     emoji:  "📱",
-    accent: "#69f0ae",
-    bg: "linear-gradient(135deg, #1a237e 0%, #283593 55%, #0d47a1 100%)",
+    accent: "#ffd600",
+    bg: "linear-gradient(135deg, #7f0000 0%, #b71c1c 55%, #c62828 100%)",
   },
 ];
 

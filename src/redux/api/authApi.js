@@ -81,22 +81,11 @@ export const authApi = createApi({
 
         // ── Şifrəni unut ──
         forgotPassword: builder.mutation({
-            query: (body) => {
-                console.log("Sending forgot password request", body);
-                return {
-                    url: "/password/forgot",
-                    method: "POST",
-                    body,
-                };
-            },
-            async onQueryStarted(arg, { queryFulfilled }) {
-                try {
-                    const result = await queryFulfilled;
-                    console.log("Forgot password request successful", result);
-                } catch (error) {
-                    console.error("Forgot password request failed", error);
-                }
-            },
+            query: (body) => ({
+                url: "/password/forgot",
+                method: "POST",
+                body,
+            }),
         }),
 
         // ════════════════════════════════════════════════════
@@ -114,6 +103,12 @@ export const authApi = createApi({
             query: (sellerName) => `/store/seller/${encodeURIComponent(sellerName)}`,
         }),
 
+        // ── BÜTÜN MAĞAZALAR — reytinqə görə sıralı ──
+        getAllStores: builder.query({
+            query: ({ sort = "rating", page = 1, limit = 24 } = {}) =>
+                `/stores?sort=${sort}&page=${page}&limit=${limit}`,
+        }),
+
     }),
 });
 
@@ -126,4 +121,5 @@ export const {
     useGetStoreBySlugQuery,
     useGetStoreSlugBySellerQuery,
     useLazyGetStoreSlugBySellerQuery,
+    useGetAllStoresQuery,
 } = authApi;

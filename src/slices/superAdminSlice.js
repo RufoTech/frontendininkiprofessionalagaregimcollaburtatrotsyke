@@ -147,6 +147,21 @@ export const fetchAllSuperAdmins = createAsyncThunk("superAdmin/fetchSuperAdmins
     catch (e) { return rejectWithValue(e.response?.data?.message || "Xəta"); }
 });
 
+// ── SATICI RƏYLƏRİ ────────────────────────────────────────────────────
+export const fetchAdminReviews = createAsyncThunk("superAdmin/fetchAdminReviews", async (id, { rejectWithValue }) => {
+    try { const { data } = await axios.get(`${BASE}/admins/${id}/reviews`, cfg); return data; }
+    catch (e) { return rejectWithValue(e.response?.data?.message || "Xəta"); }
+});
+
+// ── BÜTÜN SİFARİŞLƏR ─────────────────────────────────────────────────
+export const fetchAllOrders = createAsyncThunk("superAdmin/fetchAllOrders", async (params = {}, { rejectWithValue }) => {
+    try {
+        const q = new URLSearchParams(params).toString();
+        const { data } = await axios.get(`${BASE}/orders?${q}`, cfg);
+        return data;
+    } catch (e) { return rejectWithValue(e.response?.data?.message || "Xəta"); }
+});
+
 // ── localStorage persistence ──────────────────────────────────────────
 const savedAdmin = (() => {
     try { return JSON.parse(localStorage.getItem("superAdminInfo") || "null"); } catch { return null; }
@@ -161,9 +176,14 @@ const superAdminSlice = createSlice({
         admins:         [],  totalAdmins: 0,
         bloggers:       [],  totalBloggers: 0,
         superAdmins:    [],
-        selectedUser:   null,
-        selectedAdmin:  null,
+        selectedUser:    null,
+        selectedAdmin:   null,
         selectedBlogger: null,
+        adminReviews:    [],
+        adminReviewsAvg: 0,
+        adminReviewsCount: 0,
+        allOrders:       [],
+        totalOrders:     0,
         loading:        false,
         error:          null,
         actionResult:   null,
@@ -336,7 +356,26 @@ const superAdminSlice = createSlice({
         // SuperAdmins
          .addCase(fetchAllSuperAdmins.pending, p)
          .addCase(fetchAllSuperAdmins.fulfilled, (s, a) => { s.loading = false; s.superAdmins = a.payload.superAdmins || []; })
-         .addCase(fetchAllSuperAdmins.rejected, r);
+         .addCase(fetchAllSuperAdmins.rejected, r)
+
+        // Satıcı rəyləri
+         .addCase(fetchAdminReviews.pending, p)
+         .addCase(fetchAdminReviews.fulfilled, (s, a) => {
+             s.loading = false;
+             s.adminReviews     = a.payload.reviews    || [];
+             s.adminReviewsAvg  = a.payload.avgRating  || 0;
+             s.adminReviewsCount = a.payload.numReviews || 0;
+         })
+         .addCase(fetchAdminReviews.rejected, r)
+
+        // Bütün sifarişlər
+         .addCase(fetchAllOrders.pending, p)
+         .addCase(fetchAllOrders.fulfilled, (s, a) => {
+             s.loading     = false;
+             s.allOrders   = a.payload.orders || [];
+             s.totalOrders = a.payload.total  || 0;
+         })
+         .addCase(fetchAllOrders.rejected, r);
     },
 });
 

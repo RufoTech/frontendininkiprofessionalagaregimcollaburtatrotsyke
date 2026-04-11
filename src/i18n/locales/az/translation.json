@@ -750,5 +750,56 @@
     "gifts_trending": "Trend məhsullar",
     "gifts_books": "Kitablar",
     "allSubcategories": "Bütün"
+  },
+  "storesList": {
+    "title": "Bütün Mağazalar",
+    "foundCount": "mağaza tapıldı",
+    "sortedByRating": "reytinqə görə sıralanıb",
+    "sortBy": "Sıralama:",
+    "sortRating": "Reytinq",
+    "sortName": "Ad",
+    "noRating": "Rəy yoxdur",
+    "labelGood": "Yaxşı",
+    "labelAvg": "Orta",
+    "labelWeak": "Zəif",
+    "viewStore": "Mağazaya bax →",
+    "products": "məhsul",
+    "noStores": "Mağaza tapılmadı",
+    "loading": "Yüklənir..."
+  },
+  "notFound": {
+    "title": "Səhifə tapılmadı",
+    "desc": "Axtardığınız səhifə mövcud deyil və ya köçürülüb.",
+    "backHome": "Əsas səhifəyə qayıt"
+  },
+  "adminOrders": {
+    "title": "Mağaza Sifarişləri",
+    "refresh": "Yenilə",
+    "noOrders": "Bu statusda sifariş yoxdur",
+    "pending": "Gözlənilir",
+    "processing": "Hazırlanır",
+    "shipped": "Göndərildi",
+    "delivered": "Çatdırıldı",
+    "completed": "Tamamlandı",
+    "orderCompleted": "Sifariş tamamlandı",
+    "changeStatus": "Statusu dəyiş",
+    "updating": "Yenilənir...",
+    "deliveredNote": "Sifariş tamamlanır — geri qaytarıla bilməz",
+    "currentStatus": "Cari",
+    "products": "məhsul"
+  },
+  "myOrders": {
+    "title": "Sifarişlərim",
+    "noOrders": "Hələ heç bir sifarişiniz yoxdur",
+    "noOrdersDesc": "Alış-veriş etdikdən sonra sifarişləriniz burada görünəcək",
+    "ordersFound": "sifariş tapıldı",
+    "ordersWillAppear": "Sifarişləriniz burada görünəcək",
+    "completed": "Sifariş tamamlandı",
+    "downloadReceipt": "Çeki yüklə",
+    "pending": "Gözlənilir",
+    "processing": "Hazırlanır",
+    "shipped": "Göndərildi",
+    "delivered": "Çatdırıldı",
+    "total": "Cəmi"
   }
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Coins, ShoppingBag, ShoppingCart, MessageSquare, ArrowRight, CornerDownRight } from "lucide-react";
+import { ArrowRight, Coins, Gift, MessageSquare, ShoppingCart, Sparkles } from "lucide-react";
 
 export default function BonusBanner() {
   const navigate = useNavigate();
@@ -10,144 +10,151 @@ export default function BonusBanner() {
   const bonuses = [
     {
       id: 1,
-      title: "Aktiv Alıcı Bonusu",
-      desc: "Yeni alıcı qeydiyyatı və ilk alış-verişindən sonra +1 Bonus Coin qazanın.",
-      icon: (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <Coins size={28} color="#eab308" style={{ fill: "#fef08a" }} />
-          <ArrowRight size={18} color="#9ca3af" />
-          <ShoppingBag size={28} color="#f97316" style={{ fill: "#ffedd5" }} />
-        </div>
-      ),
-      bg: "#f8fafc"
+      title: "Yeni hesab bonusu",
+      desc: "Qeydiyyat və ilk alışdan sonra bonus coin qazanaraq növbəti sifarişdə üstünlük əldə edin.",
+      icon: Gift,
+      color: "#e8192c",
+      surface: "linear-gradient(135deg, rgba(232,25,44,0.1), rgba(255,255,255,0.92))",
     },
     {
       id: 2,
-      title: "Səbət Artırma Bonusu",
-      desc: "Minimum 25 AZN-lik səbət üçün +1 Bonus Coin. Əlavə hər 5 AZN üçün daha +1 Bonus Coin.",
-      icon: (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <Coins size={28} color="#eab308" style={{ fill: "#fef08a" }} />
-          <CornerDownRight size={18} color="#9ca3af" />
-          <ShoppingCart size={28} color="#3b82f6" style={{ fill: "#dbeafe" }} />
-        </div>
-      ),
-      bg: "#f8fafc"
+      title: "Səbət artımı mükafatı",
+      desc: "Daha böyük səbət dəyəri daha çox coin deməkdir. Kampaniya vaxtı bu blok conversion üçün daha görünən edildi.",
+      icon: ShoppingCart,
+      color: "#2563eb",
+      surface: "linear-gradient(135deg, rgba(37,99,235,0.1), rgba(255,255,255,0.92))",
     },
     {
       id: 3,
-      title: "Yorum Yazma Bonusu",
-      desc: "Platformada və ya Play Market/iOS-da yorum yazın və +1 Bonus Coin əldə edin.",
-      icon: (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <MessageSquare size={28} color="#10b981" style={{ fill: "#d1fae5" }} />
-          <Coins size={24} color="#eab308" style={{ fill: "#fef08a", position: 'relative', left: -10, top: 10 }} />
-        </div>
-      ),
-      bg: "#f8fafc"
+      title: "Rəy yaz, bonus qazan",
+      desc: "Platforma üçün rəy bildirən istifadəçilər daha aktiv loyallıq dövrünə daxil olur və coin toplayır.",
+      icon: MessageSquare,
+      color: "#0f9d58",
+      surface: "linear-gradient(135deg, rgba(15,157,88,0.1), rgba(255,255,255,0.92))",
     }
   ];
 
   return (
-    <div style={{
-      background: "#fff",
-      borderRadius: 20,
-      padding: "24px 20px",
-      marginBottom: 32,
-      boxShadow: "0 4px 20px rgba(0,0,0,0.03)",
-      position: "relative",
-      overflow: "hidden",
-      border: "1px solid #f1f5f9"
-    }}>
-      {/* Background Decorative Coins */}
-      <div style={{ position: "absolute", top: -20, right: -20, opacity: 0.15, transform: "rotate(15deg)", pointerEvents: "none" }}>
-        <Coins size={120} color="#eab308" />
+    <section
+      style={{
+        position: "relative",
+        overflow: "hidden",
+        borderRadius: 28,
+        padding: "28px 24px",
+        marginBottom: 32,
+        background: "linear-gradient(135deg, #fffdf7 0%, #fff7f2 52%, #ffffff 100%)",
+        border: "1px solid rgba(250,204,21,0.24)",
+        boxShadow: "0 22px 50px rgba(15,23,42,0.08)"
+      }}
+    >
+      <div style={{ position: "absolute", top: -34, right: -24, opacity: 0.12, pointerEvents: "none" }}>
+        <Coins size={150} color="#ca8a04" />
       </div>
-      <div style={{ position: "absolute", bottom: -30, left: -20, opacity: 0.1, transform: "rotate(-15deg)", pointerEvents: "none" }}>
-        <Coins size={100} color="#eab308" />
+      <div style={{ position: "absolute", bottom: -32, left: -16, opacity: 0.1, pointerEvents: "none" }}>
+        <Sparkles size={130} color="#f59e0b" />
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-        <h2 style={{ 
-          fontSize: 22, 
-          fontWeight: 900, 
-          color: "#1e293b", 
-          margin: 0,
-          display: "flex",
-          alignItems: "center",
-          gap: 10
-        }}>
-          Bonus Sistemi
-        </h2>
+      <div style={{ position: "relative", zIndex: 1, display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 16, marginBottom: 22 }}>
+        <div>
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "8px 14px",
+              borderRadius: 999,
+              background: "rgba(250,204,21,0.12)",
+              color: "#a16207",
+              fontSize: 12,
+              fontWeight: 800,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+            }}
+          >
+            Loyalty system
+          </span>
+          <h2 style={{ fontSize: 30, fontWeight: 900, color: "#111827", margin: "12px 0 8px", letterSpacing: "-0.04em" }}>
+            Bonus sistemi artıq daha aydın və daha dəyərli görünür
+          </h2>
+          <p style={{ margin: 0, maxWidth: 700, color: "#6b7280", lineHeight: 1.7 }}>
+            İstifadəçi bonus qaydalarını oxuyarkən yorulmaması üçün kartlar ritmik şəkildə yenidən quruldu və çağırış düyməsi daha görünən edildi.
+          </p>
+        </div>
+
         {isAuthenticated && (
           <button
             onClick={() => navigate("/my-bonus")}
             style={{
-              background: "#eff6ff",
-              color: "#3b82f6",
+              alignSelf: "flex-start",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "14px 18px",
+              borderRadius: 18,
               border: "none",
-              borderRadius: 10,
-              padding: "8px 14px",
-              fontSize: 13,
-              fontWeight: 700,
+              background: "linear-gradient(135deg, #f59e0b, #f97316)",
+              color: "#fff",
+              fontSize: 14,
+              fontWeight: 800,
               cursor: "pointer",
-              transition: "all 0.2s"
+              boxShadow: "0 18px 30px rgba(249,115,22,0.24)"
             }}
-            onMouseEnter={e => e.currentTarget.style.background = "#dbeafe"}
-            onMouseLeave={e => e.currentTarget.style.background = "#eff6ff"}
           >
-            Bonuslarım
+            Bonuslarım <ArrowRight size={16} />
           </button>
         )}
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        {bonuses.map((b) => (
-          <div
-            key={b.id}
-            style={{
-              background: b.bg,
-              border: "1px solid #e2e8f0",
-              borderRadius: 16,
-              padding: "16px",
-              display: "flex",
-              alignItems: "flex-start",
-              gap: 16,
-              transition: "transform 0.2s, box-shadow 0.2s",
-              cursor: "pointer"
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow = "0 6px 16px rgba(0,0,0,0.04)";
-              e.currentTarget.style.borderColor = "#cbd5e1";
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "none";
-              e.currentTarget.style.borderColor = "#e2e8f0";
-            }}
-          >
-            <div style={{ 
-              background: "#fff", 
-              padding: "10px", 
-              borderRadius: 12, 
-              boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-              flexShrink: 0
-            }}>
-              {b.icon}
-            </div>
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gap: 16
+        }}
+      >
+        {bonuses.map((bonus) => {
+          const Icon = bonus.icon;
 
-            <div>
-              <div style={{ fontSize: 15, fontWeight: 800, color: "#0f172a", marginBottom: 6 }}>
-                {b.title}
+          return (
+            <article
+              key={bonus.id}
+              style={{
+                borderRadius: 24,
+                padding: 20,
+                background: bonus.surface,
+                border: "1px solid rgba(255,255,255,0.9)",
+                boxShadow: "0 16px 32px rgba(15,23,42,0.08)",
+                display: "flex",
+                flexDirection: "column",
+                gap: 14
+              }}
+            >
+              <div
+                style={{
+                  width: 52,
+                  height: 52,
+                  borderRadius: 18,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: "#fff",
+                  color: bonus.color,
+                  boxShadow: "0 10px 18px rgba(15,23,42,0.08)"
+                }}
+              >
+                <Icon size={22} />
               </div>
-              <div style={{ fontSize: 13, color: "#64748b", lineHeight: 1.5, fontWeight: 500 }}>
-                {b.desc}
+
+              <div>
+                <h3 style={{ margin: "0 0 8px", fontSize: 18, color: "#111827", fontWeight: 800 }}>{bonus.title}</h3>
+                <p style={{ margin: 0, color: "#667085", lineHeight: 1.7, fontSize: 14 }}>{bonus.desc}</p>
               </div>
-            </div>
-          </div>
-        ))}
+            </article>
+          );
+        })}
       </div>
-    </div>
+    </section>
   );
 }

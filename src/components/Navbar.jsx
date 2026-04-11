@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react"
+import ReactCountryFlag from "react-country-flag"
 import { Link, useNavigate, useLocation } from "react-router-dom"
 import { useSelector, useDispatch } from "react-redux"
 import { logout } from "../redux/features/userSlice"
 import { bloggerLogout } from "../slices/bloggerSlice"
 import { useGetCartQuery, useGetFavoritesQuery } from "../redux/api/productsApi"
+import { useLazyGetStoreSlugBySellerQuery } from "../redux/api/authApi"
 import { setLanguage } from "../slices/languageSlice"
 import { useTranslation } from "react-i18next"
 import {
@@ -328,11 +330,19 @@ const LOCAL_PRODUCTS = [
 ]
 
 const languages = [
-  { code: "az", label: "Azərbaycan", flag: "🇦🇿", short: "AZ" },
-  { code: "en", label: "English",    flag: "🇬🇧", short: "EN" },
-  { code: "ru", label: "Русский",    flag: "🇷🇺", short: "RU" },
-  { code: "tr", label: "Türkçe",     flag: "🇹🇷", short: "TR" },
+  { code: "az", label: "Azərbaycan", countryCode: "AZ", short: "AZ" },
+  { code: "en", label: "English",    countryCode: "GB", short: "EN" },
+  { code: "ru", label: "Русский",    countryCode: "RU", short: "RU" },
+  { code: "tr", label: "Türkçe",     countryCode: "TR", short: "TR" },
 ]
+
+const Flag = ({ countryCode, size = 20 }) => (
+  <ReactCountryFlag
+    countryCode={countryCode}
+    svg
+    style={{ width: size, height: size * 0.7, borderRadius: 3, objectFit: "cover", flexShrink: 0 }}
+  />
+)
 
 const C = {
   primary:     "#E8192C",
@@ -351,6 +361,7 @@ const C = {
 function LanguageSwitcher() {
   const dispatch    = useDispatch()
   const currentLang = useSelector((s) => s.language.currentLang)
+  const { i18n }   = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const ref = useRef(null)
 
@@ -374,7 +385,7 @@ function LanguageSwitcher() {
         color:isOpen ? C.primary : C.mid,
         boxShadow:isOpen ? `0 0 0 3px ${C.rose100}` : "none",
       }}>
-        <span style={{ fontSize: 16 }}>{active.flag}</span>
+        <Flag countryCode={active.countryCode} size={20} />
         <span>{active.label}</span>
         <ChevronDown size={11} style={{ transition: "transform .2s", transform: isOpen ? "rotate(180deg)" : "rotate(0)" }} />
       </button>
@@ -408,7 +419,7 @@ function LanguageSwitcher() {
                 onMouseEnter={e => { if (!isAct) e.currentTarget.style.background = "#f9fafb" }}
                 onMouseLeave={e => { if (!isAct) e.currentTarget.style.background = "transparent" }}
               >
-                <span style={{ fontSize: 18 }}>{lang.flag}</span>
+                <Flag countryCode={lang.countryCode} size={22} />
                 <span>{lang.label}</span>
                 {isAct && <span style={{ marginLeft: "auto", width: 6, height: 6, borderRadius: "50%", background: C.primary }} />}
               </li>
@@ -804,6 +815,16 @@ const Navbar = () => {
   const isAdmin   = user?.user?.role === "admin"
   const isBlogger = !!bloggerProfile?.blogger
 
+  const [getStoreSlug] = useLazyGetStoreSlugBySellerQuery()
+  const handleViewMyStore = async () => {
+    const storeName = user?.user?.sellerInfo?.storeName
+    if (!storeName) return
+    try {
+      const res = await getStoreSlug(storeName).unwrap()
+      if (res?.storeSlug) { navigate(`/store/${res.storeSlug}`); setIsUserMenuOpen(false) }
+    } catch { navigate("/stores"); setIsUserMenuOpen(false) }
+  }
+
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 10)
     window.addEventListener("scroll", fn)
@@ -1079,6 +1100,9 @@ const Navbar = () => {
               )}
             </span>
             <span className="nb-link-anim-3">
+              <Link to="/stores" className={`bnl ${isAct("/stores") ? "on" : ""}`}>Mağazalar</Link>
+            </span>
+            <span className="nb-link-anim-4">
               <Link to="/contact" className={`bnl ${isAct("/contact") ? "on" : ""}`}>{t("navbar.contact")}</Link>
             </span>
           </div>
@@ -1124,6 +1148,7 @@ const Navbar = () => {
                       <div style={{ borderTop:"1px solid #f3f4f6", paddingTop:5 }}>
                         {isAdmin && (
                           <>
+                            <button onClick={handleViewMyStore} style={{ display:"block", width:"100%", textAlign:"left", padding:"8px 12px", borderRadius:10, fontSize:13, color:C.primary, background:"none", border:"none", cursor:"pointer", fontFamily:"'Inter',sans-serif", transition:"background .12s", fontWeight:700 }} onMouseEnter={e => e.currentTarget.style.background=C.rose50} onMouseLeave={e => e.currentTarget.style.background="transparent"}>🏪 Mağazama bax</button>
                             <Link to="/admin/products" onClick={() => setIsUserMenuOpen(false)} style={dropLink} onMouseEnter={e => e.currentTarget.style.background="#f9fafb"} onMouseLeave={e => e.currentTarget.style.background="transparent"}>{t("navbar.adminProducts")}</Link>
                             <Link to="/admin/product"  onClick={() => setIsUserMenuOpen(false)} style={dropLink} onMouseEnter={e => e.currentTarget.style.background="#f9fafb"} onMouseLeave={e => e.currentTarget.style.background="transparent"}>{t("navbar.addProduct")}</Link>
                             <Link to="/admin/orders"   onClick={() => setIsUserMenuOpen(false)} style={dropLink} onMouseEnter={e => e.currentTarget.style.background="#f9fafb"} onMouseLeave={e => e.currentTarget.style.background="transparent"}>🏪 {t("navbar.storeOrders")}</Link>
@@ -1283,6 +1308,7 @@ const Navbar = () => {
             })}
           </div>
 
+          <Link to="/stores" className="bsi" onClick={() => setIsMenuOpen(false)} style={{ marginTop:6 }}><ShoppingBag size={17} color={C.primary} /> Mağazalar</Link>
           <Link to="/contact" className="bsi" onClick={() => setIsMenuOpen(false)} style={{ marginTop:6 }}><MessageCircle size={17} color={C.primary} /> {t("navbar.contact")}</Link>
         </nav>
 
@@ -1298,6 +1324,7 @@ const Navbar = () => {
               <>
                 {isAdmin && (
                   <>
+                    <button className="bsi" onClick={() => { handleViewMyStore(); setIsMenuOpen(false) }} style={{ background:"none", border:"none", cursor:"pointer", color:C.primary, fontWeight:700, textAlign:"left", width:"100%" }}>🏪 Mağazama bax</button>
                     <Link to="/admin/products"    className="bsi" onClick={() => setIsMenuOpen(false)}>{t("navbar.adminProducts")}</Link>
                     <Link to="/admin/product"     className="bsi" onClick={() => setIsMenuOpen(false)}>{t("navbar.addProduct")}</Link>
                     <Link to="/admin/orders"      className="bsi" onClick={() => setIsMenuOpen(false)}>🏪 {t("navbar.storeOrders")}</Link>

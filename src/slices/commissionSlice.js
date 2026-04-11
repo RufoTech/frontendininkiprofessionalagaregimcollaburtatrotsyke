@@ -1,6 +1,58 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as api from "./commissionApi";
 
+// ── ADMİN: bütün komisyalar ────────────────────────────────────────────────
+export const getAdminAllCommissions = createAsyncThunk(
+  "commission/adminAllCommissions",
+  async (params, { rejectWithValue }) => {
+    try {
+      const { data } = await api.fetchAdminAllCommissions(params);
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Xəta baş verdi");
+    }
+  }
+);
+
+// ── ADMİN: bütün satıcı balansları ────────────────────────────────────────
+export const getAdminAllBalances = createAsyncThunk(
+  "commission/adminAllBalances",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await api.fetchAdminAllBalances();
+      return data.balances;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Xəta baş verdi");
+    }
+  }
+);
+
+// ── SİMULYASİYA WEBHOOK ────────────────────────────────────────────────────
+export const doSimulateWebhook = createAsyncThunk(
+  "commission/simulateWebhook",
+  async ({ providerOrderId, eventType }, { rejectWithValue }) => {
+    try {
+      const { data } = await api.simulateWebhook(providerOrderId, eventType);
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Xəta baş verdi");
+    }
+  }
+);
+
+// ── KOMİSYA STATUS YOXLAMA ─────────────────────────────────────────────────
+export const checkCommissionStatus = createAsyncThunk(
+  "commission/checkStatus",
+  async (orderId, { rejectWithValue }) => {
+    try {
+      const { data } = await api.fetchCommissionStatus(orderId);
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Xəta baş verdi");
+    }
+  }
+);
+
 // ════════════════════════════════════════════════════════════════════════════
 //  ASYNC THUNK-LAR
 // ════════════════════════════════════════════════════════════════════════════
@@ -62,14 +114,20 @@ const commissionSlice = createSlice({
                             //   totalWithdrawn, totalOrderAmount }
     monthly:        null,   // { totalOrderAmount, totalSellerEarning,
                             //   settledSellerEarning, pendingSellerEarning, ... }
-    withdrawResult: null,
-    loading:        false,
-    error:          null,
+    withdrawResult:    null,
+    // Admin görünüşü
+    adminCommissions:  null,  // { count, commissions[] }
+    adminBalances:     null,  // balances[]
+    // Simulyasiya
+    simulateResult:    null,
+    loading:           false,
+    error:             null,
   },
   reducers: {
     clearCommissionState: (state) => {
       state.error          = null;
       state.withdrawResult = null;
+      state.simulateResult = null;
     },
   },
   extraReducers: (builder) => {
@@ -102,14 +160,44 @@ const commissionSlice = createSlice({
         state.withdrawResult = action.payload;
 
         if (action.payload?.success && state.balance) {
-          // Serverden gelen remainingBalance-i götür — daha etibarlı
           state.balance.availableBalance =
             action.payload.remainingBalance ?? state.balance.availableBalance;
-          // totalWithdrawn-ı optimistik yenilə
-          // (dəqiq dəyər üçün getSellerBalance yenidən çağırıla bilər)
         }
       })
-      .addCase(doWithdrawBalance.rejected,  setRejected);
+      .addCase(doWithdrawBalance.rejected,  setRejected)
+
+      // ── getAdminAllCommissions ──────────────────────────────────────
+      .addCase(getAdminAllCommissions.pending,   setPending)
+      .addCase(getAdminAllCommissions.fulfilled, (state, action) => {
+        state.loading           = false;
+        state.adminCommissions  = action.payload;
+      })
+      .addCase(getAdminAllCommissions.rejected,  setRejected)
+
+      // ── getAdminAllBalances ─────────────────────────────────────────
+      .addCase(getAdminAllBalances.pending,   setPending)
+      .addCase(getAdminAllBalances.fulfilled, (state, action) => {
+        state.loading       = false;
+        state.adminBalances = action.payload;
+      })
+      .addCase(getAdminAllBalances.rejected,  setRejected)
+
+      // ── doSimulateWebhook ───────────────────────────────────────────
+      .addCase(doSimulateWebhook.pending,   setPending)
+      .addCase(doSimulateWebhook.fulfilled, (state, action) => {
+        state.loading        = false;
+        state.simulateResult = { success: true, ...action.payload };
+      })
+      .addCase(doSimulateWebhook.rejected, (state, action) => {
+        state.loading        = false;
+        state.simulateResult = { success: false, message: action.payload };
+        state.error          = action.payload;
+      })
+
+      // ── checkCommissionStatus ───────────────────────────────────────
+      .addCase(checkCommissionStatus.pending,   setPending)
+      .addCase(checkCommissionStatus.fulfilled, (state) => { state.loading = false; })
+      .addCase(checkCommissionStatus.rejected,  setRejected);
   },
 });
 

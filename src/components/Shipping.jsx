@@ -8,7 +8,7 @@ const Shipping = () => {
           
           {/* Free Shipping */}
           <div className="flex flex-col items-center text-center bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <div className="text-blue-600 bg-blue-50 p-4 rounded-full">
+            <div className="text-red-600 bg-red-50 p-4 rounded-full">
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
                 fill="none" 
@@ -56,7 +56,7 @@ const Shipping = () => {
 
           {/* 30 Day Return */}
           <div className="flex flex-col items-center text-center bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <div className="text-purple-600 bg-purple-50 p-4 rounded-full">
+            <div className="text-red-600 bg-red-50 p-4 rounded-full">
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
                 fill="none" 

@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setLanguage } from '../slices/languageSlice';
 import { useState, useRef, useEffect } from 'react';
 import { Globe } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const languages = [
   { code: 'az', label: 'Azərbaycan', flag: '🇦🇿' },
@@ -12,6 +13,7 @@ const languages = [
 
 export default function LanguageSwitcher() {
   const dispatch = useDispatch();
+  const { i18n } = useTranslation();
   const currentLang = useSelector((state) => state.language.currentLang);
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
@@ -105,6 +107,8 @@ export default function LanguageSwitcher() {
               <li
                 key={lang.code}
                 onClick={() => {
+                  i18n.changeLanguage(lang.code);
+                  localStorage.setItem('lang', lang.code);
                   dispatch(setLanguage(lang.code));
                   setIsOpen(false);
                 }}

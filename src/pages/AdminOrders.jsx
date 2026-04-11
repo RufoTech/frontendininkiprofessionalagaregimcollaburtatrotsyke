@@ -1,324 +1,370 @@
-// src/pages/AdminOrders.jsx
-
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAdminOrders, updateOrderStatus } from "../slices/orderSlice";
+import { useTranslation } from "react-i18next";
 import {
-    ShoppingBag, Loader2, PackageCheck,
-    Truck, Clock, CheckCircle2, ChevronDown,
-    Store, RefreshCw,
+  CheckCircle2,
+  ChevronDown,
+  Clock,
+  Loader2,
+  PackageCheck,
+  RefreshCw,
+  ShoppingBag,
+  Store,
+  Truck,
 } from "lucide-react";
 
-// ── STATUS KONFİQURASİYASI ────────────────────────────────────────────────
-// Hər 5 status üçün label, rəng və ikon təyin edilir.
-// "delivered" → "Çatdırıldı", "completed" → isCompleted=true olan sifarişlər.
 const STATUS_CONFIG = {
-    pending:    { label: "Gözlənilir",  color: "bg-yellow-100 text-yellow-700 border-yellow-200", Icon: Clock },
-    processing: { label: "Hazırlanır",  color: "bg-blue-100 text-blue-700 border-blue-200",       Icon: PackageCheck },
-    shipped:    { label: "Göndərildi",  color: "bg-purple-100 text-purple-700 border-purple-200", Icon: Truck },
-    delivered:  { label: "Çatdırıldı", color: "bg-green-100 text-green-700 border-green-200",    Icon: CheckCircle2 },
+  pending: { label: "Gözlənilir", color: "rgba(245,158,11,0.12)", text: "#b45309", Icon: Clock },
+  processing: { label: "Hazırlanır", color: "rgba(217,119,6,0.12)", text: "#b45309", Icon: PackageCheck },
+  shipped: { label: "Göndərildi", color: "rgba(6,182,212,0.12)", text: "#0e7490", Icon: Truck },
+  delivered: { label: "Çatdırıldı", color: "rgba(34,197,94,0.12)", text: "#15803d", Icon: CheckCircle2 },
 };
 
 const StatusBadge = ({ status }) => {
-    const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.pending;
-    return (
-        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border ${cfg.color}`}>
-            <cfg.Icon className="w-3.5 h-3.5" />
-            {cfg.label}
-        </span>
-    );
+  const { t } = useTranslation();
+  const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.pending;
+  const labels = {
+    pending: t("adminOrders.pending"),
+    processing: t("adminOrders.processing"),
+    shipped: t("adminOrders.shipped"),
+    delivered: t("adminOrders.delivered"),
+  };
+
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 12px", borderRadius: 999, background: cfg.color, color: cfg.text, fontSize: 12, fontWeight: 800 }}>
+      <cfg.Icon size={13} />
+      {labels[status] || cfg.label}
+    </span>
+  );
 };
 
-// ── TAMAMLANDI BANNERİ ────────────────────────────────────────────────────
-// isCompleted === true olduqda sifariş kartının üstündə göstərilir.
-const CompletedBanner = () => (
-    <div className="flex items-center gap-2 px-6 py-2.5 bg-green-50 border-b border-green-100">
-        <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
-        <span className="text-xs font-semibold text-green-700">Sifariş tamamlandı</span>
+const CompletedBanner = () => {
+  const { t } = useTranslation();
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 18px", background: "#f0fdf4", borderBottom: "1px solid #bbf7d0", color: "#15803d", fontSize: 12, fontWeight: 800 }}>
+      <CheckCircle2 size={14} />
+      {t("adminOrders.orderCompleted")}
     </div>
-);
-
-// ── STATUS DROPDOWN ───────────────────────────────────────────────────────
-// Satıcı bu dropdown vasitəsilə sifarişin statusunu dəyişdirir.
-// "delivered" seçildikdə sifariş bağlanır: isCompleted = true olur.
-// isCompleted === true olduqda dropdown yerinə statik "Tamamlandı" badge-i göstərilir.
-const StatusDropdown = ({ orderId, currentStatus, isCompleted, onUpdate, updating }) => {
-    const [open, setOpen] = useState(false);
-
-    const statuses = [
-        { value: "pending",    label: "Gözlənilir", Icon: Clock,        note: null },
-        { value: "processing", label: "Hazırlanır", Icon: PackageCheck, note: null },
-        { value: "shipped",    label: "Göndərildi", Icon: Truck,        note: null },
-        {
-            value: "delivered",
-            label: "Çatdırıldı",
-            Icon: CheckCircle2,
-            note: "Sifariş tamamlanır — geri qaytarıla bilməz",
-        },
-    ];
-
-    const handleSelect = (status) => {
-        if (status === currentStatus) { setOpen(false); return; }
-        onUpdate(orderId, status);
-        setOpen(false);
-    };
-
-    useEffect(() => {
-        if (!open) return;
-        const handler = () => setOpen(false);
-        document.addEventListener("click", handler);
-        return () => document.removeEventListener("click", handler);
-    }, [open]);
-
-    // Tamamlanmış sifarişdə dropdown göstərilmir — dəyişdirilə bilməz
-    if (isCompleted) {
-        return (
-            <div className="flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 text-green-700 text-sm font-semibold rounded-lg">
-                <CheckCircle2 className="w-4 h-4" />
-                Tamamlandı
-            </div>
-        );
-    }
-
-    return (
-        <div className="relative" onClick={(e) => e.stopPropagation()}>
-            <button
-                onClick={() => setOpen((prev) => !prev)}
-                disabled={updating}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors"
-            >
-                {updating ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Yenilənir...</>
-                ) : (
-                    <>Statusu dəyiş <ChevronDown className={`w-4 h-4 transition-transform ${open ? "rotate-180" : ""}`} /></>
-                )}
-            </button>
-
-            {open && (
-                <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-lg z-10 overflow-hidden">
-                    {statuses.map(({ value, label, Icon, note }) => {
-                        const isActive    = value === currentStatus;
-                        const isDelivered = value === "delivered";
-                        return (
-                            <button
-                                key={value}
-                                onClick={() => handleSelect(value)}
-                                className={`w-full flex items-start gap-3 px-4 py-3 text-sm text-left transition-colors
-                                    ${isActive    ? "bg-gray-100 font-semibold" : ""}
-                                    ${isDelivered && !isActive ? "hover:bg-green-50" : "hover:bg-gray-50"}
-                                `}
-                            >
-                                <Icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${isDelivered ? "text-green-600" : "text-gray-500"}`} />
-                                <span className="flex flex-col">
-                                    <span className={isDelivered ? "text-green-700 font-semibold" : ""}>{label}</span>
-                                    {note && (
-                                        <span className="text-xs text-orange-500 mt-0.5 font-normal">{note}</span>
-                                    )}
-                                </span>
-                                {isActive && <span className="ml-auto text-xs text-gray-400 mt-0.5">Cari</span>}
-                            </button>
-                        );
-                    })}
-                </div>
-            )}
-        </div>
-    );
+  );
 };
 
+const StatusDropdown = ({ orderId, currentStatus, isCompleted, onUpdate, updating }) => {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
 
-// ── ANA KOMPONENTİ ────────────────────────────────────────────────────────
-const AdminOrders = () => {
-    const dispatch = useDispatch();
-    const { adminOrders, loading, error } = useSelector((state) => state.order);
-    const { user } = useSelector((state) => state.userSlice);
-    const [updatingId, setUpdatingId]   = useState(null);
-    const [filterStatus, setFilterStatus] = useState("all");
+  const statuses = [
+    { value: "pending", label: t("adminOrders.pending"), Icon: Clock },
+    { value: "processing", label: t("adminOrders.processing"), Icon: PackageCheck },
+    { value: "shipped", label: t("adminOrders.shipped"), Icon: Truck },
+    { value: "delivered", label: t("adminOrders.delivered"), Icon: CheckCircle2, note: t("adminOrders.deliveredNote") },
+  ];
 
-    useEffect(() => {
-        dispatch(getAdminOrders());
-    }, [dispatch]);
+  useEffect(() => {
+    if (!open) return undefined;
+    const handler = () => setOpen(false);
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, [open]);
 
-    const handleStatusUpdate = async (orderId, status) => {
-        setUpdatingId(orderId);
-        await dispatch(updateOrderStatus({ orderId, status }));
-        setUpdatingId(null);
-        // "delivered" seçildikdə slice artıq isCompleted-i yeniləyir —
-        // getAdminOrders yenidən çağırmağa ehtiyac yoxdur.
-        // Amma digər hallarda da sinxron qalmaq üçün yenidən yükləyirik.
-        dispatch(getAdminOrders());
-    };
-
-    // ── FİLTR MƏNTİQİ ────────────────────────────────────────────────
-    // "completed" → isCompleted === true olan bütün sifarişlər
-    // "delivered" → orderStatus === "delivered" (isCompleted ilə eyni ola bilər)
-    // digər statuslar → orderStatus ilə uyğunlaşdırılır
-    const filteredOrders = (() => {
-        if (filterStatus === "all")       return adminOrders;
-        if (filterStatus === "completed") return adminOrders.filter((o) => o.isCompleted);
-        return adminOrders.filter((o) => o.orderStatus === filterStatus);
-    })();
-
-    // ── STATİSTİKA ────────────────────────────────────────────────────
-    const stats = {
-        all:        adminOrders.length,
-        pending:    adminOrders.filter((o) => o.orderStatus === "pending").length,
-        processing: adminOrders.filter((o) => o.orderStatus === "processing").length,
-        shipped:    adminOrders.filter((o) => o.orderStatus === "shipped").length,
-        delivered:  adminOrders.filter((o) => o.orderStatus === "delivered").length,
-        completed:  adminOrders.filter((o) => o.isCompleted).length,
-    };
-
-    // ── FİLTR DÜYMƏLƏRİ ──────────────────────────────────────────────
-    // 6 düymə: Hamısı, Gözlənilir, Hazırlanır, Göndərildi, Çatdırıldı, Tamamlandı
-    const filterButtons = [
-        { key: "all",        label: "Hamısı",     color: "bg-gray-900 text-white" },
-        { key: "pending",    label: "Gözlənilir", color: "bg-yellow-50 text-yellow-700 border border-yellow-200" },
-        { key: "processing", label: "Hazırlanır", color: "bg-blue-50 text-blue-700 border border-blue-200" },
-        { key: "shipped",    label: "Göndərildi", color: "bg-purple-50 text-purple-700 border border-purple-200" },
-        { key: "delivered",  label: "Çatdırıldı", color: "bg-green-50 text-green-700 border border-green-200" },
-        { key: "completed",  label: "Tamamlandı", color: "bg-emerald-50 text-emerald-700 border border-emerald-200" },
-    ];
-
-    if (loading && adminOrders.length === 0) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="w-10 h-10 animate-spin text-gray-700" />
-            </div>
-        );
-    }
-
+  if (isCompleted) {
     return (
-        <div className="min-h-screen bg-gray-50 py-10">
-            <div className="max-w-6xl mx-auto px-4">
-
-                {/* ── BAŞLIQ ─────────────────────────────────────────── */}
-                <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-3">
-                        <Store className="w-7 h-7 text-gray-800" />
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-900">Mağaza Sifarişləri</h1>
-                            <p className="text-sm text-gray-500 mt-0.5">{user?.sellerInfo?.storeName || "Mağazanız"}</p>
-                        </div>
-                    </div>
-                    <button
-                        onClick={() => dispatch(getAdminOrders())}
-                        disabled={loading}
-                        className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50"
-                    >
-                        <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /> Yenilə
-                    </button>
-                </div>
-
-                {/* ── STATİSTİKA KARTLARI ────────────────────────────── */}
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 mb-8">
-                    {filterButtons.map(({ key, label, color }) => (
-                        <button
-                            key={key}
-                            onClick={() => setFilterStatus(key)}
-                            className={`rounded-xl p-4 text-center transition-all ${color}
-                                ${filterStatus === key
-                                    ? "ring-2 ring-offset-1 ring-gray-400 shadow-md scale-105"
-                                    : "hover:opacity-80 hover:scale-102"
-                                }`}
-                        >
-                            <p className="text-2xl font-bold">{stats[key]}</p>
-                            <p className="text-xs mt-1 font-medium">{label}</p>
-                        </button>
-                    ))}
-                </div>
-
-                {/* ── XƏTA ───────────────────────────────────────────── */}
-                {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 mb-6">
-                        {error}
-                    </div>
-                )}
-
-                {/* ── BOŞ VƏZİYYƏT ───────────────────────────────────── */}
-                {filteredOrders.length === 0 ? (
-                    <div className="text-center py-20 bg-white rounded-2xl border border-gray-200">
-                        <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                        <p className="text-gray-500 text-lg">Bu statusda sifariş yoxdur</p>
-                    </div>
-                ) : (
-                    <div className="space-y-5">
-                        {filteredOrders.map((order) => {
-                            const orderId = order.id || order._id;
-                            return (
-                                <div
-                                    key={orderId}
-                                    className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden"
-                                >
-                                    {/* Tamamlanmış sifarişdə yaşıl banner */}
-                                    {order.isCompleted && <CompletedBanner />}
-
-                                    {/* ── SİFARİŞ BAŞLIĞI ─────────────────────────── */}
-                                    <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-4 bg-gray-50 border-b border-gray-200">
-                                        <div className="flex items-center gap-6">
-                                            <div>
-                                                <p className="text-xs text-gray-400 mb-0.5">Sifariş tarixi</p>
-                                                <p className="text-sm font-medium text-gray-800">
-                                                    {new Date(order.createdAt).toLocaleDateString("az-AZ", {
-                                                        day: "2-digit", month: "long", year: "numeric",
-                                                    })}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <p className="text-xs text-gray-400 mb-0.5">Ümumi məbləğ</p>
-                                                <p className="text-sm font-bold text-gray-900">
-                                                    {order.totalAmount?.toFixed(2)} ₼
-                                                </p>
-                                            </div>
-                                            <StatusBadge status={order.orderStatus} />
-                                        </div>
-
-                                        {/* Status dəyişdirmə düyməsi */}
-                                        <StatusDropdown
-                                            orderId={orderId}
-                                            currentStatus={order.orderStatus}
-                                            isCompleted={order.isCompleted}
-                                            onUpdate={handleStatusUpdate}
-                                            updating={updatingId === orderId}
-                                        />
-                                    </div>
-
-                                    {/* ── MƏHSULLAR ───────────────────────────────── */}
-                                    <div className="px-6 py-4 space-y-3">
-                                        {order.orderItems?.map((item, index) => (
-                                            <div key={index} className="flex items-center gap-4">
-                                                <div className="w-14 h-14 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                                                    <img
-                                                        src={item.image || "/placeholder.svg"}
-                                                        alt={item.name}
-                                                        className="w-full h-full object-cover"
-                                                        onError={(e) => { e.target.src = "/placeholder.svg"; }}
-                                                    />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="font-medium text-gray-900 text-sm truncate">{item.name}</p>
-                                                    <p className="text-xs text-gray-500">Say: {item.quantity}</p>
-                                                </div>
-                                                <p className="font-semibold text-gray-800 text-sm whitespace-nowrap">
-                                                    {(item.price * item.quantity).toFixed(2)} ₼
-                                                </p>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {/* ── ALT HİSSƏ — SİFARİŞ ID ─────────────────── */}
-                                    <div className="px-6 py-3 bg-gray-50 border-t border-gray-100">
-                                        <p className="text-xs text-gray-400">
-                                            Sifariş № <span className="font-mono">{orderId}</span>
-                                        </p>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
-            </div>
-        </div>
+      <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 16, background: "#f0fdf4", color: "#15803d", fontWeight: 800, fontSize: 13 }}>
+        <CheckCircle2 size={15} />
+        {t("adminOrders.completed")}
+      </div>
     );
+  }
+
+  return (
+    <div style={{ position: "relative" }} onClick={(event) => event.stopPropagation()}>
+      <button
+        onClick={() => setOpen((prev) => !prev)}
+        disabled={updating}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "12px 16px",
+          borderRadius: 16,
+          border: "none",
+          background: "linear-gradient(135deg,#111827,#334155)",
+          color: "#fff",
+          fontSize: 13,
+          fontWeight: 800,
+          cursor: "pointer",
+        }}
+      >
+        {updating ? <><Loader2 size={15} className="animate-spin" /> {t("adminOrders.updating")}</> : <>{t("adminOrders.changeStatus")} <ChevronDown size={15} /></>}
+      </button>
+
+      {open && (
+        <div style={{ position: "absolute", right: 0, top: "calc(100% + 10px)", minWidth: 250, borderRadius: 18, background: "#fff", border: "1px solid rgba(148,163,184,0.18)", boxShadow: "0 22px 48px rgba(15,23,42,0.12)", overflow: "hidden", zIndex: 20 }}>
+          {statuses.map(({ value, label, Icon, note }) => (
+            <button
+              key={value}
+              onClick={() => {
+                if (value !== currentStatus) onUpdate(orderId, value);
+                setOpen(false);
+              }}
+              style={{
+                width: "100%",
+                display: "flex",
+                alignItems: "start",
+                gap: 10,
+                padding: "14px 16px",
+                border: "none",
+                background: value === currentStatus ? "rgba(15,23,42,0.05)" : "#fff",
+                cursor: "pointer",
+                textAlign: "left",
+              }}
+            >
+              <Icon size={16} color={value === "delivered" ? "#15803d" : "#64748b"} style={{ marginTop: 2 }} />
+              <span style={{ display: "grid", gap: 4 }}>
+                <span style={{ fontSize: 13, fontWeight: 800, color: value === "delivered" ? "#15803d" : "#0f172a" }}>{label}</span>
+                {note && <span style={{ fontSize: 12, color: "#f97316" }}>{note}</span>}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const AdminOrders = () => {
+  const { t } = useTranslation();
+  const dispatch = useDispatch();
+  const { adminOrders, loading, error } = useSelector((state) => state.order);
+  const { user } = useSelector((state) => state.userSlice);
+  const [updatingId, setUpdatingId] = useState(null);
+  const [filterStatus, setFilterStatus] = useState("all");
+
+  useEffect(() => {
+    dispatch(getAdminOrders());
+  }, [dispatch]);
+
+  const handleStatusUpdate = async (orderId, status) => {
+    setUpdatingId(orderId);
+    await dispatch(updateOrderStatus({ orderId, status }));
+    setUpdatingId(null);
+    dispatch(getAdminOrders());
+  };
+
+  const filteredOrders = (() => {
+    if (filterStatus === "all") return adminOrders;
+    if (filterStatus === "completed") return adminOrders.filter((o) => o.isCompleted);
+    return adminOrders.filter((o) => o.orderStatus === filterStatus);
+  })();
+
+  const stats = {
+    all: adminOrders.length,
+    pending: adminOrders.filter((o) => o.orderStatus === "pending").length,
+    processing: adminOrders.filter((o) => o.orderStatus === "processing").length,
+    shipped: adminOrders.filter((o) => o.orderStatus === "shipped").length,
+    delivered: adminOrders.filter((o) => o.orderStatus === "delivered").length,
+    completed: adminOrders.filter((o) => o.isCompleted).length,
+  };
+
+  const filterButtons = [
+    { key: "all", label: t("common.seeAll"), bg: "linear-gradient(135deg,#111827,#334155)", color: "#fff" },
+    { key: "pending", label: t("adminOrders.pending"), bg: "#fffbeb", color: "#b45309" },
+    { key: "processing", label: t("adminOrders.processing"), bg: "#fff7ed", color: "#b45309" },
+    { key: "shipped", label: t("adminOrders.shipped"), bg: "#ecfeff", color: "#0e7490" },
+    { key: "delivered", label: t("adminOrders.delivered"), bg: "#f0fdf4", color: "#15803d" },
+    { key: "completed", label: t("adminOrders.completed"), bg: "#ecfdf5", color: "#047857" },
+  ];
+
+  if (loading && adminOrders.length === 0) {
+    return (
+      <section className="page-section" style={{ minHeight: 320, display: "grid", placeItems: "center" }}>
+        <Loader2 size={38} color="#e8192c" className="animate-spin" />
+      </section>
+    );
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <section
+        className="page-section"
+        style={{
+          padding: 0,
+          overflow: "hidden",
+          background: "linear-gradient(135deg, #22080c 0%, #7f1520 46%, #ef4444 100%)",
+          color: "#fff",
+        }}
+      >
+        <div className="floating-orb floating-orb--rose" style={{ width: 240, height: 240, top: -70, right: -30 }} />
+        <div className="floating-orb floating-orb--mint" style={{ width: 220, height: 220, bottom: -80, left: -30 }} />
+
+        <div style={{ position: "relative", zIndex: 1, padding: "34px 30px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24, alignItems: "end" }}>
+          <div>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 14px", borderRadius: 999, background: "rgba(255,255,255,0.12)", fontSize: 12, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+              Seller dashboard
+            </span>
+            <h1 style={{ margin: "14px 0 8px", fontSize: "clamp(2rem, 4vw, 3.8rem)", lineHeight: 0.96, fontWeight: 900, letterSpacing: "-0.05em" }}>
+              {t("adminOrders.title")}
+            </h1>
+            <p style={{ margin: 0, color: "rgba(255,255,255,0.8)", lineHeight: 1.7 }}>
+              {user?.sellerInfo?.storeName || "Mağazanız"} üçün sifariş axını daha rahat idarə olunur.
+            </p>
+          </div>
+
+          <div style={{ justifySelf: "end", display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "flex-end" }}>
+            <div style={{ padding: "16px 18px", borderRadius: 20, background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.18)", backdropFilter: "blur(14px)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 46, height: 46, borderRadius: 16, background: "#fff", color: "#e8192c", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Store size={20} />
+                </div>
+                <div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.72)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>Store</div>
+                  <div style={{ fontWeight: 900 }}>{stats.all}</div>
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => dispatch(getAdminOrders())}
+              disabled={loading}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "14px 18px",
+                borderRadius: 16,
+                background: "rgba(255,255,255,0.12)",
+                color: "#fff",
+                border: "1px solid rgba(255,255,255,0.18)",
+                fontWeight: 800,
+                cursor: "pointer",
+              }}
+            >
+              <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+              {t("adminOrders.refresh")}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section className="page-section">
+        <div className="section-heading" style={{ position: "relative", zIndex: 1 }}>
+          <div>
+            <span className="section-kicker">Order states</span>
+            <h2 style={{ fontSize: 30, fontWeight: 900, letterSpacing: "-0.04em", marginTop: 12 }}>Mağaza sifarişləri</h2>
+          </div>
+        </div>
+
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 12, marginBottom: 22 }}>
+            {filterButtons.map(({ key, label, bg, color }) => (
+              <button
+                key={key}
+                onClick={() => setFilterStatus(key)}
+                style={{
+                  border: filterStatus === key ? "2px solid rgba(15,23,42,0.12)" : "1px solid rgba(148,163,184,0.16)",
+                  background: bg,
+                  color,
+                  borderRadius: 20,
+                  padding: "16px 14px",
+                  cursor: "pointer",
+                  boxShadow: filterStatus === key ? "0 14px 28px rgba(15,23,42,0.08)" : "none",
+                }}
+              >
+                <div style={{ fontSize: 24, fontWeight: 900 }}>{stats[key]}</div>
+                <div style={{ fontSize: 12, fontWeight: 800, marginTop: 4 }}>{label}</div>
+              </button>
+            ))}
+          </div>
+
+          {error && (
+            <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626", borderRadius: 16, padding: "14px 18px", marginBottom: 18 }}>
+              {error}
+            </div>
+          )}
+
+          {filteredOrders.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "70px 24px", borderRadius: 24, background: "rgba(255,255,255,0.82)", border: "1px dashed rgba(148,163,184,0.28)" }}>
+              <ShoppingBag size={48} color="#cbd5e1" style={{ marginBottom: 14 }} />
+              <p style={{ margin: 0, color: "#64748b", fontSize: 18, fontWeight: 700 }}>{t("adminOrders.noOrders")}</p>
+            </div>
+          ) : (
+            <div style={{ display: "grid", gap: 18 }}>
+              {filteredOrders.map((order) => {
+                const orderId = order.id || order._id;
+                return (
+                  <article
+                    key={orderId}
+                    style={{
+                      borderRadius: 26,
+                      overflow: "hidden",
+                      background: "linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.92))",
+                      border: "1px solid rgba(148,163,184,0.16)",
+                      boxShadow: "0 18px 38px rgba(15,23,42,0.08)",
+                    }}
+                  >
+                    {order.isCompleted && <CompletedBanner />}
+
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 16, flexWrap: "wrap", padding: "18px 20px", background: "rgba(248,250,252,0.88)", borderBottom: "1px solid rgba(148,163,184,0.12)" }}>
+                      <div style={{ display: "flex", gap: 22, flexWrap: "wrap", alignItems: "center" }}>
+                        <div>
+                          <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em" }}>Sifariş tarixi</div>
+                          <div style={{ marginTop: 4, fontSize: 15, fontWeight: 800, color: "#0f172a" }}>
+                            {new Date(order.createdAt).toLocaleDateString("az-AZ", { day: "2-digit", month: "long", year: "numeric" })}
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em" }}>Ümumi məbləğ</div>
+                          <div style={{ marginTop: 4, fontSize: 24, fontWeight: 900, color: "#e8192c", letterSpacing: "-0.04em" }}>
+                            {order.totalAmount?.toFixed(2)} ₼
+                          </div>
+                        </div>
+                        <StatusBadge status={order.orderStatus} />
+                      </div>
+
+                      <StatusDropdown
+                        orderId={orderId}
+                        currentStatus={order.orderStatus}
+                        isCompleted={order.isCompleted}
+                        onUpdate={handleStatusUpdate}
+                        updating={updatingId === orderId}
+                      />
+                    </div>
+
+                    <div style={{ padding: "18px 20px", display: "grid", gap: 12 }}>
+                      {order.orderItems?.map((item, index) => (
+                        <div key={index} style={{ display: "grid", gridTemplateColumns: "64px minmax(0,1fr) auto", gap: 14, alignItems: "center", padding: "10px 0", borderBottom: index === order.orderItems.length - 1 ? "none" : "1px solid rgba(148,163,184,0.1)" }}>
+                          <div style={{ width: 64, height: 64, borderRadius: 18, overflow: "hidden", background: "#f1f5f9", border: "1px solid rgba(148,163,184,0.14)" }}>
+                            <img
+                              src={item.image || "/placeholder.svg"}
+                              alt={item.name}
+                              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                              onError={(e) => { e.target.src = "/placeholder.svg"; }}
+                            />
+                          </div>
+                          <div style={{ minWidth: 0 }}>
+                            <p style={{ margin: 0, fontWeight: 800, fontSize: 15, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.name}</p>
+                            <p style={{ margin: "4px 0 0", fontSize: 12, color: "#64748b" }}>Say: {item.quantity}</p>
+                          </div>
+                          <p style={{ margin: 0, fontWeight: 900, fontSize: 15, color: "#0f172a", whiteSpace: "nowrap" }}>
+                            {(item.price * item.quantity).toFixed(2)} ₼
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div style={{ padding: "14px 20px", background: "rgba(248,250,252,0.88)", borderTop: "1px solid rgba(148,163,184,0.12)" }}>
+                      <p style={{ margin: 0, fontSize: 11, color: "#94a3b8" }}>
+                        Sifariş № <span style={{ fontFamily: "monospace" }}>{orderId}</span>
+                      </p>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
+  );
 };
 
 export default AdminOrders;

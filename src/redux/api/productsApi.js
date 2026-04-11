@@ -25,7 +25,7 @@ const baseQueryWithAuth = async (args, api, extraOptions) => {
 export const productApi = createApi({
   reducerPath: "productApi",
   baseQuery: baseQueryWithAuth,
-  tagTypes: ["Cart", "Favorites", "Products", "Reviews"],
+  tagTypes: ["Cart", "Favorites", "Products", "Reviews", "SellerReviews"],
   endpoints: (builder) => ({
 
     getProducts: builder.query({
@@ -165,6 +165,25 @@ export const productApi = createApi({
       query: (id) => `/products/${id}/reviews`,
       providesTags: ["Reviews"],
     }),
+
+    // ── SATICI RƏY / REYTİNQ ─────────────────────────────────────────
+    getSellerReviews: builder.query({
+      query: (sellerId) => `/seller/${sellerId}/reviews`,
+      providesTags: (result, error, sellerId) => [{ type: "SellerReviews", id: sellerId }],
+    }),
+
+    checkCanReview: builder.query({
+      query: (sellerId) => `/seller/${sellerId}/can-review`,
+    }),
+
+    createOrUpdateSellerReview: builder.mutation({
+      query: ({ sellerId, rating, comment }) => ({
+        url:    `/seller/${sellerId}/review`,
+        method: "PUT",
+        body:   { rating, comment },
+      }),
+      invalidatesTags: (result, error, { sellerId }) => [{ type: "SellerReviews", id: sellerId }],
+    }),
   }),
 });
 
@@ -185,4 +204,7 @@ export const {
   useGetFilteredProductsQuery,
   useCreateOrUpdateReviewMutation,
   useGetProductReviewsQuery,
+  useGetSellerReviewsQuery,
+  useCheckCanReviewQuery,
+  useCreateOrUpdateSellerReviewMutation,
 } = productApi;

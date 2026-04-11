@@ -80,7 +80,7 @@ const Testimonials = () => {
         {/* Scroll to Top Button */}
         <button 
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-8 right-8 bg-black text-white p-4 rounded-full shadow-lg hover:bg-gray-800 transition-colors duration-300"
+          className="fixed bottom-8 right-8 bg-[#E8192C] text-white p-4 rounded-full shadow-lg hover:bg-[#b8001e] transition-colors duration-300"
           aria-label="Scroll to top"
         >
           <ChevronUp className="w-6 h-6" />

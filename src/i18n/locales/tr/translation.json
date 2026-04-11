@@ -750,5 +750,56 @@
     "gifts_trending": "Trend Ürünler",
     "gifts_books": "Kitaplar",
     "allSubcategories": "Tümü"
+  },
+  "storesList": {
+    "title": "Tüm Mağazalar",
+    "foundCount": "mağaza bulundu",
+    "sortedByRating": "puana göre sıralandı",
+    "sortBy": "Sıralama:",
+    "sortRating": "Puan",
+    "sortName": "İsim",
+    "noRating": "Yorum yok",
+    "labelGood": "İyi",
+    "labelAvg": "Orta",
+    "labelWeak": "Zayıf",
+    "viewStore": "Mağazaya git →",
+    "products": "ürün",
+    "noStores": "Mağaza bulunamadı",
+    "loading": "Yükleniyor..."
+  },
+  "notFound": {
+    "title": "Sayfa bulunamadı",
+    "desc": "Aradığınız sayfa mevcut değil veya taşınmış.",
+    "backHome": "Ana sayfaya dön"
+  },
+  "adminOrders": {
+    "title": "Mağaza Siparişleri",
+    "refresh": "Yenile",
+    "noOrders": "Bu durumda sipariş yok",
+    "pending": "Bekliyor",
+    "processing": "Hazırlanıyor",
+    "shipped": "Gönderildi",
+    "delivered": "Teslim Edildi",
+    "completed": "Tamamlandı",
+    "orderCompleted": "Sipariş tamamlandı",
+    "changeStatus": "Durumu Değiştir",
+    "updating": "Güncelleniyor...",
+    "deliveredNote": "Sipariş sonlandırılacak — geri alınamaz",
+    "currentStatus": "Mevcut",
+    "products": "ürün"
+  },
+  "myOrders": {
+    "title": "Siparişlerim",
+    "noOrders": "Henüz siparişiniz yok",
+    "noOrdersDesc": "Alışveriş yaptıktan sonra siparişleriniz burada görünecek",
+    "ordersFound": "sipariş bulundu",
+    "ordersWillAppear": "Siparişleriniz burada görünecek",
+    "completed": "Sipariş tamamlandı",
+    "downloadReceipt": "Makbuzu indir",
+    "pending": "Bekliyor",
+    "processing": "Hazırlanıyor",
+    "shipped": "Gönderildi",
+    "delivered": "Teslim Edildi",
+    "total": "Toplam"
   }
 }
